@@ -67,7 +67,7 @@ contract FundingVault is Ownable {
     constructor(
         address _fundingToken,
         address _votingToken,
-        address _votingPowerToken,
+        // address _votingPowerToken,
         uint256 _minRequestableAmount,
         uint256 _maxRequestableAmount,
         uint256 _tallyDate,
@@ -85,13 +85,13 @@ contract FundingVault is Ownable {
         if(_maxRequestableAmount <= _minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }
-        if(_fundingToken == address(0) || _votingToken == address(0) || _votingPowerToken == address(0)){
+        if(_fundingToken == address(0) || _votingToken == address(0) /*|| _votingPowerToken == address(0)*/){
             revert FundingVault__CannotBeAZeroAddress();
         }
         i_tallyDate = _tallyDate;
         i_fundingToken = IERC20(_fundingToken);
         i_votingToken = IERC20(_votingToken);
-        i_votingPowerToken = IERC20(_votingPowerToken);
+        // i_votingPowerToken = IERC20(_votingPowerToken);
         s_minRequestableAmount = _minRequestableAmount;
         s_maxRequestableAmount = _maxRequestableAmount;
     }
