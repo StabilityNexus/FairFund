@@ -15,8 +15,8 @@ pragma solidity ^0.8.20;
  *
  * layout of functions
  * constructor
- * receive function (if exists)
- * fallback function (if exists)
+ * receive function 
+ * fallback function 
  * external functions
  * public functions
  * internal functions
@@ -61,6 +61,9 @@ contract FundingVault is Ownable {
 
     mapping(address proposer => uint256[] proposalIds) private s_proposerToProposalIds;
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
+
+    // Events //
+    event FundingTokenDeposited(address indexed from, uint256 indexed amount);
 
 
     // Functions //
@@ -119,6 +122,7 @@ contract FundingVault is Ownable {
             revert FundingVault__AmountCannotBeZero();
         }
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
+        emit FundingTokenDeposited(msg.sender, _amount);
     }
 
     /**
@@ -146,6 +150,26 @@ contract FundingVault is Ownable {
 
     function distributeFunds(uint256 _proposalId) external {
         // TODO
+    }
+
+    function getMinRequestableAmount() public view returns (uint256) {
+        return s_minRequestableAmount;
+    }
+
+    function getMaxRequestableAmount() public view returns (uint256) {
+        return s_maxRequestableAmount;
+    }
+
+    function getTallyDate() public view returns (uint256) {
+        return i_tallyDate;
+    }
+
+    function getFundingToken() public view returns (address) {
+        return address(i_fundingToken);
+    }
+
+    function getVotingToken() public view returns (address) {
+        return address(i_votingToken);
     }
 
 }
