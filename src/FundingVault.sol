@@ -15,8 +15,8 @@ pragma solidity ^0.8.20;
  *
  * layout of functions
  * constructor
- * receive function 
- * fallback function 
+ * receive function
+ * fallback function
  * external functions
  * public functions
  * internal functions
@@ -25,13 +25,11 @@ pragma solidity ^0.8.20;
  * pure functions
  * getters
  */
-
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FundingVault is Ownable {
-
     // Errors //
     error FundingVault__AmountCannotBeZero();
     error FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
@@ -40,6 +38,9 @@ contract FundingVault is Ownable {
     error FundingVault__TallyDateCannotBeInThePast();
     error FundingVault__MetadataCannotBeEmpty();
     error FundingVault__AmountExceededsLimit();
+    error FundingVault__ProposalDoesNotExist();
+    error FundingVault__AlreadyVoted();
+    error FundingVault__TallyDateNotPassed();
 
     // Type Declarations //
     struct Proposal {
@@ -65,12 +66,22 @@ contract FundingVault is Ownable {
 
     mapping(address proposer => uint256[] proposalIds) private s_proposerToProposalIds;
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
+    mapping(uint256 proposalId => uint256 votes) private s_votes;
+
+    mapping(address voter => bool status) private s_voterStatus;
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
     event RegisteredVoter(address indexed voter, uint256 indexed amount);
     event ProposalSubmitted(address indexed proposer, uint256 indexed proposalId);
+    event VotedOnProposal(address indexed voter, uint256 indexed proposalId, uint256 indexed amount);
 
+    modifier tallyDatePassed() {
+        if (block.timestamp < i_tallyDate) {
+            revert FundingVault__TallyDateNotPassed();
+        }
+        _;
+    }
 
     // Functions //
     constructor(
@@ -82,19 +93,19 @@ contract FundingVault is Ownable {
         uint256 _tallyDate,
         address _owner
     ) Ownable(_owner) {
-        if(_tallyDate < block.timestamp){
+        if (_tallyDate < block.timestamp) {
             revert FundingVault__TallyDateCannotBeInThePast();
         }
-        if(_minRequestableAmount > _maxRequestableAmount){
+        if (_minRequestableAmount > _maxRequestableAmount) {
             revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
-        if(_maxRequestableAmount <= 0){
+        if (_maxRequestableAmount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
-        if(_maxRequestableAmount <= _minRequestableAmount) {
+        if (_maxRequestableAmount <= _minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }
-        if(_fundingToken == address(0) || _votingToken == address(0) || _votingPowerToken == address(0)){
+        if (_fundingToken == address(0) || _votingToken == address(0) || _votingPowerToken == address(0)) {
             revert FundingVault__CannotBeAZeroAddress();
         }
         i_tallyDate = _tallyDate;
@@ -105,26 +116,25 @@ contract FundingVault is Ownable {
         s_maxRequestableAmount = _maxRequestableAmount;
     }
 
-
     function setMinRequestableAmount(uint256 _minRequestableAmount) public onlyOwner {
-        if(_minRequestableAmount > s_maxRequestableAmount){
+        if (_minRequestableAmount > s_maxRequestableAmount) {
             revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
         s_minRequestableAmount = _minRequestableAmount;
     }
 
     function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
-        if(_maxRequestableAmount <= 0){
+        if (_maxRequestableAmount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
-        if(_maxRequestableAmount <= s_minRequestableAmount) {
+        if (_maxRequestableAmount <= s_minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }
         s_maxRequestableAmount = _maxRequestableAmount;
     }
 
     function deposit(uint256 _amount) public {
-        if(_amount <= 0){
+        if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
@@ -136,25 +146,28 @@ contract FundingVault is Ownable {
      * @param _amount The amount of votingTokens to lock in order to receive votingPowerTokens
      */
     function register(uint256 _amount) public {
-        if(_amount <= 0){
+        if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
         i_votingToken.transferFrom(msg.sender, address(this), _amount);
         i_votingPowerToken.mint(msg.sender, _amount);
+
         emit RegisteredVoter(msg.sender, _amount);
     }
 
-    function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient) public {
-        if(bytes(_metadata).length == 0){
+    function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient)
+        public
+    {
+        if (bytes(_metadata).length == 0) {
             revert FundingVault__MetadataCannotBeEmpty();
         }
-        if(_minimumAmount <= s_minRequestableAmount || _maximumAmount >= s_maxRequestableAmount){
+        if (_minimumAmount <= s_minRequestableAmount || _maximumAmount >= s_maxRequestableAmount) {
             revert FundingVault__AmountExceededsLimit();
         }
-        if(_minimumAmount > _maximumAmount){
+        if (_minimumAmount > _maximumAmount) {
             revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
-        if(_recipient == address(0)){
+        if (_recipient == address(0)) {
             revert FundingVault__CannotBeAZeroAddress();
         }
         s_proposalIdCounter++;
@@ -164,15 +177,56 @@ contract FundingVault is Ownable {
     }
 
     function voteOnProposal(uint256 _proposalId, uint256 _amount) public {
-        // TODO
+        if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
+            revert FundingVault__ProposalDoesNotExist();
+        }
+        uint256 votingPower = i_votingPowerToken.balanceOf(msg.sender);
+
+        if (s_voterStatus[msg.sender]) {
+            revert FundingVault__AlreadyVoted();
+        }
+        i_votingPowerToken.transferFrom(msg.sender, address(this), _amount);
+
+        if (_amount > votingPower) {
+            revert FundingVault__AmountExceededsLimit();
+        }
+        s_votes[_proposalId] += _amount;
+        emit VotedOnProposal(msg.sender, _proposalId, _amount);
     }
 
-    function calculateFundingToBeReceived(uint256 _proposalId) public view returns (uint256) {
-        // TODO
+    function calculateFundingToBeReceived(uint256 _proposalId) public view tallyDatePassed returns (uint256) {
+        if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
+            revert FundingVault__ProposalDoesNotExist();
+        }
+        uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
+        uint256 totalBalance = i_fundingToken.balanceOf(address(this));
+        uint256 totalVotes = s_votes[_proposalId];
+
+        Proposal memory proposal = s_proposals[_proposalId];
+
+        uint256 transferable = totalBalance * (totalVotes / totalVotingPowerTokens);
+
+        bool isProposalAccepted = transferable >= proposal.minimumAmount;
+
+        if (isProposalAccepted) {
+            if (transferable > proposal.maximumAmount) {
+                return proposal.maximumAmount;
+            } else {
+                return transferable;
+            }
+        } else {
+            return 0;
+        }
     }
 
-    function distributeFunds(uint256 _proposalId) external {
-        // TODO
+    function distributeFunds() external tallyDatePassed {
+        for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
+            uint256 amount = calculateFundingToBeReceived(i);
+            Proposal memory proposal = s_proposals[i];
+            if (amount > 0) {
+                i_fundingToken.transfer(proposal.recipient, amount);
+            }
+        }
     }
 
     function getMinRequestableAmount() public view returns (uint256) {
@@ -194,5 +248,4 @@ contract FundingVault is Ownable {
     function getVotingToken() public view returns (address) {
         return address(i_votingToken);
     }
-
 }
