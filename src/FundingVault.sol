@@ -27,6 +27,7 @@ pragma solidity ^0.8.20;
  */
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FundingVault is Ownable {
@@ -37,6 +38,8 @@ contract FundingVault is Ownable {
     error FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
     error FundingVault__CannotBeAZeroAddress();
     error FundingVault__TallyDateCannotBeInThePast();
+    error FundingVault__MetadataCannotBeEmpty();
+    error FundingVault__AmountExceededsLimit();
 
     // Type Declarations //
     struct Proposal {
@@ -47,9 +50,10 @@ contract FundingVault is Ownable {
     }
 
     // State Variables //
+    uint256 private s_proposalIdCounter;
     IERC20 private immutable i_fundingToken;
     IERC20 private immutable i_votingToken;
-    IERC20 private immutable i_votingPowerToken;
+    VotingPowerToken private immutable i_votingPowerToken;
 
     uint256 private s_minRequestableAmount;
     uint256 private s_maxRequestableAmount;
@@ -64,13 +68,15 @@ contract FundingVault is Ownable {
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
+    event RegisteredVoter(address indexed voter, uint256 indexed amount);
+    event ProposalSubmitted(address indexed proposer, uint256 indexed proposalId);
 
 
     // Functions //
     constructor(
         address _fundingToken,
         address _votingToken,
-        // address _votingPowerToken,
+        address _votingPowerToken,
         uint256 _minRequestableAmount,
         uint256 _maxRequestableAmount,
         uint256 _tallyDate,
@@ -88,13 +94,13 @@ contract FundingVault is Ownable {
         if(_maxRequestableAmount <= _minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }
-        if(_fundingToken == address(0) || _votingToken == address(0) /*|| _votingPowerToken == address(0)*/){
+        if(_fundingToken == address(0) || _votingToken == address(0) || _votingPowerToken == address(0)){
             revert FundingVault__CannotBeAZeroAddress();
         }
         i_tallyDate = _tallyDate;
         i_fundingToken = IERC20(_fundingToken);
         i_votingToken = IERC20(_votingToken);
-        // i_votingPowerToken = IERC20(_votingPowerToken);
+        i_votingPowerToken = VotingPowerToken(_votingPowerToken);
         s_minRequestableAmount = _minRequestableAmount;
         s_maxRequestableAmount = _maxRequestableAmount;
     }
@@ -133,11 +139,28 @@ contract FundingVault is Ownable {
         if(_amount <= 0){
             revert FundingVault__AmountCannotBeZero();
         }
-        // TODO
+        i_votingToken.transferFrom(msg.sender, address(this), _amount);
+        i_votingPowerToken.mint(msg.sender, _amount);
+        emit RegisteredVoter(msg.sender, _amount);
     }
 
     function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient) public {
-        // TODO
+        if(bytes(_metadata).length == 0){
+            revert FundingVault__MetadataCannotBeEmpty();
+        }
+        if(_minimumAmount <= s_minRequestableAmount || _maximumAmount >= s_maxRequestableAmount){
+            revert FundingVault__AmountExceededsLimit();
+        }
+        if(_minimumAmount > _maximumAmount){
+            revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
+        }
+        if(_recipient == address(0)){
+            revert FundingVault__CannotBeAZeroAddress();
+        }
+        s_proposalIdCounter++;
+        s_proposals[s_proposalIdCounter] = Proposal(_metadata, _minimumAmount, _maximumAmount, _recipient);
+        s_proposerToProposalIds[msg.sender].push(s_proposalIdCounter);
+        emit ProposalSubmitted(msg.sender, s_proposalIdCounter);
     }
 
     function voteOnProposal(uint256 _proposalId, uint256 _amount) public {
