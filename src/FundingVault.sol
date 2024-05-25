@@ -29,6 +29,21 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+/**
+ * @title FundingVault
+ * @author Aditya Bhattad
+ * @notice  A contract that allows users to deposit funds and vote on proposals, after voting ends anyone can call distributeFunds to distribute the funds to the proposals
+ * Whether a proposal is selected for receiving funds is decided using this formula:
+ * Let:
+ * `V(p)` be the number of votingPowerTokens assigned to proposal `p`
+ * `S` be the total supply of votingPowerTokens
+ * `R` be the vault's balance of fundingTokens
+ *
+ * A proposal `p` is accepted iff `R * V(p)/S >= p.minimumAmount`.
+ *
+ * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
+ * The funding to be received by a rejected proposal `p` is `0`.
+ */
 contract FundingVault is Ownable {
     // Errors //
     error FundingVault__AmountCannotBeZero();
@@ -67,6 +82,7 @@ contract FundingVault is Ownable {
     mapping(address proposer => uint256[] proposalIds) private s_proposerToProposalIds;
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
     mapping(uint256 proposalId => uint256 votes) private s_votes;
+    mapping(address voter => uint256 lockedVotingTokens) private s_lockedVotingTokens;
 
     mapping(address voter => bool status) private s_voterStatus;
 
@@ -75,6 +91,7 @@ contract FundingVault is Ownable {
     event RegisteredVoter(address indexed voter, uint256 indexed amount);
     event ProposalSubmitted(address indexed proposer, uint256 indexed proposalId);
     event VotedOnProposal(address indexed voter, uint256 indexed proposalId, uint256 indexed amount);
+    event ReleasedTokens(address indexed voter, uint256 indexed amount);
 
     modifier tallyDatePassed() {
         if (block.timestamp < i_tallyDate) {
@@ -84,6 +101,17 @@ contract FundingVault is Ownable {
     }
 
     // Functions //
+
+
+    /**
+     * @param _fundingToken The token that will be used to fund the proposals
+     * @param _votingToken The token that will be locked against voting power tokens, which allows the user to vote on proposals
+     * @param _votingPowerToken The token that will be minted when a user locks their voting tokens
+     * @param _minRequestableAmount The minimum amount of token that can be requested in proposal
+     * @param _maxRequestableAmount The maximum amount of token that can be requested in proposal
+     * @param _tallyDate The date in which the tally will be taken as seconds since unix epoch
+     * @param _owner The owner of the contract
+     */
     constructor(
         address _fundingToken,
         address _votingToken,
@@ -116,6 +144,10 @@ contract FundingVault is Ownable {
         s_maxRequestableAmount = _maxRequestableAmount;
     }
 
+    /**
+     * @param _minRequestableAmount The minimum amount of token that can be requested in proposal
+     * @notice Only the owner can call this function
+     */
     function setMinRequestableAmount(uint256 _minRequestableAmount) public onlyOwner {
         if (_minRequestableAmount > s_maxRequestableAmount) {
             revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
@@ -123,6 +155,10 @@ contract FundingVault is Ownable {
         s_minRequestableAmount = _minRequestableAmount;
     }
 
+    /**
+     * @param _maxRequestableAmount The maximum amount of token that can be requested in proposal
+     * @notice Only the owner can call this function
+     */
     function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
         if (_maxRequestableAmount <= 0) {
             revert FundingVault__AmountCannotBeZero();
@@ -133,11 +169,16 @@ contract FundingVault is Ownable {
         s_maxRequestableAmount = _maxRequestableAmount;
     }
 
+    /**
+     * @dev Allows users to deposit fundingToken into the vault
+     * @param _amount The amount of fundingToken to deposit
+     */
     function deposit(uint256 _amount) public {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
+        s_lockedVotingTokens[msg.sender] += _amount;
         emit FundingTokenDeposited(msg.sender, _amount);
     }
 
@@ -149,12 +190,20 @@ contract FundingVault is Ownable {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
+
         i_votingToken.transferFrom(msg.sender, address(this), _amount);
         i_votingPowerToken.mint(msg.sender, _amount);
 
         emit RegisteredVoter(msg.sender, _amount);
     }
 
+    /**
+     * @dev Allows users to submit a proposal
+     * @param _metadata The metadata of the proposal
+     * @param _minimumAmount The minimum amount of fundingToken requested 
+     * @param _maximumAmount The maximum amount of fundingToken requested
+     * @param _recipient The address that will receive the fundingToken if the proposal is accepted
+     */
     function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient)
         public
     {
@@ -176,28 +225,42 @@ contract FundingVault is Ownable {
         emit ProposalSubmitted(msg.sender, s_proposalIdCounter);
     }
 
+    /**
+     * @dev Allows users to vote on a proposal
+     * @param _proposalId The id of the proposal to vote on
+     * @param _amount The amount of votingToken to vote with
+     */
     function voteOnProposal(uint256 _proposalId, uint256 _amount) public {
         if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
             revert FundingVault__ProposalDoesNotExist();
         }
         uint256 votingPower = i_votingPowerToken.balanceOf(msg.sender);
-
-        if (s_voterStatus[msg.sender]) {
-            revert FundingVault__AlreadyVoted();
-        }
-        i_votingPowerToken.transferFrom(msg.sender, address(this), _amount);
-
         if (_amount > votingPower) {
             revert FundingVault__AmountExceededsLimit();
         }
+        i_votingPowerToken.transferFrom(msg.sender, address(this), _amount);
         s_votes[_proposalId] += _amount;
         emit VotedOnProposal(msg.sender, _proposalId, _amount);
     }
 
+    /**
+     * @dev Calculates the amount of fundingToken to be received by a proposal
+     * @param _proposalId The id of the proposal to calculate the funding for
+     * @return The amount of fundingToken to be received by the proposal
+     */
     function calculateFundingToBeReceived(uint256 _proposalId) public view tallyDatePassed returns (uint256) {
         if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
             revert FundingVault__ProposalDoesNotExist();
         }
+        /**
+         * Let:
+         * `V(p)` be the number of votingPowerTokens assigned to proposal `p`
+         * `S` be the total supply of votingPowerTokens
+         * `R` be the vault's balance of fundingTokens
+         * A proposal `p` is accepted iff `R * V(p)/S >= p.minimumAmount`.
+         * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
+         * The funding to be received by a rejected proposal `p` is `0`.
+         */
         uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
         uint256 totalBalance = i_fundingToken.balanceOf(address(this));
         uint256 totalVotes = s_votes[_proposalId];
@@ -219,6 +282,10 @@ contract FundingVault is Ownable {
         }
     }
 
+    /**
+     * @dev Distributes the funds to the proposals
+     * @notice Can only be called after the tally date has passed
+     */
     function distributeFunds() external tallyDatePassed {
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
@@ -229,6 +296,21 @@ contract FundingVault is Ownable {
         }
     }
 
+    /**
+     * @dev Allows users to release their votingToken after the tally date has passed
+     * @notice Can only be called after the tally date has passed
+     */
+    function releaseTokens() public {
+        if (block.timestamp < i_tallyDate) {
+            revert FundingVault__TallyDateNotPassed();
+        }
+        uint256 votingPower = i_votingPowerToken.balanceOf(msg.sender);
+        i_votingPowerToken.burn(msg.sender, votingPower);
+        i_votingToken.transfer(msg.sender, votingPower);
+        emit ReleasedTokens(msg.sender, votingPower);
+    }
+
+    // Getters //
     function getMinRequestableAmount() public view returns (uint256) {
         return s_minRequestableAmount;
     }
