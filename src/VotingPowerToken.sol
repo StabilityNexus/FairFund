@@ -1,6 +1,31 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
+/**
+ * Layout of the contract
+ * version
+ * imports
+ * errors
+ * interfaces, libraries, and contracts
+ * type declarations
+ * state variables
+ * events
+ * modifiers
+ * functions
+ *
+ * layout of functions
+ * constructor
+ * receive function
+ * fallback function
+ * external functions
+ * public functions
+ * internal functions
+ * private functions
+ * view functions
+ * pure functions
+ * getters
+ */
+
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 

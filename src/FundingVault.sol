@@ -45,6 +45,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * The funding to be received by a rejected proposal `p` is `0`.
  */
 contract FundingVault is Ownable {
+
     // Errors //
     error FundingVault__AmountCannotBeZero();
     error FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();

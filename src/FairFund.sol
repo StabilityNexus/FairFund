@@ -1,11 +1,42 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
+/**
+ * Layout of the contract
+ * version
+ * imports
+ * errors
+ * interfaces, libraries, and contracts
+ * type declarations
+ * state variables
+ * events
+ * modifiers
+ * functions
+ *
+ * layout of functions
+ * constructor
+ * receive function
+ * fallback function
+ * external functions
+ * public functions
+ * internal functions
+ * private functions
+ * view functions
+ * pure functions
+ * getters
+ */
+
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {FundingVault} from "./FundingVault.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 
+
+/**
+ * @title FairFund
+ * @author Aditya Bhattad
+ * @notice This is the main FairFund contract that will be used for deployment and keeping track of all the funding vaults.
+ */
 contract FairFund is Ownable {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
@@ -15,12 +46,26 @@ contract FairFund is Ownable {
 
     // State Variables //
     uint256 private s_fundingVaultIdCounter;
+    mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
 
     // Events //
     event FundingVaultDeployed(address fundingVault);
 
+    // Functions //
+
+    /**
+     * @notice Sets the deployer of the contract as the owner
+     */
     constructor() Ownable(msg.sender) {}
 
+    /**
+     * @param _fundingToken The token that will be used to fund the proposals
+     * @param _votingToken The token that will be used to vote on the proposals
+     * @param _minRequestableAmount The minimum amount that can be requested for a single proposal from the funding vault
+     * @param _maxRequestableAmount The maximum amount that can be requested for a single proposal from the funding vault
+     * @param _tallyDate The date when the voting will end and the proposals will be tallied
+     * @param _owner The address of the owner of the funding vault, this address will be able to modify minimum and maximum requestable amounts
+     */
     function deployFundingVault(
         address _fundingToken,
         address _votingToken,
@@ -29,6 +74,7 @@ contract FairFund is Ownable {
         uint256 _tallyDate,
         address _owner
     ) external {
+
         if (_fundingToken == address(0) || _votingToken == address(0) || _owner == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
@@ -54,6 +100,17 @@ contract FairFund is Ownable {
             _owner
         );
         votingPowerToken.transferOwnership(address(fundingVault));
+        s_fundingVaults[fundingVaultId] = address(fundingVault);
         emit FundingVaultDeployed(address(fundingVault));
     }
+
+    // Getters //
+    function getFundingVault(uint256 _fundingVaultId) external view returns (address) {
+        return s_fundingVaults[_fundingVaultId];
+    }
+
+    function getTotalNumberOfFundingVaults() external view returns (uint256) {
+        return s_fundingVaultIdCounter;
+    }
+
 }
