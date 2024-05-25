@@ -51,7 +51,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
     error FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
     error FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
     error FundingVault__CannotBeAZeroAddress();
-    error FundingVault__TallyDateCannotBeInThePast();
     error FundingVault__MetadataCannotBeEmpty();
     error FundingVault__AmountExceededsLimit();
     error FundingVault__ProposalDoesNotExist();
@@ -120,21 +119,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
         uint256 _tallyDate,
         address _owner
     ) Ownable(_owner) {
-        if (_tallyDate < block.timestamp) {
-            revert FundingVault__TallyDateCannotBeInThePast();
-        }
-        if (_minRequestableAmount > _maxRequestableAmount) {
-            revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
-        }
-        if (_maxRequestableAmount <= 0) {
-            revert FundingVault__AmountCannotBeZero();
-        }
-        if (_maxRequestableAmount <= _minRequestableAmount) {
-            revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
-        }
-        if (_fundingToken == address(0) || _votingToken == address(0) || _votingPowerToken == address(0)) {
-            revert FundingVault__CannotBeAZeroAddress();
-        }
         i_tallyDate = _tallyDate;
         i_fundingToken = IERC20(_fundingToken);
         i_votingToken = IERC20(_votingToken);

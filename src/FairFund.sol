@@ -38,8 +38,8 @@ contract FairFund {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
     error FairFund__TallyDateCannotBeInThePast();
-    error FairFund__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
     error FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
+    error FairFund__MaxRequestableAmountCannotBeZero();
 
     // State Variables //
     uint256 private s_fundingVaultIdCounter;
@@ -75,7 +75,10 @@ contract FairFund {
         if (_minRequestableAmount > _maxRequestableAmount) {
             revert FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
-
+        if(_maxRequestableAmount == 0) {
+            revert FairFund__MaxRequestableAmountCannotBeZero();
+        }
+        
         s_fundingVaultIdCounter++;
         uint256 fundingVaultId = s_fundingVaultIdCounter;
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);
