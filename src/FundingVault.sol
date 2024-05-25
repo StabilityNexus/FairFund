@@ -327,4 +327,8 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function getVotingToken() public view returns (address) {
         return address(i_votingToken);
     }
+
+    function getVotingPowerToken() public view returns (address) {
+        return address(i_votingPowerToken);
+    }
 }

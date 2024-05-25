@@ -6,10 +6,9 @@ import {FairFund} from "../src/FairFund.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 
 contract DeployFairFund is Script {
-    function run() external returns(FairFund fairFund,HelperConfig helperConfig){
-
+    function run() external returns (FairFund fairFund, HelperConfig helperConfig) {
         helperConfig = new HelperConfig();
-        (uint256 deployerKey) = helperConfig.activeNetworkConfig();   
+        (uint256 deployerKey) = helperConfig.activeNetworkConfig();
 
         vm.startBroadcast(deployerKey);
         fairFund = new FairFund();

@@ -25,7 +25,6 @@ pragma solidity ^0.8.20;
  * pure functions
  * getters
  */
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {FundingVault} from "./FundingVault.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
@@ -35,7 +34,7 @@ import {VotingPowerToken} from "./VotingPowerToken.sol";
  * @author Aditya Bhattad
  * @notice This is the main FairFund contract that will be used for deployment and keeping track of all the funding vaults.
  */
-contract FairFund is Ownable {
+contract FairFund {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
     error FairFund__TallyDateCannotBeInThePast();
@@ -47,14 +46,9 @@ contract FairFund is Ownable {
     mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
 
     // Events //
-    event FundingVaultDeployed(address fundingVault);
+    event FundingVaultDeployed(address indexed fundingVault);
 
     // Functions //
-
-    /**
-     * @notice Sets the deployer of the contract as the owner
-     */
-    constructor() Ownable(msg.sender) {}
 
     /**
      * @param _fundingToken The token that will be used to fund the proposals
@@ -81,6 +75,7 @@ contract FairFund is Ownable {
         if (_minRequestableAmount > _maxRequestableAmount) {
             revert FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
+
         s_fundingVaultIdCounter++;
         uint256 fundingVaultId = s_fundingVaultIdCounter;
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);
