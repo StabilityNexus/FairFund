@@ -25,12 +25,10 @@ pragma solidity ^0.8.20;
  * pure functions
  * getters
  */
-
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {FundingVault} from "./FundingVault.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
-
 
 /**
  * @title FairFund
@@ -74,7 +72,6 @@ contract FairFund is Ownable {
         uint256 _tallyDate,
         address _owner
     ) external {
-
         if (_fundingToken == address(0) || _votingToken == address(0) || _owner == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
@@ -112,5 +109,4 @@ contract FairFund is Ownable {
     function getTotalNumberOfFundingVaults() external view returns (uint256) {
         return s_fundingVaultIdCounter;
     }
-
 }

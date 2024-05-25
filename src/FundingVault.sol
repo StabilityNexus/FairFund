@@ -45,8 +45,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
  * The funding to be received by a rejected proposal `p` is `0`.
  */
-contract FundingVault is Ownable,ReentrancyGuard{
-
+contract FundingVault is Ownable, ReentrancyGuard {
     // Errors //
     error FundingVault__AmountCannotBeZero();
     error FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
@@ -102,7 +101,6 @@ contract FundingVault is Ownable,ReentrancyGuard{
     }
 
     // Functions //
-
 
     /**
      * @param _fundingToken The token that will be used to fund the proposals
@@ -200,7 +198,7 @@ contract FundingVault is Ownable,ReentrancyGuard{
     /**
      * @dev Allows users to submit a proposal
      * @param _metadata The metadata of the proposal
-     * @param _minimumAmount The minimum amount of fundingToken requested 
+     * @param _minimumAmount The minimum amount of fundingToken requested
      * @param _maximumAmount The maximum amount of fundingToken requested
      * @param _recipient The address that will receive the fundingToken if the proposal is accepted
      */
