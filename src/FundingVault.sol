@@ -240,7 +240,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
          * `V(p)` be the number of votingPowerTokens assigned to proposal `p`
          * `S` be the total supply of votingPowerTokens
          * `R` be the vault's balance of fundingTokens
-         * A proposal `p` is accepted iff `R * V(p)/S >= p.minimumAmount`.
+         * A proposal `p` is accepted iff `R * V(p)/S >= p.minimumAmount (bug: What if proposer sets the minimum amount to zero, their proposal will always get accepted)`.
          * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
          * The funding to be received by a rejected proposal `p` is `0`.
          */
@@ -292,6 +292,21 @@ contract FundingVault is Ownable, ReentrancyGuard {
     }
 
     // Getters //
+    function getProposal(uint256 _proposalId)
+        public
+        view
+        returns (
+            string memory,
+            uint256,
+            uint256,
+            address
+        )
+    {
+        Proposal memory proposal = s_proposals[_proposalId];
+        return (proposal.metadata, proposal.minimumAmount, proposal.maximumAmount, proposal.recipient);
+    }
+
+
     function getMinRequestableAmount() public view returns (uint256) {
         return s_minRequestableAmount;
     }
