@@ -27,6 +27,7 @@ pragma solidity ^0.8.20;
  */
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -44,7 +45,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
  * The funding to be received by a rejected proposal `p` is `0`.
  */
-contract FundingVault is Ownable {
+contract FundingVault is Ownable,ReentrancyGuard{
 
     // Errors //
     error FundingVault__AmountCannotBeZero();
@@ -83,7 +84,6 @@ contract FundingVault is Ownable {
     mapping(address proposer => uint256[] proposalIds) private s_proposerToProposalIds;
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
     mapping(uint256 proposalId => uint256 votes) private s_votes;
-    mapping(address voter => uint256 lockedVotingTokens) private s_lockedVotingTokens;
 
     mapping(address voter => bool status) private s_voterStatus;
 
@@ -174,12 +174,11 @@ contract FundingVault is Ownable {
      * @dev Allows users to deposit fundingToken into the vault
      * @param _amount The amount of fundingToken to deposit
      */
-    function deposit(uint256 _amount) public {
+    function deposit(uint256 _amount) public nonReentrant {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
-        s_lockedVotingTokens[msg.sender] += _amount;
         emit FundingTokenDeposited(msg.sender, _amount);
     }
 
@@ -187,7 +186,7 @@ contract FundingVault is Ownable {
      * @dev locks votingToken from the user and mints votingPowerToken
      * @param _amount The amount of votingTokens to lock in order to receive votingPowerTokens
      */
-    function register(uint256 _amount) public {
+    function register(uint256 _amount) public nonReentrant {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
@@ -207,6 +206,7 @@ contract FundingVault is Ownable {
      */
     function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient)
         public
+        nonReentrant
     {
         if (bytes(_metadata).length == 0) {
             revert FundingVault__MetadataCannotBeEmpty();
@@ -231,7 +231,7 @@ contract FundingVault is Ownable {
      * @param _proposalId The id of the proposal to vote on
      * @param _amount The amount of votingToken to vote with
      */
-    function voteOnProposal(uint256 _proposalId, uint256 _amount) public {
+    function voteOnProposal(uint256 _proposalId, uint256 _amount) public nonReentrant {
         if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
             revert FundingVault__ProposalDoesNotExist();
         }
@@ -287,7 +287,7 @@ contract FundingVault is Ownable {
      * @dev Distributes the funds to the proposals
      * @notice Can only be called after the tally date has passed
      */
-    function distributeFunds() external tallyDatePassed {
+    function distributeFunds() external nonReentrant tallyDatePassed {
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
             Proposal memory proposal = s_proposals[i];
@@ -301,11 +301,9 @@ contract FundingVault is Ownable {
      * @dev Allows users to release their votingToken after the tally date has passed
      * @notice Can only be called after the tally date has passed
      */
-    function releaseTokens() public {
-        if (block.timestamp < i_tallyDate) {
-            revert FundingVault__TallyDateNotPassed();
-        }
+    function releaseVotingTokens() public nonReentrant tallyDatePassed {
         uint256 votingPower = i_votingPowerToken.balanceOf(msg.sender);
+        i_votingPowerToken.transferFrom(msg.sender, address(this), votingPower);
         i_votingPowerToken.burn(msg.sender, votingPower);
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
