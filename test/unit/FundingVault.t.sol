@@ -16,9 +16,7 @@ contract MockERC20 is ERC20 {
     }
 }
 
-
 contract FundingVaultTest is Test {
-
     FundingVault fundingVault;
     MockERC20 fundingToken;
     MockERC20 votingToken;

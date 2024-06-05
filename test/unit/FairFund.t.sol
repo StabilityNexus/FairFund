@@ -69,7 +69,7 @@ contract FairFundTest is Test {
     }
 
     function testSuccessfullDeploymentEmitEvent() external {
-        vm.expectEmit(false,false,false,false);
+        vm.expectEmit(false, false, false, false);
         emit FundingVaultDeployed(address(0));
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
     }

@@ -75,10 +75,10 @@ contract FairFund {
         if (_minRequestableAmount > _maxRequestableAmount) {
             revert FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
         }
-        if(_maxRequestableAmount == 0) {
+        if (_maxRequestableAmount == 0) {
             revert FairFund__MaxRequestableAmountCannotBeZero();
         }
-        
+
         s_fundingVaultIdCounter++;
         uint256 fundingVaultId = s_fundingVaultIdCounter;
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);

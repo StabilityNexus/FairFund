@@ -292,20 +292,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
     }
 
     // Getters //
-    function getProposal(uint256 _proposalId)
-        public
-        view
-        returns (
-            string memory,
-            uint256,
-            uint256,
-            address
-        )
-    {
+    function getProposal(uint256 _proposalId) public view returns (string memory, uint256, uint256, address) {
         Proposal memory proposal = s_proposals[_proposalId];
         return (proposal.metadata, proposal.minimumAmount, proposal.maximumAmount, proposal.recipient);
     }
-
 
     function getMinRequestableAmount() public view returns (uint256) {
         return s_minRequestableAmount;
