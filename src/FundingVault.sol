@@ -57,6 +57,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     error FundingVault__ProposalDoesNotExist();
     error FundingVault__AlreadyVoted();
     error FundingVault__TallyDateNotPassed();
+    error FundingVault__NotEnoughBalance();
 
     // Type Declarations //
     struct Proposal {
@@ -171,6 +172,9 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function register(uint256 _amount) public nonReentrant {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
+        }
+        if(i_votingToken.balanceOf(msg.sender) < _amount) {
+            revert FundingVault__NotEnoughBalance();
         }
         i_votingToken.transferFrom(msg.sender, address(this), _amount);
         i_votingPowerToken.mint(msg.sender, _amount);
@@ -289,6 +293,9 @@ contract FundingVault is Ownable, ReentrancyGuard {
      */
     function releaseVotingTokens() public nonReentrant tallyDatePassed {
         uint256 votingPower = s_voterToVotingTokens[msg.sender];
+        if(votingPower <= 0) {
+            revert FundingVault__AmountCannotBeZero();
+        }
         s_voterToVotingTokens[msg.sender] = 0;
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
