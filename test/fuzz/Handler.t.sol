@@ -54,7 +54,7 @@ contract Handler is Test {
     function voteOnProposal(uint256 seed, uint96 proposalId, uint96 amount) public {
         address user = getValidVoter(seed);
         bound(amount, 0, votingToken.balanceOf(address(user)));
-        bound(proposalId,1, fundingVault.getTotalProposals());
+        bound(proposalId, 1, fundingVault.getTotalProposals());
         vm.startPrank(user);
         fundingVault.voteOnProposal(proposalId, amount);
         vm.stopPrank();

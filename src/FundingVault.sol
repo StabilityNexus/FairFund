@@ -306,6 +306,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
         return (proposal.metadata, proposal.minimumAmount, proposal.maximumAmount, proposal.recipient);
     }
 
+    function getProposalIdsByProposer(address _proposer) public view returns (uint256[] memory) {
+        return s_proposerToProposalIds[_proposer];
+    }
+
     function getTotalProposals() public view returns (uint256) {
         return s_proposalIdCounter;
     }

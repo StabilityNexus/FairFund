@@ -44,10 +44,10 @@ $$0$$
 
 #### Smart Contract Development
 - [x] Create a README.
-- [ ] Update the smart contracts.
+- [x] Update the smart contracts.
 - [x] Conduct unit tests.
-- [ ] Conduct stateless and stateful fuzz testing.
-- [ ] Perform basic security review.
+- [x] Conduct stateless and stateful fuzz testing.
+- [x] Perform basic security review.
 
 #### Off-Chain Development
 - [ ] Set up a Next.js project.
