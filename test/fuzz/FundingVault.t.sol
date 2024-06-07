@@ -16,7 +16,6 @@ contract MockERC20 is ERC20 {
     }
 }
 
-
 contract FundingVaultTest is Test {
     FundingVault fundingVault;
     MockERC20 fundingToken;
@@ -74,5 +73,4 @@ contract FundingVaultTest is Test {
         assertEq(votingPowerToken.balanceOf(address(this)), _amount);
         assertEq(fundingVault.getVotingPowerOf(address(this)), _amount);
     }
-
 }

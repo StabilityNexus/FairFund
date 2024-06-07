@@ -19,35 +19,35 @@ contract FairFundTest is Test {
         (fairFund, helperConfig) = deployFairFund.run();
     }
 
-    function testDeployFairFund() external view {
+    function testDeployFairFund() public view {
         console.log("FairFund address: ", address(fairFund));
         console.log("HelperConfig address: ", address(helperConfig));
         assertTrue(address(fairFund) != address(0), "FairFund should be deployed");
         assertTrue(address(helperConfig) != address(0), "HelperConfig should be deployed");
     }
 
-    function testDeployFundingVaultZeroAddress() external {
+    function testDeployFundingVaultZeroAddress() public {
         vm.expectRevert(FairFund.FairFund__CannotBeAZeroAddress.selector);
         fairFund.deployFundingVault(address(0), address(1), 1, 10, block.timestamp + 1 days, address(1));
     }
 
-    function testDeployFundingVaultTallyDateInPast() external {
+    function testDeployFundingVaultTallyDateInPast() public {
         vm.warp(100 days);
         vm.expectRevert(FairFund.FairFund__TallyDateCannotBeInThePast.selector);
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp - 1 days, address(1));
     }
 
-    function testDeployFundingVaultMinGreaterThanMax() external {
+    function testDeployFundingVaultMinGreaterThanMax() public {
         vm.expectRevert(FairFund.FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount.selector);
         fairFund.deployFundingVault(address(1), address(1), 10, 1, block.timestamp + 1 days, address(1));
     }
 
-    function testDeployFundingVaultSuccess() external {
+    function testDeployFundingVaultSuccess() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         assertEq(fairFund.getTotalNumberOfFundingVaults(), 1);
     }
 
-    function testVotingTokenNameAndSymbol() external {
+    function testVotingTokenNameAndSymbol() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
         VotingPowerToken votingToken = VotingPowerToken(fundingVault.getVotingPowerToken());
@@ -55,31 +55,31 @@ contract FairFundTest is Test {
         assertEq(votingToken.symbol(), "VOTE_1");
     }
 
-    function testVotingPowerTokenOwnership() external {
+    function testVotingPowerTokenOwnership() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
         VotingPowerToken votingToken = VotingPowerToken(fundingVault.getVotingPowerToken());
         assertEq(votingToken.owner(), address(fundingVault));
     }
 
-    function testFundingVaultOwnership() external {
+    function testFundingVaultOwnership() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
         assertEq(fundingVault.owner(), address(1));
     }
 
-    function testSuccessfullDeploymentEmitEvent() external {
+    function testSuccessfullDeploymentEmitEvent() public {
         vm.expectEmit(false, false, false, false);
         emit FundingVaultDeployed(address(0));
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
     }
 
-    function testGetFundingVault() external {
+    function testGetFundingVault() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         assertEq(fairFund.getFundingVault(1), fairFund.getFundingVault(1));
     }
 
-    function testGetTotalNumberOfFundingVaults() external {
+    function testGetTotalNumberOfFundingVaults() public {
         fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
         assertEq(fairFund.getTotalNumberOfFundingVaults(), 1);
     }
