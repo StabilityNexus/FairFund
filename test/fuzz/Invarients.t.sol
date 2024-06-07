@@ -10,7 +10,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {MockERC20} from "../mocks/MockERC20.sol";
 import {Handler} from "./Handler.t.sol";
 
-
 contract InvarientsTest is StdInvariant, Test {
     FundingVault fundingVault;
     MockERC20 fundingToken;
@@ -33,16 +32,15 @@ contract InvarientsTest is StdInvariant, Test {
             owner
         );
         votingPowerToken.transferOwnership(address(fundingVault));
-        handler = new Handler(
-            address(fundingToken),
-            address(votingToken),
-            address(votingPowerToken),
-            address(fundingVault)
-        );
+        handler =
+            new Handler(address(fundingToken), address(votingToken), address(votingPowerToken), address(fundingVault));
         targetContract(address(handler));
     }
 
-    function invariant_totalSupplyOfVotingTokenMustAlwaysBeEqualToTotalVotingTokensLockedInSmartContract() public view {
+    function invariant_totalSupplyOfVotingTokenMustAlwaysBeEqualToTotalVotingTokensLockedInSmartContract()
+        public
+        view
+    {
         assertEq(votingToken.balanceOf(address(fundingVault)), votingPowerToken.totalSupply());
     }
 }

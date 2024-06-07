@@ -295,6 +295,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
             revert FundingVault__AmountCannotBeZero();
         }
         s_voterToVotingTokens[msg.sender] = 0;
+        i_votingPowerToken.burn(msg.sender, votingPower);
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
     }
@@ -303,6 +304,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function getProposal(uint256 _proposalId) public view returns (string memory, uint256, uint256, address) {
         Proposal memory proposal = s_proposals[_proposalId];
         return (proposal.metadata, proposal.minimumAmount, proposal.maximumAmount, proposal.recipient);
+    }
+
+    function getTotalProposals() public view returns (uint256) {
+        return s_proposalIdCounter;
     }
 
     function getMinRequestableAmount() public view returns (uint256) {

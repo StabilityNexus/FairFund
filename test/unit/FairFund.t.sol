@@ -6,7 +6,7 @@ import {DeployFairFund} from "../../script/DeployFairFund.s.sol";
 import {FairFund} from "../../src/FairFund.sol";
 import {FundingVault} from "../../src/FundingVault.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
 contract FairFundTest is Test {
     HelperConfig helperConfig;
@@ -20,8 +20,6 @@ contract FairFundTest is Test {
     }
 
     function testDeployFairFund() public view {
-        console.log("FairFund address: ", address(fairFund));
-        console.log("HelperConfig address: ", address(helperConfig));
         assertTrue(address(fairFund) != address(0), "FairFund should be deployed");
         assertTrue(address(helperConfig) != address(0), "HelperConfig should be deployed");
     }
