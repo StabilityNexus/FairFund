@@ -29,7 +29,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {console} from "forge-std/console.sol";
 
 /**
  * @title FundingVault
@@ -173,7 +172,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
-        if(i_votingToken.balanceOf(msg.sender) < _amount) {
+        if (i_votingToken.balanceOf(msg.sender) < _amount) {
             revert FundingVault__NotEnoughBalance();
         }
         i_votingToken.transferFrom(msg.sender, address(this), _amount);
@@ -279,7 +278,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function distributeFunds() external nonReentrant tallyDatePassed {
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
-            console.log("Amount to be received by proposal %d is %d", i, amount);
             Proposal memory proposal = s_proposals[i];
             if (amount > 0) {
                 i_fundingToken.transfer(proposal.recipient, amount);
@@ -293,7 +291,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
      */
     function releaseVotingTokens() public nonReentrant tallyDatePassed {
         uint256 votingPower = s_voterToVotingTokens[msg.sender];
-        if(votingPower <= 0) {
+        if (votingPower <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
         s_voterToVotingTokens[msg.sender] = 0;

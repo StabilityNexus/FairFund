@@ -215,7 +215,7 @@ contract FundingVaultTest is Test {
         votingToken.mint(randomUser, 10 ether);
         votingToken.approve(address(fundingVault), 10 ether);
         fundingVault.register(10 ether);
-        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        fundingVault.submitProposal("<Proposal Link>", 3 ether, 5 ether, address(randomUser));
         votingPowerToken.approve(address(fundingVault), 5 ether);
         fundingVault.voteOnProposal(1, 1 ether);
         vm.stopPrank();
@@ -228,12 +228,12 @@ contract FundingVaultTest is Test {
         assertEq(fundingVault.calculateFundingToBeReceived(1), 0);
     }
 
-    function testFailCalculateFundingToBeReceivedWithoutTallyDatePassed() public {
+    function testCalculateFundingToBeReceivedWithoutTallyDatePassed() public {
         vm.expectRevert(FundingVault.FundingVault__TallyDateNotPassed.selector);
         fundingVault.calculateFundingToBeReceived(1);
     }
 
-    function testFailCalculateFundingToBeReceived() public {
+    function testCalculateFundingToBeReceivedWithInvalidProposal() public {
         vm.expectRevert(FundingVault.FundingVault__ProposalDoesNotExist.selector);
 
         // fast forward time to pass the tally date
@@ -283,12 +283,12 @@ contract FundingVaultTest is Test {
         assertEq(fundingVault.getVotingPowerOf(msg.sender), 0);
     }
 
-    function testFailReleaseVotingTokens() public {
+    function testReleaseVotingTokensWithoutTallyData() public {
         vm.expectRevert(FundingVault.FundingVault__TallyDateNotPassed.selector);
         fundingVault.releaseVotingTokens();
     }
 
-    function testFailReleaseVotingTokensWhenNoVotingPower() public {
+    function testReleaseVotingTokensWhenNoVotingPower() public {
         // Setup
         vm.startPrank(randomUser);
         votingToken.mint(randomUser, 10 ether);
