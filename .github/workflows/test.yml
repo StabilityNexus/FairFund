@@ -1,6 +1,9 @@
 name: test
 
-on: push
+on:
+  push:
+    paths:
+      - 'app/blockchain/**'
 
 env:
   FOUNDRY_PROFILE: ci
@@ -12,6 +15,11 @@ jobs:
 
     name: Foundry project
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: app/blockchain
+
     steps:
       - uses: actions/checkout@v4
         with:
