@@ -53,8 +53,8 @@ contract FairFund {
     /**
      * @param _fundingToken The token that will be used to fund the proposals
      * @param _votingToken The token that will be used to vote on the proposals
-     * @param _minRequestableAmount The minimum amount that can be requested for a single proposal from the funding vault
-     * @param _maxRequestableAmount The maximum amount that can be requested for a single proposal from the funding vault
+     * @param _minRequestableAmount The minimum amount that can be requested by a single proposal from the funding vault
+     * @param _maxRequestableAmount The maximum amount that can be requested by a single proposal from the funding vault
      * @param _tallyDate The date when the voting will end and the proposals will be tallied
      * @param _owner The address of the owner of the funding vault, this address will be able to modify minimum and maximum requestable amounts
      */

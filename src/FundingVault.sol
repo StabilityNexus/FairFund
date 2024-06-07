@@ -29,6 +29,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {console} from "forge-std/console.sol";
 
 /**
  * @title FundingVault
@@ -82,8 +83,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     mapping(address proposer => uint256[] proposalIds) private s_proposerToProposalIds;
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
     mapping(uint256 proposalId => uint256 votes) private s_votes;
-
-    mapping(address voter => bool status) private s_voterStatus;
+    mapping(address voter => uint256 amountOfVotingTokens) private s_voterToVotingTokens;
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
@@ -172,9 +172,9 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
-
         i_votingToken.transferFrom(msg.sender, address(this), _amount);
         i_votingPowerToken.mint(msg.sender, _amount);
+        s_voterToVotingTokens[msg.sender] += _amount;
 
         emit RegisteredVoter(msg.sender, _amount);
     }
@@ -246,11 +246,14 @@ contract FundingVault is Ownable, ReentrancyGuard {
          */
         uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
         uint256 totalBalance = i_fundingToken.balanceOf(address(this));
-        uint256 totalVotes = s_votes[_proposalId];
+        // Floating point adjustment:
+        // 1.totalVotes is multiplied by 1e18 to avoid rounding errors
+        // 2.transferable is divided by 1e18 to get the actual amount
+        uint256 totalVotes = s_votes[_proposalId] * 1e18;
 
         Proposal memory proposal = s_proposals[_proposalId];
 
-        uint256 transferable = totalBalance * (totalVotes / totalVotingPowerTokens);
+        uint256 transferable = (totalBalance * (totalVotes / totalVotingPowerTokens)) / 1e18;
 
         bool isProposalAccepted = transferable >= proposal.minimumAmount;
 
@@ -272,6 +275,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function distributeFunds() external nonReentrant tallyDatePassed {
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
+            console.log("Amount to be received by proposal %d is %d", i, amount);
             Proposal memory proposal = s_proposals[i];
             if (amount > 0) {
                 i_fundingToken.transfer(proposal.recipient, amount);
@@ -284,9 +288,8 @@ contract FundingVault is Ownable, ReentrancyGuard {
      * @notice Can only be called after the tally date has passed
      */
     function releaseVotingTokens() public nonReentrant tallyDatePassed {
-        uint256 votingPower = i_votingPowerToken.balanceOf(msg.sender);
-        i_votingPowerToken.transferFrom(msg.sender, address(this), votingPower);
-        i_votingPowerToken.burn(msg.sender, votingPower);
+        uint256 votingPower = s_voterToVotingTokens[msg.sender];
+        s_voterToVotingTokens[msg.sender] = 0;
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
     }
@@ -319,5 +322,9 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     function getVotingPowerToken() public view returns (address) {
         return address(i_votingPowerToken);
+    }
+
+    function getVotingPowerOf(address _voter) public view returns (uint256) {
+        return s_voterToVotingTokens[_voter];
     }
 }

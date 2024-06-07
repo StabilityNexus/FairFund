@@ -35,7 +35,7 @@ contract VotingPowerToken is ERC20, Ownable {
         _mint(_to, _amount);
     }
 
-    function burn(address _from, uint256 _amount) external onlyOwner {
-        _burn(_from, _amount);
+    function burn(uint256 _amount) external onlyOwner {
+        _burn(msg.sender, _amount);
     }
 }
