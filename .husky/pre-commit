@@ -1,3 +1,6 @@
 cd app/blockchain 
 forge fmt
 forge compile
+
+cd ../../app/web-app
+npm run lint

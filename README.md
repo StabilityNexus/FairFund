@@ -40,7 +40,7 @@ $$\min(p.\text{maximumAmount}, R \times \frac{V(p)}{S})$$
 The funding to be received by a rejected proposal `p` is:
 $$0$$
 
-### Action Items / Road Map
+### Roadmap
 
 #### Smart Contract Development
 - [x] Create a README.
@@ -50,7 +50,7 @@ $$0$$
 - [x] Perform basic security review.
 
 #### Off-Chain Development
-- [ ] Set up a Next.js project.
+- [x] Set up a Next.js project.
 - [ ] Design a database schema (Sponsor, Proposer, Proposal, Funding Vault, etc.).
 - [ ] Implement sponsor and proposer registration (Sign Up and Sign In).
 - [ ] Implement functionality to connect a wallet to an existing account.
