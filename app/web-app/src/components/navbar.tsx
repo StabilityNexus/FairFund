@@ -3,6 +3,7 @@
 import Link from "next/link";
 import VoteIcon from "@/components/vote-icon";
 import { Button } from "./ui/button";
+import ConnectWalletButton from "./connect-wallet-button";
 
 
 export default function Navbar(){
@@ -17,9 +18,7 @@ export default function Navbar(){
                     </h1>
                 </Link>
                 <div className="flex items-center gap-x-3">
-                    <Button size="sm" >
-                        Connect
-                    </Button>
+                    <ConnectWalletButton/>
                 </div>
         </div>
     )

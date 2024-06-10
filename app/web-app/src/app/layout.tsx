@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google"
 import "@/app/globals.css";
 import { cn } from "@/lib/utils";
+import { config } from "@/wagmi/config";
+import Web3ModalProvider from "@/wagmi/context";
+import { cookieToInitialState } from 'wagmi'
+import { headers } from "next/headers";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -18,13 +22,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialState = cookieToInitialState(config, headers().get('cookie'))
   return (
     <html lang="en">
       <body className={cn(
           "min-h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}>
-        {children}
+         <Web3ModalProvider initialState={initialState}>{children}</Web3ModalProvider>
       </body>
     </html>
   );
