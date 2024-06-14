@@ -23,7 +23,7 @@ function isWalletConnected(){
 
 export default function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
-    if(path==='/'){
+    if(path==='/' || path.startsWith('/api')){
         return NextResponse.next();
     }
     if (isPathAllowed(path)) {    

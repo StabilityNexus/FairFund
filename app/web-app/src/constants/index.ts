@@ -1,6 +1,6 @@
 export const fairFund: SmartContract = {
-    address: "0x66b04c2d28042dc8efa9e512de8145374b930f37",
-    abi: [
+    address: "0x2bd5008dbb949aDF563A781000a7B2858F631591",
+    abi:  [
         {
             "type": "function",
             "name": "deployFundingVault",
@@ -36,7 +36,13 @@ export const fairFund: SmartContract = {
                     "internalType": "address"
                 }
             ],
-            "outputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
             "stateMutability": "nonpayable"
         },
         {

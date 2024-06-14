@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button";
-import { writeContract } from '@wagmi/core'
+import { writeContract, simulateContract } from '@wagmi/core'
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { parseUnits } from 'viem'
 import { fairFund } from "@/constants";
+import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
 
 const createVaultFormSchema = z.object({
@@ -65,7 +66,7 @@ export default function VaultForm() {
             const unixTime = getUnixTime(data.tallyDate);
             const minRequestableAmount = parseUnits(data.minRequestableAmount, 18);
             const maxRequestableAmount = parseUnits(data.maxRequestableAmount, 18);
-            const result = await writeContract(wagmiConfig, {
+            const {result,request} = await simulateContract(wagmiConfig, {
                 // @ts-ignore
                 address: fairFund.address,
                 abi: fairFund.abi,
@@ -79,17 +80,25 @@ export default function VaultForm() {
                     address
                 ]
             })
-            if (result) {
+            const hash = await writeContract(wagmiConfig, request)
+            await axios.post('/api/vault/new', {
+                description:'TODO',
+                creatorAddress:address,
+                amountFundingTokens:0,
+                amountVotingTokens:0
+            })
+            if (hash) {
                 toast({
                     title: "Funding vault created",
                     description: (
                         <div className="truncate">
                             <p>Your funding vault has been created successfully.</p>
-                            <p>transaction hash: <a href={`https://sepolia.etherscan.io/tx/${result}`} target="_blank" rel="noopener noreferrer">{result}</a></p>
+                            <p>transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{result}</a></p>
                         </div>
                     ),
                 })
             }
+            
         } catch (err) {
             toast({
                 variant: 'destructive',
