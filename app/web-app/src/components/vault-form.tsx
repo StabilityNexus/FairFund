@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button";
-import { useWriteContract } from 'wagmi'
+import { writeContract } from '@wagmi/core'
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { parseUnits } from 'viem'
 import { fairFund } from "@/constants";
-import { sepolia } from "wagmi/chains";
+import { config as wagmiConfig } from "@/wagmi/config";
 
 const createVaultFormSchema = z.object({
     fundingTokenAddress: z.string({
@@ -44,19 +44,14 @@ const createVaultFormSchema = z.object({
 export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const {
-        data: hash,
-        isPending,
-        writeContract
-    } = useWriteContract()
     const { toast } = useToast()
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
-        defaultValues:{
-            fundingTokenAddress:'0xabc...',
-            votingTokenAddress:'0xefg...',
-            minRequestableAmount:'0',
-            maxRequestableAmount:'0',
+        defaultValues: {
+            fundingTokenAddress: '0xabc...',
+            votingTokenAddress: '0xefg...',
+            minRequestableAmount: '0',
+            maxRequestableAmount: '0',
         }
     });
     const isLoading = form.formState.isLoading;
@@ -68,39 +63,45 @@ export default function VaultForm() {
                 return;
             }
             const unixTime = getUnixTime(data.tallyDate);
-            writeContract({
+            const minRequestableAmount = parseUnits(data.minRequestableAmount, 18);
+            const maxRequestableAmount = parseUnits(data.maxRequestableAmount, 18);
+            const result = await writeContract(wagmiConfig, {
                 // @ts-ignore
                 address: fairFund.address,
-                abi:fairFund.abi,
-                functionName:'deployFundingVault',
-                args:[
+                abi: fairFund.abi,
+                functionName: 'deployFundingVault',
+                args: [
                     data.fundingTokenAddress,
                     data.votingTokenAddress,
-                    parseUnits(data.minRequestableAmount,18),
-                    parseUnits(data.maxRequestableAmount,18),
+                    minRequestableAmount,
+                    maxRequestableAmount,
                     unixTime,
                     address
                 ]
-                
             })
-            if(hash){
+            if (result) {
                 toast({
-                   title:"Funding vault created",
-                   description:`Transaction hash: ${hash}`, 
+                    title: "Funding vault created",
+                    description: (
+                        <div className="truncate">
+                            <p>Your funding vault has been created successfully.</p>
+                            <p>transaction hash: <a href={`https://sepolia.etherscan.io/tx/${result}`} target="_blank" rel="noopener noreferrer">{result}</a></p>
+                        </div>
+                    ),
                 })
             }
         } catch (err) {
             toast({
-                variant:'destructive',
-                title:'Error creating vault',
-                description:'Something went wrong. Please try again.'          
+                variant: 'destructive',
+                title: 'Error creating vault',
+                description: 'Something went wrong. Please try again.'
             })
             console.log('[VAULT FORM]: Error creating vault: ', err);
         }
     }
 
 
-    return ( 
+    return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-10">

@@ -65,7 +65,7 @@ contract FairFund {
         uint256 _maxRequestableAmount,
         uint256 _tallyDate,
         address _owner
-    ) external {
+    ) external returns(address){
         if (_fundingToken == address(0) || _votingToken == address(0) || _owner == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
@@ -97,6 +97,7 @@ contract FairFund {
         votingPowerToken.transferOwnership(address(fundingVault));
         s_fundingVaults[fundingVaultId] = address(fundingVault);
         emit FundingVaultDeployed(address(fundingVault));
+        return address(fundingVault);
     }
 
     // Getters //

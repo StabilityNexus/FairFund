@@ -7,7 +7,7 @@ declare interface Route{
 }
 
 
-declare interface FairFund{
+declare interface SmartContract{
     address:string;
     abi:any;
 }
