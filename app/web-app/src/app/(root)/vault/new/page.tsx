@@ -1,9 +1,7 @@
+import VaultForm from "@/components/vault-form";
+
 export default function NewVaultPage(){
     return (
-        <div>
-            <h1>
-                New Vault.
-            </h1>
-        </div>
+        <VaultForm/>
     );
 }
