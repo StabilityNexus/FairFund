@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns"
+import { format, getUnixTime } from "date-fns"
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -15,8 +15,13 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button";
+import { useWriteContract } from 'wagmi'
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { parseUnits } from 'viem'
+import { fairFund } from "@/constants";
+import { sepolia } from "wagmi/chains";
 
 const createVaultFormSchema = z.object({
     fundingTokenAddress: z.string({
@@ -25,10 +30,10 @@ const createVaultFormSchema = z.object({
     votingTokenAddress: z.string({
         required_error: 'Voting Token Address is required.'
     }),
-    minRequestableAmount: z.number({
+    minRequestableAmount: z.string({
         required_error: 'Minimum Requestable Amount is required.'
     }),
-    maxRequestableAmount: z.number({
+    maxRequestableAmount: z.string({
         required_error: 'Maximum Requestable Amount is required.'
     }),
     tallyDate: z.date({
@@ -39,26 +44,63 @@ const createVaultFormSchema = z.object({
 export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
+    const {
+        data: hash,
+        isPending,
+        writeContract
+    } = useWriteContract()
+    const { toast } = useToast()
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
+        defaultValues:{
+            fundingTokenAddress:'0xabc...',
+            votingTokenAddress:'0xefg...',
+            minRequestableAmount:'0',
+            maxRequestableAmount:'0',
+        }
     });
     const isLoading = form.formState.isLoading;
+
 
     async function handleSubmit(data: z.infer<typeof createVaultFormSchema>) {
         try {
             if (!isConnected || !address) {
                 return;
             }
-            console.log('[VAULT FORM]: Creating vault with data: ', data);
-
+            const unixTime = getUnixTime(data.tallyDate);
+            writeContract({
+                // @ts-ignore
+                address: fairFund.address,
+                abi:fairFund.abi,
+                functionName:'deployFundingVault',
+                args:[
+                    data.fundingTokenAddress,
+                    data.votingTokenAddress,
+                    parseUnits(data.minRequestableAmount,18),
+                    parseUnits(data.maxRequestableAmount,18),
+                    unixTime,
+                    address
+                ]
+                
+            })
+            if(hash){
+                toast({
+                   title:"Funding vault created",
+                   description:`Transaction hash: ${hash}`, 
+                })
+            }
         } catch (err) {
-            // TODO: add toast
+            toast({
+                variant:'destructive',
+                title:'Error creating vault',
+                description:'Something went wrong. Please try again.'          
+            })
             console.log('[VAULT FORM]: Error creating vault: ', err);
         }
     }
 
 
-    return (
+    return ( 
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-10">
@@ -132,7 +174,7 @@ export default function VaultForm() {
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Minimum amount here..."
+                                                placeholder="Minimum amount (in ETH)"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -156,7 +198,7 @@ export default function VaultForm() {
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Maximum amount here..."
+                                                placeholder="Maximum amount (in ETH)"
                                                 {...field}
                                             />
                                         </FormControl>

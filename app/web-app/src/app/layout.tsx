@@ -6,6 +6,7 @@ import { config } from "@/wagmi/config";
 import Web3ModalProvider from "@/wagmi/context";
 import { cookieToInitialState } from 'wagmi'
 import { headers } from "next/headers";
+import { Toaster } from "@/components/ui/toaster"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
           fontSans.variable
         )}>
          <Web3ModalProvider initialState={initialState}>{children}</Web3ModalProvider>
+         <Toaster />
       </body>
     </html>
   );
