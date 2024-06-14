@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import VoteIcon from "@/components/vote-icon";
-import { Button } from "./ui/button";
 import ConnectWalletButton from "./connect-wallet-button";
 
 

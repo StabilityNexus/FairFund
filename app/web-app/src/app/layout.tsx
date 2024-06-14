@@ -23,6 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialState = cookieToInitialState(config, headers().get('cookie'))
+  
   return (
     <html lang="en">
       <body className={cn(
