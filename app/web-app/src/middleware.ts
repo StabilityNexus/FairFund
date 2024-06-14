@@ -23,7 +23,10 @@ function isWalletConnected(){
 
 export default function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
-    if (isPathAllowed(path)) {
+    if(path==='/'){
+        return NextResponse.next();
+    }
+    if (isPathAllowed(path)) {    
         if (path.startsWith('/dashboard/') && path.length > '/dashboard/'.length) {
             return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
         }
