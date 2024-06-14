@@ -15,7 +15,7 @@ export default function MobileNavbar() {
                 <DropdownMenuContent className="space-y-2" >
                     {routes.map((route) => {
                         return (
-                            <DropdownMenuItem className="py-4">
+                            <DropdownMenuItem className="py-4" key={route.href}>
                                 <Link href={route.href} className="flex flex-row">
                                     <route.icon className="h-5 w-5 mr-3" />
                                     {route.label}

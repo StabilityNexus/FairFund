@@ -5,3 +5,9 @@ declare interface Route{
     href: string;
     label: string;
 }
+
+
+declare interface FairFund{
+    address:string;
+    abi:any;
+}
