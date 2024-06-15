@@ -21,6 +21,7 @@ model FundingVault {
   creatorAddress      String
   amountFundingTokens Int
   amountVotingTokens  Int
+  vaultAddress        String
   proposals           Proposal[]
 
   @@index([creatorAddress])
