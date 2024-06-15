@@ -23,8 +23,12 @@ import { parseUnits } from 'viem'
 import { fairFund } from "@/constants";
 import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
+import { Textarea } from "./ui/textarea";
 
 const createVaultFormSchema = z.object({
+    description: z.string({
+        required_error: 'Description is required.'
+    }),
     fundingTokenAddress: z.string({
         required_error: 'Funding Token Address is required.'
     }),
@@ -49,10 +53,11 @@ export default function VaultForm() {
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
-            fundingTokenAddress: '0xabc...',
-            votingTokenAddress: '0xefg...',
-            minRequestableAmount: '0',
-            maxRequestableAmount: '0',
+            description: '',
+            fundingTokenAddress: '',
+            votingTokenAddress: '',
+            minRequestableAmount: '',
+            maxRequestableAmount: '',
         }
     });
     const isLoading = form.formState.isLoading;
@@ -66,6 +71,7 @@ export default function VaultForm() {
             const unixTime = getUnixTime(data.tallyDate);
             const minRequestableAmount = parseUnits(data.minRequestableAmount, 18);
             const maxRequestableAmount = parseUnits(data.maxRequestableAmount, 18);
+
             const {result,request} = await simulateContract(wagmiConfig, {
                 // @ts-ignore
                 address: fairFund.address,
@@ -82,7 +88,7 @@ export default function VaultForm() {
             })
             const hash = await writeContract(wagmiConfig, request)
             await axios.post('/api/vault/new', {
-                description:'TODO',
+                description:data.description,
                 creatorAddress:address,
                 amountFundingTokens:0,
                 amountVotingTokens:0
@@ -91,14 +97,14 @@ export default function VaultForm() {
                 toast({
                     title: "Funding vault created",
                     description: (
-                        <div className="truncate">
-                            <p>Your funding vault has been created successfully.</p>
-                            <p>transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{result}</a></p>
+                        <div className="w-[80%] md:w-[340px]">
+                                <p>Your funding vault has been created successfully.</p>
+                                <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
                         </div>
                     ),
                 })
             }
-            
+
         } catch (err) {
             toast({
                 variant: 'destructive',
@@ -123,6 +129,33 @@ export default function VaultForm() {
                         </p>
                     </div>
                     <Separator className="bg-primary/10" />
+                    <div className="space-y-2 w-full">
+                        <FormField
+                            name="description"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Description
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                className="bg-background resize-none"
+                                                rows={6}
+                                                disabled={isLoading}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            A short description of the funding vault (this won't be stored on chain).
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )
+                            }}
+                        />
+                    </div>
                     <div className="grid grid-col-1 md:grid-cols-2 gap-4">
                         <FormField
                             name="fundingTokenAddress"
