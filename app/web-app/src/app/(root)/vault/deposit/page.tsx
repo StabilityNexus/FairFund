@@ -16,7 +16,9 @@ export default async function DepositPage({
     return (
         <>
             <DepositTokensForm
+                vaultId={vault!.id}
                 vaultAddress={vault!.vaultAddress}
+                fundingTokenAddress={vault!.fundingTokenAddress}
             />
         </>
     )
