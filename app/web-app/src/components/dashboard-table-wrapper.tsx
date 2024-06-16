@@ -32,23 +32,31 @@ export default async function TableWrapper() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {vaults.map((vault) => (
-                    <TableRow key={vault.id} >
-                        <TableCell>{vault.id}</TableCell>
-                        <TableCell>{vault.description}</TableCell>
-                        <TableCell className="truncate">{vault.creatorAddress}</TableCell>
-                        <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
-                        <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
-                        <TableCell>
-                            <Badge variant="secondary">
-                                <Link className="cursor-pointer p-1 flex gap-1" href={`/vault/${vault.id}`}>
-                                    More
-                                    <MoveUpRight className="h-4 w-4" />
-                                </Link>
-                            </Badge>
+                {vaults.length > 0 ? (
+                    vaults.map((vault) => (
+                        <TableRow key={vault.id} >
+                            <TableCell>{vault.id}</TableCell>
+                            <TableCell>{vault.description}</TableCell>
+                            <TableCell className="truncate">{vault.creatorAddress}</TableCell>
+                            <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
+                            <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
+                            <TableCell>
+                                <Badge variant="secondary">
+                                    <Link className="cursor-pointer p-1 flex gap-1" href={`/vault/${vault.id}`}>
+                                        More
+                                        <MoveUpRight className="h-4 w-4" />
+                                    </Link>
+                                </Badge>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="text-center">
+                            No funding vaults yet.
                         </TableCell>
                     </TableRow>
-                ))}
+                )}
             </TableBody>
         </Table>
     )

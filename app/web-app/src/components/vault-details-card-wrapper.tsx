@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Description } from "@radix-ui/react-toast";
 
 interface VaultDetailsCardWrapperProps {
-    id: number;
+    fundingVaultId: number;
 }
 
 const iconMap = {
@@ -18,25 +18,25 @@ const iconMap = {
 }
 
 export default async function VaultDetailsCardWrapper({
-    id
+    fundingVaultId
 }: VaultDetailsCardWrapperProps) {
     const vault = await prisma.fundingVault.findUnique({
         where: {
-            id
+            id:fundingVaultId
         }
     })
     const proposals = await prisma.proposal.count({
         where: {
-            fundingVaultId: id
+            fundingVaultId: fundingVaultId
         }
     })
     return (
         <>
             <div className="m-2 w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <CardBody title="ID" icon={iconMap["id"]} body={vault!.id} />
+                <CardBody title="ID" icon={iconMap["id"]} body={`FundingVault#${vault!.id}`} />
                 <CardBody title="Funding token Locked" icon={iconMap["locked"]} body={vault!.amountFundingTokens} />
                 <CardBody title="Proposals" icon={iconMap["proposals"]} body={proposals} />
-                <CardBody title="Tally Date" icon={iconMap["tallyDate"]} body={"nac"} />
+                <CardBody title="Tally Date" icon={iconMap["tallyDate"]} body={vault!.tallyDate.toLocaleDateString()} />
             </div>
             <div className="m-2 w-full grid gap-6 md:grid-cols-2">
                 <CardBody className="max-h-[100px]" bodyClassName="text-md text-muted-foreground font-normal w-full" title="Creator" icon={iconMap["creator"]} body={
