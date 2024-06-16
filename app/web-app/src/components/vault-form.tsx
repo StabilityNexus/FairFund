@@ -24,7 +24,6 @@ import { fairFund } from "@/constants";
 import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { Textarea } from "./ui/textarea";
-import { revalidatePath } from 'next/cache';
 
 const createVaultFormSchema = z.object({
     description: z.string({
