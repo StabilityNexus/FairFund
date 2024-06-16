@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try{
-        const {vaultAddress, description,creatorAddress,amountVotingTokens,amountFundingTokens,fundingTokenAddress,votingTokenAddress } = await req.json();
+        const {vaultAddress, description,creatorAddress,amountVotingTokens,amountFundingTokens,fundingTokenAddress,votingTokenAddress,tallyDate} = await req.json();
         const vault = await prisma.fundingVault.create({
             data: {
                 description,
@@ -14,6 +14,7 @@ export async function POST(req: Request) {
                 amountVotingTokens,
                 fundingTokenAddress,
                 votingTokenAddress,
+                tallyDate
             },
         });
         return NextResponse.json(vault);

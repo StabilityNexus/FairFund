@@ -94,7 +94,8 @@ export default function VaultForm() {
                 amountFundingTokens:0,
                 amountVotingTokens:0,
                 fundingTokenAddress:data.fundingTokenAddress,
-                votingTokenAddress:data.votingTokenAddress
+                votingTokenAddress:data.votingTokenAddress,
+                tallyDate:data.tallyDate
             })
             if (hash) {
                 toast({

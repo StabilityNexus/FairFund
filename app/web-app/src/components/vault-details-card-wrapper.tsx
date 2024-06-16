@@ -1,7 +1,8 @@
 import prisma from "@/lib/db";
 import CardBody from "./card-body";
-import { Coins, Dock, DollarSignIcon, Fingerprint } from "lucide-react";
+import { Coins, Dock, DollarSignIcon, File, Fingerprint, PersonStandingIcon, TimerIcon, User2 } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { Description } from "@radix-ui/react-toast";
 
 interface VaultDetailsCardWrapperProps {
     id: number;
@@ -11,8 +12,9 @@ const iconMap = {
     id: Fingerprint,
     locked: Coins,
     proposals: Dock,
-    avg: DollarSignIcon
-
+    tallyDate: TimerIcon,
+    creator:User2,
+    description:File
 }
 
 export default async function VaultDetailsCardWrapper({
@@ -30,13 +32,14 @@ export default async function VaultDetailsCardWrapper({
     })
     return (
         <>
-            <div className="m-2 w-full grid gap-6 md:grid-cols-3">
+            <div className="m-2 w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <CardBody title="ID" icon={iconMap["id"]} body={vault!.id} />
                 <CardBody title="Funding token Locked" icon={iconMap["locked"]} body={vault!.amountFundingTokens} />
                 <CardBody title="Proposals" icon={iconMap["proposals"]} body={proposals} />
+                <CardBody title="Tally Date" icon={iconMap["tallyDate"]} body={"nac"} />
             </div>
             <div className="m-2 w-full grid gap-6 md:grid-cols-2">
-                <CardBody bodyClassName="text-md text-muted-foreground font-normal w-full" title="Creator" icon={iconMap["id"]} body={
+                <CardBody className="max-h-[100px]" bodyClassName="text-md text-muted-foreground font-normal w-full" title="Creator" icon={iconMap["creator"]} body={
                     <div className="flex flex-row items-center justify-start">
                         <p className="mr-2 text-secondary-foreground text-xs">
                             Wallet Address:
@@ -48,7 +51,7 @@ export default async function VaultDetailsCardWrapper({
                         </Badge>
                     </div>
                 } />
-                <CardBody title="Description" icon={iconMap["id"]} bodyClassName="text-sm font-light" body={vault!.description} />
+                <CardBody className="max-h-[100px]" title="Description" icon={iconMap["description"]} bodyClassName="text-sm font-light" body={vault!.description} />
             </div>
         </>
     )
