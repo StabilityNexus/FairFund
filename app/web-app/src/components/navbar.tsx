@@ -4,8 +4,6 @@ import Link from "next/link";
 import VoteIcon from "@/components/vote-icon";
 import ConnectWalletButton from "./connect-wallet-button";
 import { routes } from "@/lib/constants";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { AlignJustify } from "lucide-react";
 import MobileNavbar from "./mobile-navbar";
 
 
