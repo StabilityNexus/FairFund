@@ -108,8 +108,8 @@ export default function VaultForm() {
                     ),
                 })
             }
-            router.refresh();
             router.push('/dashboard')
+            router.refresh();
         } catch (err) {
             toast({
                 variant: 'destructive',

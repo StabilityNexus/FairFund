@@ -14,6 +14,7 @@ import axios from "axios";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { readContract } from '@wagmi/core'
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -50,7 +51,13 @@ export default function DepositTokensForm({
             return;
         }
         try {
-            const amountOfTokens = parseUnits(data.amountOfTokens, 6);
+            const decimals = await readContract(wagmiConfig, {
+                // @ts-ignore
+                address: fundingTokenAddress,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            })
+            const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
             const hash = await writeContract(wagmiConfig, {
                 // @ts-ignore
                 address: fundingTokenAddress,
@@ -65,6 +72,16 @@ export default function DepositTokensForm({
                 vaultId: vaultId,
                 amountOfTokens: data.amountOfTokens
             })
+            if (hash) {
+                toast({
+                    title: "Deposit Successful",
+                    description: (
+                        <div className="w-[80%] md:w-[340px]">
+                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
+                        </div>
+                    ),
+                })
+            }
             router.push(`/vault/${vaultId}`);
             router.refresh();
         } catch (err) {
