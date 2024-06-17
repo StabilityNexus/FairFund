@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { writeContract, readContract } from '@wagmi/core';
+import { writeContract, readContract,simulateContract } from '@wagmi/core';
 import { config as wagmiConfig } from "@/wagmi/config";
 import { erc20ABI, fundingVaultABI } from "@/constants";
 import { parseUnits } from "viem";
@@ -68,7 +68,7 @@ export default function ProposalForm({
             })
             const minRequestAmount = parseUnits(data.minRequestAmount, decimals as number);
             const maxRequestAmount = parseUnits(data.maxRequestAmount, decimals as number);
-            const hash = await writeContract(wagmiConfig, {
+            const {result,request} = await simulateContract(wagmiConfig, {
                 // @ts-ignore
                 address: fundingVault.vaultAddress,
                 abi: fundingVaultABI,
@@ -80,6 +80,7 @@ export default function ProposalForm({
                     data.recipient
                 ]
             })
+            const hash = await writeContract(wagmiConfig, request);
             await axios.post('/api/proposal/new', {
                 description: data.description,
                 proposerAddress: address,
@@ -87,6 +88,7 @@ export default function ProposalForm({
                 maxRequestAmount: data.maxRequestAmount,
                 recipient: data.recipient,
                 fundingVaultId: fundingVault.id,
+                proposalId: parseInt(result)
             })
             if (hash) {
                 toast({

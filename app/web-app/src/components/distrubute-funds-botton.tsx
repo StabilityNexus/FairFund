@@ -4,7 +4,7 @@ import { type FundingVault } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
-import { writeContract } from '@wagmi/core'
+import { writeContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { fundingVaultABI } from "@/constants";
 

@@ -29,7 +29,7 @@ export default async function CardWrapper() {
             <CardBody title="Vaults" icon={iconMap["vaults"]} body={totalVaults} />
             <CardBody title="Locked" icon={iconMap["locked"]} body={totalLocked._sum.amountFundingTokens ? totalLocked._sum.amountFundingTokens : 0} />
             <CardBody title="Proposals" icon={iconMap["proposals"]} body={totalProposals}/>
-            <CardBody title="Average Proposal" icon={iconMap["vaults"]}body={avg._avg.maxRequestAmount ? avg._avg.maxRequestAmount : 0} />
+            <CardBody title="Average Proposal Request Amount" icon={iconMap["vaults"]}body={avg._avg.maxRequestAmount ? avg._avg.maxRequestAmount : 0} />
         </>
     )
 }

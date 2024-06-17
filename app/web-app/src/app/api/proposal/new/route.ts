@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try{
-        const { description,proposerAddress,minRequestAmount,maxRequestAmount,recipient,fundingVaultId } = await req.json();
+        const { description,proposerAddress,minRequestAmount,maxRequestAmount,recipient,fundingVaultId,proposalId} = await req.json();
         const min = parseInt(minRequestAmount);
         const max = parseInt(maxRequestAmount);
         const proposal = await prisma.proposal.create({
@@ -14,7 +14,8 @@ export async function POST(req: Request) {
                 minRequestAmount:min,
                 maxRequestAmount:max,
                 recipient,
-                fundingVaultId
+                fundingVaultId,
+                proposalId
             },
         });
         return NextResponse.json(proposal);

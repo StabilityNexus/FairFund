@@ -37,6 +37,7 @@ model Proposal {
   minRequestAmount   Int
   maxRequestAmount   Int
   recipient          String
+  proposalId         Int    // proposal id w.r.t the funding vault.
   fundingVaultId     Int
   fundingVault       FundingVault @relation(fields: [fundingVaultId], references: [id])
 

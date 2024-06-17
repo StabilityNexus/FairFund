@@ -1,5 +1,5 @@
 export const fairFund: SmartContract = {
-    address: "0x2bd5008dbb949aDF563A781000a7B2858F631591",
+    address: "0x3574C5EaF7b0093F5Bd01e8259b3EfB43df5f6B0",
     abi:  [
         {
             "type": "function",
@@ -760,7 +760,13 @@ export const fundingVaultABI = [
                     "internalType": "address"
                 }
             ],
-            "outputs": [],
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "uint256",
+                    "internalType": "uint256"
+                }
+            ],
             "stateMutability": "nonpayable"
         },
         {
@@ -991,4 +997,4 @@ export const fundingVaultABI = [
             "name": "ReentrancyGuardReentrantCall",
             "inputs": []
         }
-]
+    ]

@@ -192,6 +192,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient)
         public
         nonReentrant
+        returns(uint256)
     {
         if (bytes(_metadata).length == 0) {
             revert FundingVault__MetadataCannotBeEmpty();
@@ -209,6 +210,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         s_proposals[s_proposalIdCounter] = Proposal(_metadata, _minimumAmount, _maximumAmount, _recipient);
         s_proposerToProposalIds[msg.sender].push(s_proposalIdCounter);
         emit ProposalSubmitted(msg.sender, s_proposalIdCounter);
+        return s_proposalIdCounter;
     }
 
     /**
