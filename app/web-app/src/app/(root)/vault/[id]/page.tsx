@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import CardWrapper from "@/components/vault-details-card-wrapper";
 import Link from "next/link";
+import prisma from "@/lib/db";
+import { redirect } from "next/navigation";
+import DistributeFundsButton from "@/components/distrubute-funds-botton";
 
-export default function VaultDetailsPage({
+export default async function VaultDetailsPage({
     params
 }: {
     params: {
@@ -12,6 +15,14 @@ export default function VaultDetailsPage({
     }
 }) {
     const id = params.id;
+    const vault = await prisma.fundingVault.findUnique({
+        where: {
+            id: Number(id)
+        }
+    })
+    if(!vault){
+        redirect('/dashboard')
+    }
 
     return (
         <div className="p-8 w-full h-full flex justify-center items-center flex-col gap-4">
@@ -25,7 +36,7 @@ export default function VaultDetailsPage({
             </div>
             <Separator className="bg-primary/10" />
             <CardWrapper
-                fundingVaultId={Number(id)}
+                fundingVault={vault}
             />
             <div className="space-y-2 w-full">
                 <h3 className="text-lg font-medium">
@@ -63,9 +74,10 @@ export default function VaultDetailsPage({
                         Register to Vote
                     </Button>
                 </Link>
-                <Button className="grow">
-                    Distribute Funds
-                </Button>
+                <DistributeFundsButton
+                    fundingVault={vault}
+                    className="grow"
+                />
             </div>
         </div>
     )

@@ -3,9 +3,10 @@ import CardBody from "./card-body";
 import { Coins, Dock, DollarSignIcon, File, Fingerprint, PersonStandingIcon, TimerIcon, User2 } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Description } from "@radix-ui/react-toast";
+import { type FundingVault } from "@prisma/client";
 
 interface VaultDetailsCardWrapperProps {
-    fundingVaultId: number;
+    fundingVault: FundingVault;
 }
 
 const iconMap = {
@@ -18,16 +19,12 @@ const iconMap = {
 }
 
 export default async function VaultDetailsCardWrapper({
-    fundingVaultId
+    fundingVault:vault
 }: VaultDetailsCardWrapperProps) {
-    const vault = await prisma.fundingVault.findUnique({
-        where: {
-            id: fundingVaultId
-        }
-    })
+
     const proposals = await prisma.proposal.count({
         where: {
-            fundingVaultId: fundingVaultId
+            fundingVaultId: vault.id
         }
     })
     return (
