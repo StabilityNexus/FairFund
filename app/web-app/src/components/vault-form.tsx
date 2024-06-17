@@ -116,7 +116,7 @@ export default function VaultForm() {
                 title: 'Error creating vault',
                 description: 'Something went wrong. Please try again.'
             })
-            console.log('[VAULT FORM]: Error creating vault: ', err);
+            console.log('[VAULT_FORM]: Error creating vault: ', err);
         }
     }
 
