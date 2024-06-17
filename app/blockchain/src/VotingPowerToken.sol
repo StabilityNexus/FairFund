@@ -38,4 +38,12 @@ contract VotingPowerToken is ERC20, Ownable {
     function burn(address _of, uint256 _amount) external onlyOwner {
         _burn(_of, _amount);
     }
+
+    function transferFrom(address from, address to, uint256 value) public override returns (bool) {
+        if(msg.sender != owner()){
+            super.transferFrom(from, to, value);
+        }
+        _transfer(from, to, value);
+        return true;
+    }
 }
