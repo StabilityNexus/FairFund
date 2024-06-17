@@ -1,5 +1,6 @@
 import DepositTokensForm from "@/components/desposit-tokens-form";
 import prisma from "@/lib/db";
+import { redirect } from "next/navigation";
 
 export default async function DepositPage({
     searchParams,
@@ -12,6 +13,9 @@ export default async function DepositPage({
             id: parseInt(vaultId as string),
         }
     })
+    if(!vault){
+        redirect('/dashboard')
+    }
     
     return (
         <>

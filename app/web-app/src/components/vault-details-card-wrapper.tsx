@@ -13,8 +13,8 @@ const iconMap = {
     locked: Coins,
     proposals: Dock,
     tallyDate: TimerIcon,
-    creator:User2,
-    description:File
+    creator: User2,
+    description: File
 }
 
 export default async function VaultDetailsCardWrapper({
@@ -22,7 +22,7 @@ export default async function VaultDetailsCardWrapper({
 }: VaultDetailsCardWrapperProps) {
     const vault = await prisma.fundingVault.findUnique({
         where: {
-            id:fundingVaultId
+            id: fundingVaultId
         }
     })
     const proposals = await prisma.proposal.count({
@@ -39,19 +39,17 @@ export default async function VaultDetailsCardWrapper({
                 <CardBody title="Tally Date" icon={iconMap["tallyDate"]} body={vault!.tallyDate.toLocaleDateString()} />
             </div>
             <div className="m-2 w-full grid gap-6 md:grid-cols-2">
-                <CardBody className="max-h-[100px]" bodyClassName="text-md text-muted-foreground font-normal w-full" title="Creator" icon={iconMap["creator"]} body={
+                <CardBody className="max-h-[100px] overflow-hidden" bodyClassName="text-md text-muted-foreground font-normal w-full" title="Creator" icon={iconMap["creator"]} body={
                     <div className="flex flex-row items-center justify-start">
                         <p className="mr-2 text-secondary-foreground text-xs">
                             Wallet Address:
                         </p>
-                        <Badge variant="outline" className="px-4 py-2 md:w-auto :w-[90%]">
-                            <p className="truncate">
-                                {vault!.creatorAddress}
-                            </p>
+                        <Badge variant="outline" className="px-4 py-2 w-full truncate">
+                            {vault!.creatorAddress}
                         </Badge>
                     </div>
                 } />
-                <CardBody className="max-h-[100px]" title="Description" icon={iconMap["description"]} bodyClassName="text-sm font-light" body={vault!.description} />
+                <CardBody className="max-h-[100px] overflow-hidden" title="Description" icon={iconMap["description"]} bodyClassName="text-sm font-light" body={vault!.description} />
             </div>
         </>
     )

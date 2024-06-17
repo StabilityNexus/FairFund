@@ -47,22 +47,25 @@ export default function VaultDetailsPage({
                 </h3>
             </div>
             <Separator className="bg-primary/10" />
-            <div className="flex flex-row justify-around w-full">
-                <Link href={`/proposal/new?vaultId=${id}`}>
-                    <Button>
+            <div className="m-2 w-full flex flex-wrap gap-2">
+                <Link href={`/proposal/new?vaultId=${id}`} className="grow">
+                    <Button className="w-full">
                         Create Proposal
                     </Button>
                 </Link>
-                <Link href={`/vault/deposit?vaultId=${id}`}>
-                    <Button>
+                <Link href={`/vault/deposit?vaultId=${id}`} className="grow">
+                    <Button className="w-full">
                         Deposit Funding Tokens
                     </Button>
                 </Link>
-                <Link href={`/vault/register?vaultId=${id}`}>
-                    <Button>
+                <Link href={`/vault/register?vaultId=${id}`} className="grow">
+                    <Button className="w-full">
                         Register to Vote
                     </Button>
                 </Link>
+                <Button className="grow">
+                    Distribute Funds
+                </Button>
             </div>
         </div>
     )

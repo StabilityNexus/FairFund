@@ -1,79 +1,86 @@
 'use client';
-import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useToast } from "./ui/use-toast";
+import { useAccount } from "wagmi";
+import { useToast } from "@/components/ui/use-toast";
+import {z} from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { parseUnits } from "viem";
 import { writeContract, readContract } from '@wagmi/core'
 import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI } from "@/constants";
+import { erc20ABI, fundingVaultABI } from "@/constants";
 import axios from "axios";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { parseUnits } from "viem";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
-interface DepositTokensFormProps {
-    fundingTokenAddress: string;
-    vaultAddress: string;
+interface RegisterTokenFormProps {
+    votingTokenAddress: string;
     vaultId: number;
+    vaultAddress: string;
 }
 
-const depositTokensForm = z.object({
+const registerTokensForm = z.object({
     amountOfTokens: z.string({
         required_error: "Amount of tokens is required",
     }),
 })
 
-
-export default function DepositTokensForm({
-    fundingTokenAddress,
-    vaultAddress,
-    vaultId
-}: DepositTokensFormProps) {
+export function RegisterTokenForm({
+    votingTokenAddress,
+    vaultId,
+    vaultAddress
+}:RegisterTokenFormProps){
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast()
+    const { toast } = useToast();
 
-    const form = useForm<z.infer<typeof depositTokensForm>>({
-        resolver: zodResolver(depositTokensForm),
+    const form = useForm<z.infer<typeof registerTokensForm>>({
+        resolver: zodResolver(registerTokensForm),
         defaultValues: {
             amountOfTokens: ""
         }
     })
 
-    async function handleSubmit(data: z.infer<typeof depositTokensForm>) {
+    async function handleSubmit(data: z.infer<typeof registerTokensForm>) {
         if (!isConnected || !address) {
             return;
         }
-        try {
-            const decimals = await readContract(wagmiConfig, {
+        try{
+            const decimals = await readContract(wagmiConfig,{
                 // @ts-ignore
-                address: fundingTokenAddress,
+                address: votingTokenAddress,
                 abi: erc20ABI,
                 functionName: 'decimals',
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
-            const hash = await writeContract(wagmiConfig, {
+            console.log('amountOfTokens', amountOfTokens);
+            console.log('vaultAddress', vaultAddress);
+            
+            
+            await writeContract(wagmiConfig,{
                 // @ts-ignore
-                address: fundingTokenAddress,
+                address: votingTokenAddress,
                 abi: erc20ABI,
-                functionName: 'transfer',
-                args: [
-                    vaultAddress,
-                    amountOfTokens
-                ]
+                functionName: 'approve',
+                args: [vaultAddress, amountOfTokens],
             })
-            await axios.post('/api/vault/deposit', {
+            const hash = await writeContract(wagmiConfig,{
+                // @ts-ignore
+                address: vaultAddress,
+                abi: fundingVaultABI,
+                functionName: 'register',
+                args: [amountOfTokens],
+            })
+            await axios.post('/api/vault/register',{
                 vaultId: vaultId,
                 amountOfTokens: data.amountOfTokens
             })
-            if (hash) {
+            if(hash){
                 toast({
-                    title: "Deposit Successful",
+                    title: "Register Successful",
                     description: (
                         <div className="w-[80%] md:w-[340px]">
                             <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
@@ -83,23 +90,21 @@ export default function DepositTokensForm({
             }
             router.push(`/vault/${vaultId}`);
             router.refresh();
-        } catch (err) {
+        }catch(err){
             toast({
                 variant: 'destructive',
-                title: 'Error depositing the token',
+                title: 'Error while registering to vote.',
                 description: 'Something went wrong. Please try again.'
-            })
-            console.log('[DEPOSIT_TOKENS_FORM]: ', err);
+            }) 
+            console.log('[REGISTER_TOKEN_FORM] Error while registering to vote.', err);
         }
-
-
     }
 
     return (
         <Card className="m-6">
             <CardHeader>
                 <CardTitle>
-                    Deposit Tokens
+                    Register To Vote
                 </CardTitle>
             </CardHeader>
             <CardContent>
@@ -108,7 +113,7 @@ export default function DepositTokensForm({
                         <FormField
                             name="amountOfTokens"
                             control={form.control}
-                            render={({ field }) => {
+                            render={({field})=>{
                                 return (
                                     <FormItem>
                                         <FormLabel>
@@ -121,9 +126,9 @@ export default function DepositTokensForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            This will trigger a blockchain transaction.
+                                            The amount of voting tokens you want to lock in order to receive voting power token.
                                         </FormDescription>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )
                             }}
