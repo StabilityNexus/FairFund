@@ -38,7 +38,7 @@ export default async function ProposalDetailsTableWrapper({
                             <TableCell>{proposal.id}</TableCell>
                             <TableCell>{proposal.description}</TableCell>
                             <TableCell className="truncate">{proposal.minRequestAmount}</TableCell>
-                            <TableCell><Badge variant="outline">{proposal.minRequestAmount}</Badge></TableCell>
+                            <TableCell><Badge variant="outline">{proposal.maxRequestAmount}</Badge></TableCell>
                             <TableCell><Badge variant="outline">{proposal.recipient}</Badge></TableCell>
                             <TableCell>
                                 <Badge variant="secondary">

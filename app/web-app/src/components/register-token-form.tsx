@@ -56,9 +56,6 @@ export function RegisterTokenForm({
                 functionName: 'decimals',
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
-            console.log('amountOfTokens', amountOfTokens);
-            console.log('vaultAddress', vaultAddress);
-            
             
             await writeContract(wagmiConfig,{
                 // @ts-ignore
