@@ -41,6 +41,7 @@ The funding to be received by a rejected proposal `p` is:
 $$0$$
 
 Smart Contract: [sepolia chain](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
+Frontend: https://fair-fund.vercel.app/
 
 ### Roadmap
 
@@ -53,14 +54,12 @@ Smart Contract: [sepolia chain](https://sepolia.etherscan.io/address/0x66b04c2d2
 
 #### Off-Chain Development
 - [x] Set up a Next.js project.
-- [ ] Design a database schema (Sponsor, Proposer, Proposal, Funding Vault, etc.).
-- [ ] Implement sponsor and proposer registration (Sign Up and Sign In).
-- [ ] Implement functionality to connect a wallet to an existing account.
-- [ ] Create UI for funding vault creation.
-- [ ] Develop UI for project submission.
-- [ ] Design project details page.
-- [ ] Build a general dashboard to display all the stats.
-- [ ] Build a dashboard for funding vault details and voting on the project.
+- [x] Design a database schema (Sponsor, Proposer, Proposal, Funding Vault, etc.).
+- [x] Create UI for funding vault creation.
+- [x] Develop UI for project submission.
+- [x] Design project details page.
+- [x] Build a general dashboard to display all the stats.
+- [x] Build a dashboard for funding vault details and voting on the project.
 - [ ] Implement funding vault status notifications functionality.
 
 #### System Testing
