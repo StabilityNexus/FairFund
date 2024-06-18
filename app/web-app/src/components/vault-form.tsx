@@ -153,7 +153,7 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            A short description of the funding vault (this won't be stored on chain).
+                                            A short description of the funding vault (this won&apos;t be stored on chain).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

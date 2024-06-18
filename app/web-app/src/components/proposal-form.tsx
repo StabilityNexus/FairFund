@@ -145,7 +145,7 @@ export default function ProposalForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            A short description about the proposal (this won't be stored on chain).
+                                            A short description about the proposal (this won&apos;t be stored on chain).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
