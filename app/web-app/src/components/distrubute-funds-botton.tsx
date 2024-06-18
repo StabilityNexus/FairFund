@@ -63,7 +63,7 @@ export default function DistributeFundsButton({
     }
 
     return (
-        <Button className={className} disabled={fundingVault.tallyDate?.getTime() > Date.now()}>
+        <Button className={className} disabled={fundingVault.tallyDate?.getTime() > Date.now()} onClick={handleClick}>
             Distribute Funds
         </Button>
     )
