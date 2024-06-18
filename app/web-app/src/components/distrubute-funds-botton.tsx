@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
 import { writeContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
-import { fundingVaultABI } from "@/constants";
+import { fundingVaultABI } from "@/blockchain/constants";
 
 interface DistributeFundsButtonProps {
     className?: string;

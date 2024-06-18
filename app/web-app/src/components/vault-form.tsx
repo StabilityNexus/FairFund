@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { parseUnits } from 'viem'
-import { fairFund } from "@/constants";
+import { fairFund } from "@/blockchain/constants";
 import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { Textarea } from "./ui/textarea";

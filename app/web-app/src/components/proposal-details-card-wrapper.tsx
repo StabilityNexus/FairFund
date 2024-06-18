@@ -1,6 +1,5 @@
 import { type Proposal } from "@prisma/client";
 import { Coins, File, Fingerprint, User2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import CardBody from "@/components/card-body";
 import { Badge } from "@/components/ui/badge";
 

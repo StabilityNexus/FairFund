@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { writeContract, readContract,simulateContract } from '@wagmi/core';
 import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI, fundingVaultABI } from "@/constants";
+import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
 import { parseUnits } from "viem";
 
 interface ProposalFormProps {

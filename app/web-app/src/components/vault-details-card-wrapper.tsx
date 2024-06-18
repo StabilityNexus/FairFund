@@ -1,8 +1,7 @@
 import prisma from "@/lib/db";
 import CardBody from "./card-body";
-import { Coins, Dock, DollarSignIcon, File, Fingerprint, PersonStandingIcon, TimerIcon, User2 } from "lucide-react";
+import { Coins, Dock, File, Fingerprint, TimerIcon, User2 } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { Description } from "@radix-ui/react-toast";
 import { type FundingVault } from "@prisma/client";
 
 interface VaultDetailsCardWrapperProps {

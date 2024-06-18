@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
 import { writeContract, readContract } from '@wagmi/core'
 import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI } from "@/constants";
+import { erc20ABI } from "@/blockchain/constants";
 import axios from "axios";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";

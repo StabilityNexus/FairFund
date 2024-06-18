@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
 import { writeContract, readContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI, fundingVaultABI } from "@/constants";
+import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
 import { type Proposal } from "@prisma/client";
 import { z } from "zod";
 import { useForm } from "react-hook-form";

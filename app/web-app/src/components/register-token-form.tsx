@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { writeContract, readContract } from '@wagmi/core'
 import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI, fundingVaultABI } from "@/constants";
+import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
 import axios from "axios";
 import { parseUnits } from "viem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
