@@ -30,7 +30,7 @@ export default async function VaultDetailsCardWrapper({
         <>
             <div className="m-2 w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <CardBody title="ID" icon={iconMap["id"]} body={`FundingVault#${vault!.id}`} />
-                <CardBody title="Funding token Locked" icon={iconMap["locked"]} body={vault!.amountFundingTokens} />
+                <CardBody title="Funding token locked" icon={iconMap["locked"]} body={vault!.amountFundingTokens} />
                 <CardBody title="Proposals" icon={iconMap["proposals"]} body={proposals} />
                 <CardBody title="Tally Date" icon={iconMap["tallyDate"]} body={vault!.tallyDate.toLocaleDateString()} />
             </div>

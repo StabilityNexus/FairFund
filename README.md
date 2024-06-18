@@ -40,8 +40,69 @@ $$\min(p.\text{maximumAmount}, R \times \frac{V(p)}{S})$$
 The funding to be received by a rejected proposal `p` is:
 $$0$$
 
-Smart Contract: [sepolia chain](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
-Frontend: https://fair-fund.vercel.app/
+#### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
+#### Frontend: https://fair-fund.vercel.app/
+
+## Running the Project Locally
+
+### Prerequisites
+
+1. **Foundry Setup**: Ensure you have Foundry installed and setup. You can follow the instructions given here: [Foundry Docs](https://getfoundry.sh/).
+
+### Smart Contracts
+
+1. **Navigate to the Blockchain Directory**:
+    ```bash
+    cd app/blockchain
+    ```
+
+2. **Install Dependencies**:
+    ```bash
+    forge install
+    ```
+
+3. **Run Tests**:
+    ```bash
+    forge test
+    ```
+
+4. **Deploy to the Testnet**:
+    - Ensure you have a `.env` file set up. You can use `.env.example` as a template.
+    - Load the environment variables:
+        ```bash
+        source .env
+        ```
+    - Deploy the contract:
+        ```bash
+        forge script script/DeployFairFund.s.sol:DeployFairFund --rpc-url $SEPOLIA_RPC_URL --verify -vvvv --broadcast --legacy
+        ```
+
+### Frontend
+
+1. **Navigate to the Web App Directory**:
+    ```bash
+    cd app/web-app
+    ```
+
+2. **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+3. **Update the environment variables**:
+    - Create a `.env` file in the `web-app` directory and update all the values. You can use `.env.example` as a template.
+
+3. **Run the Development Server**:
+    ```bash
+    npm run dev
+    ```
+
+4. **Update Smart Contract Address**:
+    - Change the smart contract address in `web-app/src/blockchain/constants.ts` to match the deployed contract address.
+
+5. **Access the Web App**:
+    - Open your browser and navigate to `http://localhost:3000`.
+
 
 ### Roadmap
 
