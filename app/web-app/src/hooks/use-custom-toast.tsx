@@ -22,5 +22,53 @@ export function useCustomToast(){
         })
     }
 
-    return {showConnectWalletMessage, showHashMessage};
+    function showErrorMessage(error:any){
+        if(error instanceof Error){
+            switch(true){
+                case error.message.includes("FundingVault__AmountCannotBeZero"):
+                    toast({
+                        variant: 'destructive',
+                        description: 'Amount of tokens cannot be zero or less than zero.'
+                    })
+                    break;
+                case error.message.includes("FundingVault__NotEnoughBalance"):
+                    toast({
+                        variant: 'destructive',
+                        description: 'You do not have enough tokens.'
+                    })
+                    break;
+
+                case error.message.includes("FundingVault__AmountExceededsLimit"):
+                    toast({
+                        variant: 'destructive',
+                        description: 'Amount of tokens exceeds the limit.'
+                    })
+                    break;
+                case error.message.includes("FundingVault__CannotBeAZeroAddress"):
+                    toast({
+                        variant: 'destructive',
+                        description: 'Cannot enter a zero address.'
+                    })
+                    break;
+                case error.message.includes("FundingVault__TallyDateNotPassed"):
+                    toast({
+                        variant: 'destructive',
+                        description: 'Tally date has not passed yet.'
+                    })
+                    break;
+                default:
+                    toast({
+                        variant: 'destructive',
+                        description: 'Something went wrong. Please try again.'
+                    })
+            }
+        }else{
+            toast({
+                variant: 'destructive',
+                description: 'Something went wrong. Please try again.'
+            })
+        }
+    }
+
+    return {showConnectWalletMessage, showHashMessage,showErrorMessage};
 }

@@ -5,7 +5,6 @@ import { type FundingVault } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { z } from "zod";
-import { useToast } from "@/components/ui/use-toast";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,8 +44,7 @@ export default function ProposalForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
-    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
+    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
 
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
@@ -101,11 +99,7 @@ export default function ProposalForm({
             router.push(`/vault/${fundingVault.id}`)
             router.refresh();
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error submitting proposal.',
-                description: 'Something went wrong. Please try again.'
-            })
+            showErrorMessage(err);
             console.log('[PROPOSAL_FORM]: Error submitting proposal.', err);
         }
     }

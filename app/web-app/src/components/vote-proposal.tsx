@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
 import { writeContract, readContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
@@ -40,8 +39,7 @@ export default function VoteProposal({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
-    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
+    const { showConnectWalletMessage, showHashMessage, showErrorMessage } = useCustomToast();
 
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
@@ -64,8 +62,8 @@ export default function VoteProposal({
                 functionName: 'decimals',
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
-            
-            const hash:string = await writeContract(wagmiConfig, {
+
+            const hash: string = await writeContract(wagmiConfig, {
                 // @ts-ignore
                 address: vaultAddress,
                 abi: fundingVaultABI,
@@ -75,16 +73,12 @@ export default function VoteProposal({
                     amountOfTokens
                 ]
             })
-            if(hash){
+            if (hash) {
                 showHashMessage("Successfully voted to proposal", hash);
             }
         } catch (err) {
-            if(err instanceof Error && err.message.includes("FundingVault__AmountExceededsLimit()")){
-                toast({
-                    variant: 'destructive',
-                    title: 'Error while voting to',
-                    description: 'Something went wrong. Please try again.'
-                }) 
+            if (err instanceof Error && err.message.includes("FundingVault__AmountExceededsLimit()")) {
+                showErrorMessage(err);
             }
             console.log('[VOTE_PROPOSAL]: ', err);
         }
@@ -99,7 +93,7 @@ export default function VoteProposal({
                         <FormField
                             name="amountOfTokens"
                             control={form.control}
-                            render={({field})=>{
+                            render={({ field }) => {
                                 return (
                                     <FormItem>
                                         <FormLabel>
@@ -114,7 +108,7 @@ export default function VoteProposal({
                                         <FormDescription>
                                             The amount of votes you want to allocate to this proposal.
                                         </FormDescription>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )
                             }}

@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { writeContract, simulateContract } from '@wagmi/core'
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 import { parseUnits } from 'viem'
 import { fairFund } from "@/blockchain/constants";
 import axios from "axios";
@@ -50,8 +49,7 @@ const createVaultFormSchema = z.object({
 export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
-    const { showConnectWalletMessage,showHashMessage } = useCustomToast();
+    const { showConnectWalletMessage,showHashMessage,showErrorMessage } = useCustomToast();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -106,11 +104,7 @@ export default function VaultForm() {
             router.push('/dashboard')
             router.refresh();
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error creating vault',
-                description: 'Something went wrong. Please try again.'
-            })
+            showErrorMessage(err);
             console.log('[VAULT_FORM]: Error creating vault: ', err);
         }
     }

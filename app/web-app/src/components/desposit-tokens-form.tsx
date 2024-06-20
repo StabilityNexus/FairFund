@@ -3,7 +3,6 @@ import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useToast } from "./ui/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
@@ -37,8 +36,7 @@ export default function DepositTokensForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
-    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
+    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
 
 
     const form = useForm<z.infer<typeof depositTokensForm>>({
@@ -81,11 +79,7 @@ export default function DepositTokensForm({
             router.push(`/vault/${vaultId}`);
             router.refresh();
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error depositing the token',
-                description: 'Something went wrong. Please try again.'
-            })
+            showErrorMessage(err);
             console.log('[DEPOSIT_TOKENS_FORM]: ', err);
         }
 

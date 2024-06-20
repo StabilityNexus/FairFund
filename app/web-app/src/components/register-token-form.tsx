@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
 import {z} from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,8 +35,7 @@ export function RegisterTokenForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
-    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
+    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
 
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
@@ -85,11 +83,7 @@ export function RegisterTokenForm({
             router.push(`/vault/${vaultId}`);
             router.refresh();
         }catch(err){
-            toast({
-                variant: 'destructive',
-                title: 'Error while registering to vote.',
-                description: 'Something went wrong. Please try again.'
-            }) 
+            showErrorMessage(err);
             console.log('[REGISTER_TOKEN_FORM] Error while registering to vote.', err);
         }
     }
