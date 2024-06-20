@@ -14,7 +14,7 @@ import axios from "axios";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -38,7 +38,7 @@ export default function DepositTokensForm({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
 
 
     const form = useForm<z.infer<typeof depositTokensForm>>({
@@ -76,14 +76,7 @@ export default function DepositTokensForm({
                 amountOfTokens: data.amountOfTokens
             })
             if (hash) {
-                toast({
-                    title: "Deposit Successful",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage("Tokens deposited successfully.", hash);
             }
             router.push(`/vault/${vaultId}`);
             router.refresh();

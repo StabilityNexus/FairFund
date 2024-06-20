@@ -24,7 +24,7 @@ import { fairFund } from "@/blockchain/constants";
 import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { Textarea } from "./ui/textarea";
-import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 const createVaultFormSchema = z.object({
     description: z.string({
@@ -51,7 +51,7 @@ export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const { showConnectWalletMessage } = useWalletConnectMessageToast();
+    const { showConnectWalletMessage,showHashMessage } = useCustomToast();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -101,14 +101,7 @@ export default function VaultForm() {
                 tallyDate: data.tallyDate
             })
             if (hash) {
-                toast({
-                    title: "Funding vault created",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage("Funding vault created.", hash);
             }
             router.push('/dashboard')
             router.refresh();

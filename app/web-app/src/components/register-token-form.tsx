@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 interface RegisterTokenFormProps {
     votingTokenAddress: string;
@@ -37,7 +37,7 @@ export function RegisterTokenForm({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
 
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
@@ -80,14 +80,7 @@ export function RegisterTokenForm({
                 amountOfTokens: data.amountOfTokens
             })
             if(hash){
-                toast({
-                    title: "Register Successful",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage('Successfully registered', hash);
             }
             router.push(`/vault/${vaultId}`);
             router.refresh();

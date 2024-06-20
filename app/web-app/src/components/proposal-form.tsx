@@ -18,7 +18,7 @@ import { writeContract, readContract,simulateContract } from '@wagmi/core';
 import { config as wagmiConfig } from "@/wagmi/config";
 import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
 import { parseUnits } from "viem";
-import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -46,7 +46,7 @@ export default function ProposalForm({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
 
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
@@ -96,15 +96,7 @@ export default function ProposalForm({
                 proposalId: parseInt(result)
             })
             if (hash) {
-                toast({
-                    title: "Proposal Submitted",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p>Your proposal has been successfully submitted.</p>
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage('Successfully submitted proposal', hash);   
             }
             router.push(`/vault/${fundingVault.id}`)
             router.refresh();

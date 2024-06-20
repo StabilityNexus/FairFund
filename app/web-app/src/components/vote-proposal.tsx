@@ -14,7 +14,7 @@ import { parseUnits } from "viem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 
 interface VoteProposalButtonProps {
@@ -41,7 +41,7 @@ export default function VoteProposal({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+    const {showConnectWalletMessage,showHashMessage}=useCustomToast();
 
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
@@ -65,7 +65,7 @@ export default function VoteProposal({
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
             
-            const hash = await writeContract(wagmiConfig, {
+            const hash:string = await writeContract(wagmiConfig, {
                 // @ts-ignore
                 address: vaultAddress,
                 abi: fundingVaultABI,
@@ -76,14 +76,7 @@ export default function VoteProposal({
                 ]
             })
             if(hash){
-                toast({
-                    title: "Successfully Voted",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage("Successfully voted to proposal", hash);
             }
         } catch (err) {
             if(err instanceof Error && err.message.includes("FundingVault__AmountExceededsLimit()")){
