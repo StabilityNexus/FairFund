@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
 import { writeContract, readContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
@@ -14,6 +13,7 @@ import { parseUnits } from "viem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 
 interface VoteProposalButtonProps {
@@ -39,7 +39,8 @@ export default function VoteProposal({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
+    const { showConnectWalletMessage, showHashMessage, showErrorMessage } = useCustomToast();
+
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
         resolver: zodResolver(voteProposalForm),
@@ -50,6 +51,7 @@ export default function VoteProposal({
 
     async function handleSubmit(data: z.infer<typeof voteProposalForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage()
             return;
         }
         try {
@@ -60,9 +62,8 @@ export default function VoteProposal({
                 functionName: 'decimals',
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
-            console.log(proposal.id);
-            
-            const hash = await writeContract(wagmiConfig, {
+
+            const hash: string = await writeContract(wagmiConfig, {
                 // @ts-ignore
                 address: vaultAddress,
                 abi: fundingVaultABI,
@@ -72,22 +73,13 @@ export default function VoteProposal({
                     amountOfTokens
                 ]
             })
-            if(hash){
-                toast({
-                    title: "Successfully Voted",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+            if (hash) {
+                showHashMessage("Successfully voted to proposal", hash);
             }
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error while voting to',
-                description: 'Something went wrong. Please try again.'
-            }) 
+            if (err instanceof Error && err.message.includes("FundingVault__AmountExceededsLimit()")) {
+                showErrorMessage(err);
+            }
             console.log('[VOTE_PROPOSAL]: ', err);
         }
     }
@@ -101,7 +93,7 @@ export default function VoteProposal({
                         <FormField
                             name="amountOfTokens"
                             control={form.control}
-                            render={({field})=>{
+                            render={({ field }) => {
                                 return (
                                     <FormItem>
                                         <FormLabel>
@@ -116,7 +108,7 @@ export default function VoteProposal({
                                         <FormDescription>
                                             The amount of votes you want to allocate to this proposal.
                                         </FormDescription>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )
                             }}

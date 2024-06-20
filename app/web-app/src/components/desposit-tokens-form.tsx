@@ -3,7 +3,6 @@ import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useToast } from "./ui/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseUnits } from "viem";
@@ -14,6 +13,7 @@ import axios from "axios";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -36,7 +36,8 @@ export default function DepositTokensForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast()
+    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
+
 
     const form = useForm<z.infer<typeof depositTokensForm>>({
         resolver: zodResolver(depositTokensForm),
@@ -47,6 +48,7 @@ export default function DepositTokensForm({
 
     async function handleSubmit(data: z.infer<typeof depositTokensForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage();
             return;
         }
         try {
@@ -72,23 +74,12 @@ export default function DepositTokensForm({
                 amountOfTokens: data.amountOfTokens
             })
             if (hash) {
-                toast({
-                    title: "Deposit Successful",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage("Tokens deposited successfully.", hash);
             }
             router.push(`/vault/${vaultId}`);
             router.refresh();
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error depositing the token',
-                description: 'Something went wrong. Please try again.'
-            })
+            showErrorMessage(err);
             console.log('[DEPOSIT_TOKENS_FORM]: ', err);
         }
 

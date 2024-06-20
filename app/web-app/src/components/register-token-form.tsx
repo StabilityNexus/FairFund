@@ -1,7 +1,6 @@
 'use client';
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
 import {z} from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useCustomToast } from "@/hooks/use-custom-toast";
 
 interface RegisterTokenFormProps {
     votingTokenAddress: string;
@@ -35,7 +35,8 @@ export function RegisterTokenForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast();
+    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
+
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
         resolver: zodResolver(registerTokensForm),
@@ -46,6 +47,7 @@ export function RegisterTokenForm({
 
     async function handleSubmit(data: z.infer<typeof registerTokensForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage();
             return;
         }
         try{
@@ -76,23 +78,12 @@ export function RegisterTokenForm({
                 amountOfTokens: data.amountOfTokens
             })
             if(hash){
-                toast({
-                    title: "Register Successful",
-                    description: (
-                        <div className="w-[80%] md:w-[340px]">
-                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
-                        </div>
-                    ),
-                })
+                showHashMessage('Successfully registered', hash);
             }
             router.push(`/vault/${vaultId}`);
             router.refresh();
         }catch(err){
-            toast({
-                variant: 'destructive',
-                title: 'Error while registering to vote.',
-                description: 'Something went wrong. Please try again.'
-            }) 
+            showErrorMessage(err);
             console.log('[REGISTER_TOKEN_FORM] Error while registering to vote.', err);
         }
     }

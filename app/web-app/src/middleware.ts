@@ -22,26 +22,21 @@ function isWalletConnected(){
 }
 
 export default function middleware(request: NextRequest) {
-    const path = request.nextUrl.pathname;
-    if(path==='/' || path.startsWith('/api')){
+    const pathname = request.nextUrl.pathname;
+    if(pathname==='/' || pathname.startsWith('/api')){
         return NextResponse.next();
     }
-    if (isPathAllowed(path)) {    
-        if (path.startsWith('/dashboard/') && path.length > '/dashboard/'.length) {
+    if (isPathAllowed(pathname)) {
+        if (pathname.match(/^\/dashboard\/.+$/)) {
             return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
         }
-        if (path.startsWith('/profile/') && path.length > '/profile/'.length) {
+        if (pathname.match(/^\/profile\/.+$/)) {
             return NextResponse.redirect(new URL('/profile', request.nextUrl));
         }
-        if(path.startsWith('/proposal/new') || path.startsWith('/vault/new')){
-            if(isWalletConnected()){
-                return NextResponse.next();
-            }
-            return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
-        }
-    }else{
+    } else {
         return NextResponse.redirect(new URL('/', request.nextUrl));
     }
+
 }
 
 
