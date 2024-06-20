@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { writeContract } from "@wagmi/core";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { fundingVaultABI } from "@/blockchain/constants";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 interface DistributeFundsButtonProps {
     className?: string;
@@ -21,9 +22,12 @@ export default function DistributeFundsButton({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
+    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+
 
     async function handleClick() {
         if (!isConnected || !address) {
+            showConnectWalletMessage()
             return;
         }
         if (fundingVault.tallyDate?.getTime() > Date.now()) {

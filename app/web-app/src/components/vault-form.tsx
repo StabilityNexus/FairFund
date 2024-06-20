@@ -24,6 +24,7 @@ import { fairFund } from "@/blockchain/constants";
 import axios from "axios";
 import { config as wagmiConfig } from "@/wagmi/config";
 import { Textarea } from "./ui/textarea";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 const createVaultFormSchema = z.object({
     description: z.string({
@@ -49,7 +50,8 @@ const createVaultFormSchema = z.object({
 export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast()
+    const { toast } = useToast();
+    const { showConnectWalletMessage } = useWalletConnectMessageToast();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -66,13 +68,14 @@ export default function VaultForm() {
     async function handleSubmit(data: z.infer<typeof createVaultFormSchema>) {
         try {
             if (!isConnected || !address) {
+                showConnectWalletMessage();
                 return;
             }
             const unixTime = getUnixTime(data.tallyDate);
             const minRequestableAmount = parseUnits(data.minRequestableAmount, 18);
             const maxRequestableAmount = parseUnits(data.maxRequestableAmount, 18);
 
-            const {result,request} = await simulateContract(wagmiConfig, {
+            const { result, request } = await simulateContract(wagmiConfig, {
                 // @ts-ignore
                 address: fairFund.address,
                 abi: fairFund.abi,
@@ -88,22 +91,21 @@ export default function VaultForm() {
             })
             const hash = await writeContract(wagmiConfig, request)
             await axios.post('/api/vault/new', {
-                description:data.description,
-                creatorAddress:address,
-                vaultAddress:result,
-                amountFundingTokens:0,
-                amountVotingTokens:0,
-                fundingTokenAddress:data.fundingTokenAddress,
-                votingTokenAddress:data.votingTokenAddress,
-                tallyDate:data.tallyDate
+                description: data.description,
+                creatorAddress: address,
+                vaultAddress: result,
+                amountFundingTokens: 0,
+                amountVotingTokens: 0,
+                fundingTokenAddress: data.fundingTokenAddress,
+                votingTokenAddress: data.votingTokenAddress,
+                tallyDate: data.tallyDate
             })
             if (hash) {
                 toast({
                     title: "Funding vault created",
                     description: (
                         <div className="w-[80%] md:w-[340px]">
-                                <p>Your funding vault has been created successfully.</p>
-                                <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
+                            <p className="truncate">Transaction hash: <a href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noopener noreferrer">{hash}</a></p>
                         </div>
                     ),
                 })

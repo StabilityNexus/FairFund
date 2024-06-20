@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 interface RegisterTokenFormProps {
     votingTokenAddress: string;
@@ -36,6 +37,8 @@ export function RegisterTokenForm({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
+    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
         resolver: zodResolver(registerTokensForm),
@@ -46,6 +49,7 @@ export function RegisterTokenForm({
 
     async function handleSubmit(data: z.infer<typeof registerTokensForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage();
             return;
         }
         try{

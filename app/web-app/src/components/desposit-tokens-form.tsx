@@ -14,6 +14,7 @@ import axios from "axios";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -36,7 +37,9 @@ export default function DepositTokensForm({
 
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { toast } = useToast()
+    const { toast } = useToast();
+    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+
 
     const form = useForm<z.infer<typeof depositTokensForm>>({
         resolver: zodResolver(depositTokensForm),
@@ -47,6 +50,7 @@ export default function DepositTokensForm({
 
     async function handleSubmit(data: z.infer<typeof depositTokensForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage();
             return;
         }
         try {

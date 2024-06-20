@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage, FormLabel } from "@/components/ui/form";
@@ -17,6 +18,7 @@ import { writeContract, readContract,simulateContract } from '@wagmi/core';
 import { config as wagmiConfig } from "@/wagmi/config";
 import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
 import { parseUnits } from "viem";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -44,6 +46,8 @@ export default function ProposalForm({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
+    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
         defaultValues: {
@@ -58,6 +62,7 @@ export default function ProposalForm({
     async function handleSubmit(data: z.infer<typeof proposalFormSchema>) {
         try {
             if (!isConnected || !address) {
+                showConnectWalletMessage();
                 return;
             }
             const decimals = await readContract(wagmiConfig, {

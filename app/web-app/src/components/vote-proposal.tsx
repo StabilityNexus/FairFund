@@ -14,6 +14,7 @@ import { parseUnits } from "viem";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useWalletConnectMessageToast } from "@/hooks/use-wallet-connect-message-toast";
 
 
 interface VoteProposalButtonProps {
@@ -40,6 +41,8 @@ export default function VoteProposal({
     const { address, isConnected } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
+    const {showConnectWalletMessage}=useWalletConnectMessageToast();
+
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
         resolver: zodResolver(voteProposalForm),
@@ -50,6 +53,7 @@ export default function VoteProposal({
 
     async function handleSubmit(data: z.infer<typeof voteProposalForm>) {
         if (!isConnected || !address) {
+            showConnectWalletMessage()
             return;
         }
         try {
@@ -60,7 +64,6 @@ export default function VoteProposal({
                 functionName: 'decimals',
             })
             const amountOfTokens = parseUnits(data.amountOfTokens, decimals as number);
-            console.log(proposal.id);
             
             const hash = await writeContract(wagmiConfig, {
                 // @ts-ignore
@@ -83,11 +86,13 @@ export default function VoteProposal({
                 })
             }
         } catch (err) {
-            toast({
-                variant: 'destructive',
-                title: 'Error while voting to',
-                description: 'Something went wrong. Please try again.'
-            }) 
+            if(err instanceof Error && err.message.includes("FundingVault__AmountExceededsLimit()")){
+                toast({
+                    variant: 'destructive',
+                    title: 'Error while voting to',
+                    description: 'Something went wrong. Please try again.'
+                }) 
+            }
             console.log('[VOTE_PROPOSAL]: ', err);
         }
     }
