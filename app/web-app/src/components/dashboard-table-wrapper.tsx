@@ -4,6 +4,7 @@ import { Badge } from "./ui/badge";
 import { type FundingVault } from "@prisma/client";
 import Link from "next/link";
 import { MoveUpRight } from 'lucide-react';
+import { Dot } from 'lucide-react';
 
 
 const tokenMap = (addr: string): string => {
@@ -29,6 +30,7 @@ export default async function TableWrapper() {
                     <TableHead>Creator</TableHead>
                     <TableHead>Funding Token</TableHead>
                     <TableHead>Voting Token</TableHead>
+                    <TableHead>Status</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -40,6 +42,21 @@ export default async function TableWrapper() {
                             <TableCell className="truncate">{vault.creatorAddress}</TableCell>
                             <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
                             <TableCell><Badge variant="outline">{tokenMap(vault.fundingTokenAddress)}</Badge></TableCell>
+                            <TableCell>
+                                {
+                                    vault.tallyDate?.getTime() < Date.now() ? (
+                                        <Badge variant="outline" className="bg-green-400 cursor-pointer">
+                                            <Dot className="ml-[-9px] mr-[-4px]" />
+                                            Active
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="outline" className="bg-red-400 cursor-pointer">
+                                            <Dot className="ml-[-9px] mr-[-4px]" />
+                                            Closed
+                                        </Badge>
+                                    )
+                                }
+                            </TableCell>
                             <TableCell>
                                 <Badge variant="secondary">
                                     <Link className="cursor-pointer p-1 flex gap-1" href={`/vault/${vault.id}`}>
