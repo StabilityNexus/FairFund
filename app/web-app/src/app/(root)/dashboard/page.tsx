@@ -1,5 +1,5 @@
 import CardWrapper from "@/components/dashboard-card-wrapper";
-import TableWrapper from "@/components/dashboard-table-wrapper";
+import TableWrapper from "@/components/dashboard-table/table-wrapper";
 
 export default function DashboardPage(){
     return (

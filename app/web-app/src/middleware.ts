@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse,NextRequest } from 'next/server'
 import { allowedRoutes } from '../routes';
 import { headers } from "next/headers";
 

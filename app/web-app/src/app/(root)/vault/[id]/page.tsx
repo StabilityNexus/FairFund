@@ -1,4 +1,4 @@
-import TableWrapper from "@/components/proposals-table-wrapper";
+import TableWrapper from "@/components/proposal-table/table-wrapper";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import CardWrapper from "@/components/vault-details-card-wrapper";
