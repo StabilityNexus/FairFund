@@ -38,13 +38,13 @@ export const columns: ColumnDef<FundingVault>[] = [
         header: "Status",
         cell: ({ row }) => {
             let status;
-            if (row.original.tallyDate?.getTime() < Date.now()) {
+            if (row.original.tallyDate?.getTime() > Date.now()) {
                 status = "Active";
             } else {
                 status = "Closed";
             }
             return (
-                <Badge variant="outline" className={cn("bg-green-400 cursor-pointer", status === 'Closed' && 'bg-red-400')}>
+                <Badge variant="outline" className={cn("bg-green-400 cursor-pointer", status === 'Closed' && 'bg-red-200')}>
                     <Dot className="ml-[-9px] mr-[-4px]" />
                     {status}
                 </Badge>
