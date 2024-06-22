@@ -5,6 +5,8 @@ import {
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
+    getFilteredRowModel,
+    ColumnFiltersState,
     useReactTable,
 } from "@tanstack/react-table"
 import {
@@ -16,32 +18,59 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { use, useEffect, useState } from "react"
+import DataTableToolbar from "./dashboard-table/data-table-toolbar"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    useFilter?: boolean
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    useFilter = false
 }: DataTableProps<TData, TValue>) {
+
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+        []
+    );
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        initialState:{
-            pagination:{
-                pageSize: 4,
+        ...(
+            useFilter && {
+                onColumnFiltersChange: setColumnFilters,
+                getFilteredRowModel: getFilteredRowModel(),
             }
-        }
+        ),
+        ...(
+            useFilter && {
+                state: {
+                    columnFilters,
+                }
+            }
+        ),
+        initialState: {
+            pagination: {
+                pageSize: 4,
+            },
+        },
     })
 
     return (
-        <div className="px-0 flex flex-col gap-2">
-            <div className="w-full h-80">
+        <div className="flex flex-col gap-1 space-y-4 border-none pt-2">
+            {useFilter && (
+                <DataTableToolbar
+                    table={table}
+                />
+            )}
+            <div className={cn("w-full h-80", useFilter && ("rounded-md border"))}>
                 <Table className="w-full">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => {
@@ -80,7 +109,7 @@ export function DataTable<TData, TValue>({
                                 )
                             })
                         ) : (
-                            <TableRow>
+                            <TableRow >
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No Results.
                                 </TableCell>
@@ -89,7 +118,7 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div className="z-50 flex items-center justify-center space-x-2 py-4">
+            <div className="z-50 flex items-center justify-center space-x-2 py-2">
                 <Button
                     variant="outline"
                     size="sm"
@@ -104,7 +133,7 @@ export function DataTable<TData, TValue>({
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    <ArrowRight className="h-4 w-4"/>
+                    <ArrowRight className="h-4 w-4" />
                 </Button>
             </div>
         </div>

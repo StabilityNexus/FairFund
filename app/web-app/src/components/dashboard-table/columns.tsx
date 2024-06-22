@@ -8,6 +8,7 @@ import Link from "next/link";
 
 export const columns: ColumnDef<FundingVault>[] = [
     {
+        id:"description",
         accessorKey: "description",
         header: "Description"
     },

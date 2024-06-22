@@ -7,7 +7,7 @@ export default function DashboardPage(){
            <div className="m-2 w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <CardWrapper/>
            </div>
-           <div className="w-full border-2 shadow-sm rounded-lg overflow-hidden min-h-96">
+           <div className="w-full shadow-sm rounded-lg overflow-hidden min-h-96">
                 <TableWrapper/>
           </div>
         </div>

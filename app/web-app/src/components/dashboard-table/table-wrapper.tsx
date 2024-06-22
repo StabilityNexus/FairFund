@@ -12,6 +12,7 @@ export default async function TableWrapper() {
         <DataTable
             columns={columns}
             data={vaults}
+            useFilter={true}
         />
     )
 }
