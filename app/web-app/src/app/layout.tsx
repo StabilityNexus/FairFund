@@ -32,15 +32,15 @@ export default function RootLayout({
         "min-h-screen bg-background font-sans antialiased",
         fontSans.variable
       )}>
-        <Web3ModalProvider initialState={initialState}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <Web3ModalProvider initialState={initialState}>
             {children}
-          </ThemeProvider>
-        </Web3ModalProvider>
+          </Web3ModalProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
