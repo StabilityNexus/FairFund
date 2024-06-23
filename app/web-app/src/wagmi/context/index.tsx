@@ -13,14 +13,10 @@ if (!projectId) throw new Error('Project ID is not defined')
 createWeb3Modal({
   wagmiConfig: config,
   projectId,
-  enableAnalytics: true, // Optional - defaults to your Cloud configuration
-  themeVariables: {
-    '--w3m-accent':'#000',
-  },
+  enableAnalytics: false,
   themeMode:'light',
   allWallets:"HIDE",
   enableOnramp:false,
-  
 })
 
 export default function Web3ModalProvider({

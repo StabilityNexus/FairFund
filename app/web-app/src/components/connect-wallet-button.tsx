@@ -1,9 +1,18 @@
 'use client';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { Button } from "./ui/button";
+import { useAccount } from 'wagmi';
+
+
 export default function ConnectWalletButton() {
+    const { open } = useWeb3Modal();
+    const {isConnected}=useAccount();
+
     return (
         <>
-            <w3m-network-button />
-            <w3m-button />
+            <Button className="rounded-full" onClick={()=>open()}>
+                {isConnected ?"Connected" :"Connect Wallet"}
+            </Button>
         </>
     )
 }

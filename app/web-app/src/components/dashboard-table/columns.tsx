@@ -45,7 +45,7 @@ export const columns: ColumnDef<FundingVault>[] = [
                 status = "Closed";
             }
             return (
-                <Badge variant="outline" className={cn("bg-green-400 cursor-pointer", status === 'Closed' && 'bg-red-200')}>
+                <Badge variant="outline" className={cn("bg-green-400 cursor-pointer dark:text-black", status === 'Closed' && 'bg-red-200 ')}>
                     <Dot className="ml-[-9px] mr-[-4px]" />
                     {status}
                 </Badge>
