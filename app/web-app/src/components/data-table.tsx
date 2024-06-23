@@ -18,7 +18,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { ArrowLeft, ArrowRight } from "lucide-react"
-import { use, useEffect, useState } from "react"
+import { useState } from "react"
 import DataTableToolbar from "./dashboard-table/data-table-toolbar"
 import { cn } from "@/lib/utils"
 

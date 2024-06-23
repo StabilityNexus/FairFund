@@ -7,6 +7,7 @@ import Web3ModalProvider from "@/wagmi/context";
 import { cookieToInitialState } from 'wagmi'
 import { headers } from "next/headers";
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "@/components/theme-provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,15 +25,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const initialState = cookieToInitialState(config, headers().get('cookie'))
-  
+
   return (
     <html lang="en">
       <body className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}>
-         <Web3ModalProvider initialState={initialState}>{children}</Web3ModalProvider>
-         <Toaster />
+        "min-h-screen bg-background font-sans antialiased",
+        fontSans.variable
+      )}>
+        <Web3ModalProvider initialState={initialState}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+          >
+            {children}
+          </ThemeProvider>
+        </Web3ModalProvider>
+        <Toaster />
       </body>
     </html>
   );
