@@ -11,9 +11,4 @@ export const routes:Route[] = [
         href: "/vault/new",
         label: "Create",
     },
-    {
-        icon: User2,
-        href: "/profile",
-        label: "Profile",
-    },
 ]
