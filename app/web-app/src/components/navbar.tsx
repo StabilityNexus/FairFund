@@ -5,6 +5,7 @@ import VoteIcon from "@/components/vote-icon";
 import ConnectWalletButton from "./connect-wallet-button";
 import { routes } from "@/lib/constants";
 import MobileNavbar from "./mobile-navbar";
+import { ModeToggle } from "./dark-mode-toggle";
 
 
 
@@ -33,6 +34,7 @@ export default function Navbar() {
                     })}
                 </div>
                 <ConnectWalletButton />
+                <ModeToggle/>
             </div>
             <MobileNavbar />
         </div>
