@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
                     table={table}
                 />
             )}
-            <div className={cn("w-full h-80", useFilter && ("rounded-md border"))}>
+            <div className={cn("w-full", useFilter && ("rounded-md border"))}>
                 <Table className="w-full">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => {

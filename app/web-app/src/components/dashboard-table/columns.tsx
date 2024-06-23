@@ -50,6 +50,18 @@ export const columns: ColumnDef<FundingVault>[] = [
                     {status}
                 </Badge>
             )
+        },
+        filterFn:(row,id,value)=>{
+            if(value.includes("active") && value.includes("closed")){
+                return true;
+            }
+            else if(value.length===1 && value.includes("active")){
+                return row.original.tallyDate?.getTime() > Date.now();
+            }else if(value.length===1 && value.includes("closed")){
+                return row.original.tallyDate?.getTime() < Date.now();
+            }else{
+                return false;
+            }
         }
     },
     {
