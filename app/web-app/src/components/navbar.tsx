@@ -1,11 +1,10 @@
 'use client';
-
 import Link from "next/link";
 import VoteIcon from "@/components/vote-icon";
-import ConnectWalletButton from "./connect-wallet-button";
+import ConnectWalletButton from "@/components/connect-wallet-button";
+import MobileNavbar from "@/components/mobile-navbar";
+import { ModeToggle } from "@/components/mode-toggle";
 import { routes } from "@/lib/constants";
-import MobileNavbar from "./mobile-navbar";
-import { ModeToggle } from "./dark-mode-toggle";
 
 
 
