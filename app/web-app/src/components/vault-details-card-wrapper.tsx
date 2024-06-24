@@ -63,7 +63,7 @@ export default async function VaultDetailsCardWrapper({
                                 <DialogTitle className="px-4">
                                     Description
                                 </DialogTitle>
-                                <DialogDescription className="p-4 grow overflow-y-scroll">
+                                <DialogDescription className="p-4 w-full grow overflow-y-scroll">
                                     {vault!.description}
                                 </DialogDescription>
                             </DialogHeader>

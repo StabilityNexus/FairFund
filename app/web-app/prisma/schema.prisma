@@ -27,6 +27,7 @@ model FundingVault {
   votingTokenSymbol   String
   vaultAddress        String
   tallyDate           DateTime
+  createdAt DateTime @default(now())
   proposals           Proposal[]
 
   @@index([creatorAddress])
@@ -41,6 +42,7 @@ model Proposal {
   recipient          String
   proposalId         Int    // proposal id w.r.t the funding vault.
   fundingVaultId     Int
+  createdAt DateTime @default(now())
   fundingVault       FundingVault @relation(fields: [fundingVaultId], references: [id])
 
   @@index([proposerAddress])

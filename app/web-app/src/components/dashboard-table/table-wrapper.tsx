@@ -6,7 +6,11 @@ import { columns } from "@/components/dashboard-table/columns";
 
 export default async function TableWrapper() {
 
-    const vaults: FundingVault[] = await prisma.fundingVault.findMany();
+    const vaults: FundingVault[] = await prisma.fundingVault.findMany({
+        orderBy:{
+            createdAt: 'desc'
+        }
+    });
 
     return (
         <DataTable
