@@ -1,23 +1,31 @@
-"use client";
+'use client';
 
-import axios from "axios";
-import { type FundingVault } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
-import { z } from "zod";
+import axios from 'axios';
+import { type FundingVault } from '@prisma/client';
+import { useRouter } from 'next/navigation';
+import { useAccount } from 'wagmi';
+import { z } from 'zod';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage, FormLabel } from "@/components/ui/form";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { writeContract, readContract,simulateContract } from '@wagmi/core';
-import { config as wagmiConfig } from "@/wagmi/config";
-import { erc20ABI, fundingVaultABI } from "@/blockchain/constants";
-import { parseUnits } from "viem";
-import { useCustomToast } from "@/hooks/use-custom-toast";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormMessage,
+    FormLabel,
+} from '@/components/ui/form';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { writeContract, readContract, simulateContract } from '@wagmi/core';
+import { config as wagmiConfig } from '@/wagmi/config';
+import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
+import { parseUnits } from 'viem';
+import { useCustomToast } from '@/hooks/use-custom-toast';
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -25,36 +33,34 @@ interface ProposalFormProps {
 
 const proposalFormSchema = z.object({
     description: z.string().min(1, {
-        message: "Please enter a description."
+        message: 'Please enter a description.',
     }),
     minRequestAmount: z.string().min(1, {
-        message: "Please enter a minimum request amount."
+        message: 'Please enter a minimum request amount.',
     }),
     maxRequestAmount: z.string().min(1, {
-        message: "Please enter a maximum request amount."
+        message: 'Please enter a maximum request amount.',
     }),
     recipient: z.string().min(1, {
-        message: "Please enter a valid recipient address."
+        message: 'Please enter a valid recipient address.',
     }),
-})
+});
 
-export default function ProposalForm({
-    fundingVault
-}: ProposalFormProps) {
-
+export default function ProposalForm({ fundingVault }: ProposalFormProps) {
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const {showConnectWalletMessage,showHashMessage,showErrorMessage}=useCustomToast();
+    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
+        useCustomToast();
 
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
         defaultValues: {
-            description: "",
-            minRequestAmount: "",
-            maxRequestAmount: "",
-            recipient: "",
-        }
-    })
+            description: '',
+            minRequestAmount: '',
+            maxRequestAmount: '',
+            recipient: '',
+        },
+    });
     const isLoading = form.formState.isLoading;
 
     async function handleSubmit(data: z.infer<typeof proposalFormSchema>) {
@@ -68,21 +74,27 @@ export default function ProposalForm({
                 address: fundingVault.fundingTokenAddress,
                 abi: erc20ABI,
                 functionName: 'decimals',
-            })
-            const minRequestAmount = parseUnits(data.minRequestAmount, decimals as number);
-            const maxRequestAmount = parseUnits(data.maxRequestAmount, decimals as number);
-            const {result,request} = await simulateContract(wagmiConfig, {
+            });
+            const minRequestAmount = parseUnits(
+                data.minRequestAmount,
+                decimals as number
+            );
+            const maxRequestAmount = parseUnits(
+                data.maxRequestAmount,
+                decimals as number
+            );
+            const { result, request } = await simulateContract(wagmiConfig, {
                 // @ts-ignore
                 address: fundingVault.vaultAddress,
                 abi: fundingVaultABI,
                 functionName: 'submitProposal',
                 args: [
-                    "TODO",
+                    'TODO',
                     minRequestAmount,
                     maxRequestAmount,
-                    data.recipient
-                ]
-            })
+                    data.recipient,
+                ],
+            });
             const hash = await writeContract(wagmiConfig, request);
             await axios.post('/api/proposal/new', {
                 description: data.description,
@@ -91,12 +103,12 @@ export default function ProposalForm({
                 maxRequestAmount: data.maxRequestAmount,
                 recipient: data.recipient,
                 fundingVaultId: fundingVault.id,
-                proposalId: parseInt(result)
-            })
+                proposalId: parseInt(result),
+            });
             if (hash) {
-                showHashMessage('Successfully submitted proposal', hash);   
+                showHashMessage('Successfully submitted proposal', hash);
             }
-            router.push(`/vault/${fundingVault.id}`)
+            router.push(`/vault/${fundingVault.id}`);
             router.refresh();
         } catch (err) {
             showErrorMessage(err);
@@ -107,13 +119,18 @@ export default function ProposalForm({
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-10">
+                <form
+                    onSubmit={form.handleSubmit(handleSubmit)}
+                    className="space-y-8 pb-10"
+                >
                     <div className="space-y-2 w-full">
                         <h3 className="text-lg font-medium">
-                            Submit a proposal for FundingVault#{fundingVault.id}.
+                            Submit a proposal for FundingVault#{fundingVault.id}
+                            .
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                            Submit a proposal to request funds from this FundingVault.
+                            Submit a proposal to request funds from this
+                            FundingVault.
                         </p>
                     </div>
                     <Separator className="bg-primary/10" />
@@ -124,9 +141,7 @@ export default function ProposalForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem>
-                                        <FormLabel>
-                                            Description
-                                        </FormLabel>
+                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
                                             <Textarea
                                                 className="bg-background resize-none"
@@ -136,11 +151,13 @@ export default function ProposalForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            A short description about the proposal (this won&apos;t be stored on chain).
+                                            A short description about the
+                                            proposal (this won&apos;t be stored
+                                            on chain).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                     </div>
@@ -162,11 +179,12 @@ export default function ProposalForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The minimum amount that would be suffice for recepient.
+                                            The minimum amount that would be
+                                            suffice for recepient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -186,11 +204,12 @@ export default function ProposalForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The maximum amount needed for the recepient.
+                                            The maximum amount needed for the
+                                            recepient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -210,16 +229,18 @@ export default function ProposalForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The address of the wallet that will receive the funds, if the proposal is approved.
+                                            The address of the wallet that will
+                                            receive the funds, if the proposal
+                                            is approved.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                     </div>
                     <div className="w-full flex justify-center">
-                        <Button size={"lg"} disabled={isLoading}>
+                        <Button size={'lg'} disabled={isLoading}>
                             Submit
                         </Button>
                     </div>

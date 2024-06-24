@@ -1,6 +1,6 @@
 export const allowedRoutes = [
-    "/dashboard",
-    "/profile",
-    "/proposal/",
-    "/vault/",
-]
+    '/dashboard',
+    '/profile',
+    '/proposal/',
+    '/vault/',
+];

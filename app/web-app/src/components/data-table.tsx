@@ -1,5 +1,5 @@
-"use client"
-import { Button } from "@/components/ui/button"
+'use client';
+import { Button } from '@/components/ui/button';
 import {
     ColumnDef,
     flexRender,
@@ -8,7 +8,7 @@ import {
     getFilteredRowModel,
     ColumnFiltersState,
     useReactTable,
-} from "@tanstack/react-table"
+} from '@tanstack/react-table';
 import {
     Table,
     TableBody,
@@ -16,61 +16,50 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
-import { ArrowLeft, ArrowRight } from "lucide-react"
-import { useState } from "react"
-import DataTableToolbar from "./dashboard-table/data-table-toolbar"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/table';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import DataTableToolbar from './dashboard-table/data-table-toolbar';
+import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[]
-    data: TData[]
-    useFilter?: boolean
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+    useFilter?: boolean;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
-    useFilter = false
+    useFilter = false,
 }: DataTableProps<TData, TValue>) {
-
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-        []
-    );
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-        ...(
-            useFilter && {
-                onColumnFiltersChange: setColumnFilters,
-                getFilteredRowModel: getFilteredRowModel(),
-            }
-        ),
-        ...(
-            useFilter && {
-                state: {
-                    columnFilters,
-                }
-            }
-        ),
+        ...(useFilter && {
+            onColumnFiltersChange: setColumnFilters,
+            getFilteredRowModel: getFilteredRowModel(),
+        }),
+        ...(useFilter && {
+            state: {
+                columnFilters,
+            },
+        }),
         initialState: {
             pagination: {
                 pageSize: 4,
             },
         },
-    })
+    });
 
     return (
         <div className="flex flex-col gap-1 space-y-4 border-none pt-2">
-            {useFilter && (
-                <DataTableToolbar
-                    table={table}
-                />
-            )}
-            <div className={cn("w-full", useFilter && ("rounded-md border"))}>
+            {useFilter && <DataTableToolbar table={table} />}
+            <div className={cn('w-full', useFilter && 'rounded-md border')}>
                 <Table className="w-full">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => {
@@ -79,15 +68,18 @@ export function DataTable<TData, TValue>({
                                     {headerGroup.headers.map((header) => {
                                         return (
                                             <TableHead key={header.id}>
-                                                {header.isPlaceholder ? null : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column
+                                                              .columnDef.header,
+                                                          header.getContext()
+                                                      )}
                                             </TableHead>
-                                        )
+                                        );
                                     })}
                                 </TableRow>
-                            )
+                            );
                         })}
                     </TableHeader>
                     <TableBody>
@@ -96,21 +88,30 @@ export function DataTable<TData, TValue>({
                                 return (
                                     <TableRow
                                         key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
+                                        data-state={
+                                            row.getIsSelected() && 'selected'
+                                        }
                                     >
                                         {row.getVisibleCells().map((cell) => {
                                             return (
                                                 <TableCell key={cell.id}>
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    {flexRender(
+                                                        cell.column.columnDef
+                                                            .cell,
+                                                        cell.getContext()
+                                                    )}
                                                 </TableCell>
-                                            )
+                                            );
                                         })}
                                     </TableRow>
-                                )
+                                );
                             })
                         ) : (
-                            <TableRow >
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
                                     No Results.
                                 </TableCell>
                             </TableRow>
@@ -137,5 +138,5 @@ export function DataTable<TData, TValue>({
                 </Button>
             </div>
         </div>
-    )
+    );
 }

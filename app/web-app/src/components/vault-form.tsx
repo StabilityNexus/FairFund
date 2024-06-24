@@ -1,55 +1,64 @@
-"use client";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Separator } from "@/components/ui/separator";
-import { format, getUnixTime } from "date-fns"
-import { useAccount } from "wagmi";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+'use client';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Separator } from '@/components/ui/separator';
+import { format, getUnixTime } from 'date-fns';
+import { useAccount } from 'wagmi';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Button } from "@/components/ui/button";
-import { writeContract, simulateContract } from '@wagmi/core'
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { parseUnits } from 'viem'
-import { fairFund } from "@/blockchain/constants";
-import axios from "axios";
-import { config as wagmiConfig } from "@/wagmi/config";
-import { Textarea } from "./ui/textarea";
-import { useCustomToast } from "@/hooks/use-custom-toast";
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { writeContract, simulateContract } from '@wagmi/core';
+import { cn } from '@/lib/utils';
+import { CalendarIcon } from 'lucide-react';
+import { parseUnits } from 'viem';
+import { fairFund } from '@/blockchain/constants';
+import axios from 'axios';
+import { config as wagmiConfig } from '@/wagmi/config';
+import { Textarea } from './ui/textarea';
+import { useCustomToast } from '@/hooks/use-custom-toast';
 
 const createVaultFormSchema = z.object({
     description: z.string({
-        required_error: 'Description is required.'
+        required_error: 'Description is required.',
     }),
     fundingTokenAddress: z.string({
-        required_error: 'Funding Token Address is required.'
+        required_error: 'Funding Token Address is required.',
     }),
     votingTokenAddress: z.string({
-        required_error: 'Voting Token Address is required.'
+        required_error: 'Voting Token Address is required.',
     }),
     minRequestableAmount: z.string({
-        required_error: 'Minimum Requestable Amount is required.'
+        required_error: 'Minimum Requestable Amount is required.',
     }),
     maxRequestableAmount: z.string({
-        required_error: 'Maximum Requestable Amount is required.'
+        required_error: 'Maximum Requestable Amount is required.',
     }),
     tallyDate: z.date({
-        required_error: 'Tally Date is required.'
+        required_error: 'Tally Date is required.',
     }),
-})
+});
 
 export default function VaultForm() {
     const { address, isConnected } = useAccount();
     const router = useRouter();
-    const { showConnectWalletMessage,showHashMessage,showErrorMessage } = useCustomToast();
+    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
+        useCustomToast();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -58,10 +67,9 @@ export default function VaultForm() {
             votingTokenAddress: '',
             minRequestableAmount: '',
             maxRequestableAmount: '',
-        }
+        },
     });
     const isLoading = form.formState.isLoading;
-
 
     async function handleSubmit(data: z.infer<typeof createVaultFormSchema>) {
         try {
@@ -70,8 +78,14 @@ export default function VaultForm() {
                 return;
             }
             const unixTime = getUnixTime(data.tallyDate);
-            const minRequestableAmount = parseUnits(data.minRequestableAmount, 18);
-            const maxRequestableAmount = parseUnits(data.maxRequestableAmount, 18);
+            const minRequestableAmount = parseUnits(
+                data.minRequestableAmount,
+                18
+            );
+            const maxRequestableAmount = parseUnits(
+                data.maxRequestableAmount,
+                18
+            );
 
             const { result, request } = await simulateContract(wagmiConfig, {
                 // @ts-ignore
@@ -84,10 +98,10 @@ export default function VaultForm() {
                     minRequestableAmount,
                     maxRequestableAmount,
                     unixTime,
-                    address
-                ]
-            })
-            const hash = await writeContract(wagmiConfig, request)
+                    address,
+                ],
+            });
+            const hash = await writeContract(wagmiConfig, request);
             await axios.post('/api/vault/new', {
                 description: data.description,
                 creatorAddress: address,
@@ -96,12 +110,12 @@ export default function VaultForm() {
                 amountVotingTokens: 0,
                 fundingTokenAddress: data.fundingTokenAddress,
                 votingTokenAddress: data.votingTokenAddress,
-                tallyDate: data.tallyDate
-            })
+                tallyDate: data.tallyDate,
+            });
             if (hash) {
-                showHashMessage("Funding vault created.", hash);
+                showHashMessage('Funding vault created.', hash);
             }
-            router.push('/dashboard')
+            router.push('/dashboard');
             router.refresh();
         } catch (err) {
             showErrorMessage(err);
@@ -109,11 +123,13 @@ export default function VaultForm() {
         }
     }
 
-
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-10">
+                <form
+                    onSubmit={form.handleSubmit(handleSubmit)}
+                    className="space-y-8 pb-10"
+                >
                     <div className="space-y-2 w-full">
                         <h3 className="text-lg font-medium">
                             Create a new funding vault
@@ -130,9 +146,7 @@ export default function VaultForm() {
                             render={({ field }) => {
                                 return (
                                     <FormItem>
-                                        <FormLabel>
-                                            Description
-                                        </FormLabel>
+                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
                                             <Textarea
                                                 className="bg-background resize-none"
@@ -142,11 +156,13 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            A short description of the funding vault (this won&apos;t be stored on chain).
+                                            A short description of the funding
+                                            vault (this won&apos;t be stored on
+                                            chain).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                     </div>
@@ -168,11 +184,13 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The address of the token that will be used to fund the accepted proposals.
+                                            The address of the token that will
+                                            be used to fund the accepted
+                                            proposals.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -192,11 +210,13 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The voting token holders will have to lock their voting tokens in order to vote the proposals.
+                                            The voting token holders will have
+                                            to lock their voting tokens in order
+                                            to vote the proposals.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -216,11 +236,12 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The minimum amount that can be requested by a proposal.
+                                            The minimum amount that can be
+                                            requested by a proposal.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -240,11 +261,12 @@ export default function VaultForm() {
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The maximum amount that can be requested by a proposal.
+                                            The maximum amount that can be
+                                            requested by a proposal.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                         <FormField
@@ -253,23 +275,27 @@ export default function VaultForm() {
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
-                                            Tally Date
-                                        </FormLabel>
+                                        <FormLabel>Tally Date</FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
                                                     <Button
-                                                        variant={"outline"}
+                                                        variant={'outline'}
                                                         className={cn(
-                                                            "font-normal w-full flex justify-between items-center",
-                                                            !field.value && "text-muted-foreground"
+                                                            'font-normal w-full flex justify-between items-center',
+                                                            !field.value &&
+                                                                'text-muted-foreground'
                                                         )}
                                                     >
                                                         {field.value ? (
-                                                            format(field.value, "PPP")
+                                                            format(
+                                                                field.value,
+                                                                'PPP'
+                                                            )
                                                         ) : (
-                                                            <span>Pick a date</span>
+                                                            <span>
+                                                                Pick a date
+                                                            </span>
                                                         )}
                                                         <CalendarIcon className="opacity-50" />
                                                     </Button>
@@ -288,21 +314,23 @@ export default function VaultForm() {
                                             </PopoverContent>
                                         </Popover>
                                         <FormDescription>
-                                            Date after which the funds will be distributed to the addresses that represent the selected proposals.
+                                            Date after which the funds will be
+                                            distributed to the addresses that
+                                            represent the selected proposals.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
-                                )
+                                );
                             }}
                         />
                     </div>
                     <div className="w-full flex justify-center">
-                        <Button size={"lg"} disabled={isLoading}>
+                        <Button size={'lg'} disabled={isLoading}>
                             Submit
                         </Button>
                     </div>
                 </form>
             </Form>
         </div>
-    )
+    );
 }

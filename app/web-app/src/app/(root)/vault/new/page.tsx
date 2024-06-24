@@ -1,7 +1,5 @@
-import VaultForm from "@/components/vault-form";
+import VaultForm from '@/components/vault-form';
 
-export default function NewVaultPage(){
-    return (
-        <VaultForm/>
-    );
+export default function NewVaultPage() {
+    return <VaultForm />;
 }

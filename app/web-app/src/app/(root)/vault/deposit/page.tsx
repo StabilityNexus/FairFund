@@ -1,25 +1,25 @@
-import DepositTokensForm from "@/components/desposit-tokens-form";
-import prisma from "@/lib/db";
-import { redirect } from "next/navigation";
+import DepositTokensForm from '@/components/desposit-tokens-form';
+import prisma from '@/lib/db';
+import { redirect } from 'next/navigation';
 
 export default async function DepositPage({
     searchParams,
-}:{
-    searchParams: { [key: string]: string | string[] | undefined }
-}){
+}: {
+    searchParams: { [key: string]: string | string[] | undefined };
+}) {
     const vaultId = searchParams.vaultId;
     const vault = await prisma.fundingVault.findUnique({
         where: {
             id: parseInt(vaultId as string),
-        }
-    })
-    if(!vault){
-        redirect('/dashboard')
+        },
+    });
+    if (!vault) {
+        redirect('/dashboard');
     }
-    if(vault.tallyDate.getTime()<Date.now()){
-        redirect(`/vault/${vaultId}`)
+    if (vault.tallyDate.getTime() < Date.now()) {
+        redirect(`/vault/${vaultId}`);
     }
-    
+
     return (
         <>
             <DepositTokensForm
@@ -28,5 +28,5 @@ export default async function DepositPage({
                 fundingTokenAddress={vault!.fundingTokenAddress}
             />
         </>
-    )
+    );
 }

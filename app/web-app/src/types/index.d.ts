@@ -1,15 +1,12 @@
-
-
-declare interface Route{
+declare interface Route {
     icon: any;
     href: string;
     label: string;
 }
 
-
-declare interface SmartContract{
-    address:string;
-    abi:any;
+declare interface SmartContract {
+    address: string;
+    abi: any;
 }
 
 declare interface Vault {
@@ -18,5 +15,4 @@ declare interface Vault {
     creatorAddress: string;
     fundingTokenAddress: string;
     vaultAddress: string;
-  }
-  
+}
