@@ -1,7 +1,15 @@
 import prisma from "@/lib/db";
 import CardBody from "./card-body";
 import { Coins, Dock, File, Fingerprint, TimerIcon, User2 } from "lucide-react";
-import { Badge } from "./ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge";
 import { type FundingVault } from "@prisma/client";
 
 interface VaultDetailsCardWrapperProps {
@@ -18,7 +26,7 @@ const iconMap = {
 }
 
 export default async function VaultDetailsCardWrapper({
-    fundingVault:vault
+    fundingVault: vault
 }: VaultDetailsCardWrapperProps) {
 
     const proposals = await prisma.proposal.count({
@@ -45,7 +53,23 @@ export default async function VaultDetailsCardWrapper({
                         </Badge>
                     </div>
                 } />
-                <CardBody className="max-h-[100px] overflow-hidden" title="Description" icon={iconMap["description"]} bodyClassName="text-sm font-light" body={vault!.description} />
+                <CardBody className="max-h-[100px] overflow-hidden" title="Description" icon={iconMap["description"]} bodyClassName="text-sm font-light" body={
+                    <Dialog>
+                        <DialogTrigger className="text-ellipsis">
+                            {vault!.description}
+                        </DialogTrigger>
+                        <DialogContent className="flex h-[70%] gap-4">
+                            <DialogHeader>
+                                <DialogTitle className="px-4">
+                                    Description
+                                </DialogTitle>
+                                <DialogDescription className="p-4 grow overflow-y-scroll">
+                                    {vault!.description}
+                                </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
+                } />
             </div>
         </>
     )

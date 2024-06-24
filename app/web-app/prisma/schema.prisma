@@ -21,8 +21,10 @@ model FundingVault {
   creatorAddress      String
   amountFundingTokens Int
   amountVotingTokens  Int    //This is actually the amount of voting power token.
-  fundingTokenAddress String @default("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238")
-  votingTokenAddress  String @default("0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238")
+  fundingTokenAddress String 
+  fundingTokenSymbol  String
+  votingTokenAddress  String
+  votingTokenSymbol   String
   vaultAddress        String
   tallyDate           DateTime
   proposals           Proposal[]

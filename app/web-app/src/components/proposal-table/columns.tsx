@@ -2,14 +2,36 @@
 import {type Proposal} from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Dot, MoveUpRight } from "lucide-react";
+import { MoveUpRight } from "lucide-react";
 import Link from "next/link";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 
 export const columns:ColumnDef<Proposal>[] = [
     {
         accessorKey: "description",
-        header: "Description"
+        header: "Description",
+        cell:({row})=>{
+            return (
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger className="max-w-60 truncate">
+                            {row.original.description as React.ReactNode}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <div className="max-w-96 max-h-96 overflow-scroll">
+                                <p className="text-sm">{row.original.description}</p>
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            )
+        }
     },
     {
         accessorKey: "minRequestAmount",
