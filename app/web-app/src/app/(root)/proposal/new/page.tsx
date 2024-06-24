@@ -17,6 +17,9 @@ export default async function NewProposalPage({
     if(!vault){
         redirect('/dashboard')
     }
+    if(vault.tallyDate.getTime()<Date.now()){
+        redirect(`/vault/${vaultId}`)
+    }
     return (
         <>
             <ProposalForm

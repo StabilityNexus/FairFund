@@ -16,6 +16,9 @@ export default async function RegisterPage({
     if(!vault){
         redirect('/dashboard')
     }
+    if(vault.tallyDate.getTime()<Date.now()){
+        redirect(`/vault/${vaultId}`)
+    }
 
     return (
         <>

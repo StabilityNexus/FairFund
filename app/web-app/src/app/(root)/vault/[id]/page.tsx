@@ -6,6 +6,7 @@ import Link from "next/link";
 import prisma from "@/lib/db";
 import { redirect } from "next/navigation";
 import DistributeFundsButton from "@/components/distrubute-funds-botton";
+import { cn } from "@/lib/utils";
 
 export default async function VaultDetailsPage({
     params
@@ -20,7 +21,7 @@ export default async function VaultDetailsPage({
             id: Number(id)
         }
     })
-    if(!vault){
+    if (!vault) {
         redirect('/dashboard')
     }
 
@@ -59,18 +60,18 @@ export default async function VaultDetailsPage({
             </div>
             <Separator className="bg-primary/10" />
             <div className="m-2 w-full flex flex-wrap gap-2">
-                <Link href={`/proposal/new?vaultId=${id}`} className="grow">
-                    <Button className="w-full">
+                <Link href={`/proposal/new?vaultId=${id}`} className={cn("grow", vault.tallyDate.getTime() < Date.now() && 'pointer-events-none')}>
+                    <Button className="w-full" disabled={vault.tallyDate.getTime() < Date.now()}>
                         Create Proposal
                     </Button>
                 </Link>
-                <Link href={`/vault/deposit?vaultId=${id}`} className="grow">
-                    <Button className="w-full">
+                <Link href={`/vault/deposit?vaultId=${id}`} className={cn("grow", vault.tallyDate.getTime() < Date.now() && 'pointer-events-none')}>
+                    <Button className="w-full" disabled={vault.tallyDate.getTime() < Date.now()}>
                         Deposit Funding Tokens
                     </Button>
                 </Link>
-                <Link href={`/vault/register?vaultId=${id}`} className="grow">
-                    <Button className="w-full">
+                <Link href={`/vault/register?vaultId=${id}`} className={cn("grow", vault.tallyDate.getTime() < Date.now() && 'pointer-events-none')}>
+                    <Button className="w-full" disabled={vault.tallyDate.getTime() < Date.now()}>
                         Register to Vote
                     </Button>
                 </Link>
