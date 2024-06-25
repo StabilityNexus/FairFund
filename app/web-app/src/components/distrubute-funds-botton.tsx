@@ -6,6 +6,7 @@ import { writeContract } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { fundingVaultABI } from '@/blockchain/constants';
 import { useCustomToast } from '@/hooks/use-custom-toast';
+import {BarChart3} from "lucide-react";
 
 interface DistributeFundsButtonProps {
     className?: string;
@@ -51,6 +52,7 @@ export default function DistributeFundsButton({
             disabled={fundingVault.tallyDate?.getTime() > Date.now()}
             onClick={handleClick}
         >
+            <BarChart3 className="mr-2 h-4 w-4" />
             Distribute Funds
         </Button>
     );

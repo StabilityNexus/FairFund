@@ -20,7 +20,7 @@ export default function CardBody({
 }: CardBodyProps) {
     return (
         <Card
-            className={cn('h-[150px] flex flex-col justify-around', className)}
+            className={cn('h-full', className)}
         >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle
@@ -32,7 +32,7 @@ export default function CardBody({
             </CardHeader>
             <CardContent>
                 <div
-                    className={cn('truncate text-2xl font-bold', bodyClassName)}
+                    className={cn('text-base', bodyClassName)}
                 >
                     {body}
                 </div>

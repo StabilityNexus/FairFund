@@ -40,6 +40,8 @@ $$\min(p.\text{maximumAmount}, R \times \frac{V(p)}{S})$$
 The funding to be received by a rejected proposal `p` is:
 $$0$$
 
+## Deployed Instances
+
 #### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
 #### Frontend: https://fair-fund.vercel.app/
 
