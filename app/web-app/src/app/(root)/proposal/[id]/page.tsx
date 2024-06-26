@@ -58,7 +58,7 @@ export default async function ProposalDetailsPage({
                 <p className="text-muted-foreground mb-4">
                     Enter the amount of tokens you want to allocate to this proposal.
                 </p>
-                <div className="mt-4">
+                <div className="mt-4 flex justify-center">
                     <VoteProposal
                         proposal={proposal}
                         votingTokenAddress={vault.votingTokenAddress}

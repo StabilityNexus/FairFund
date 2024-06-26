@@ -101,7 +101,7 @@ export default async function VaultDetailsCardWrapper({
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">Wallet Address:</p>
-                        <Badge variant="secondary" className="px-3 py-1 text-xs font-mono w-full truncate">
+                        <Badge variant="secondary" className="px-3 py-1 text-xs font-mono w-full break-all">
                             {vault.creatorAddress}
                         </Badge>
                     </CardContent>

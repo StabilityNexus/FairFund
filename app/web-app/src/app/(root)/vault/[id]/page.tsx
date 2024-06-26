@@ -70,7 +70,6 @@ export default async function VaultDetailsPage({
                 </CardHeader>
                 <CardContent>
                     <TableWrapper fundingVaultId={Number(id)} />
-
                 </CardContent>
             </Card>
             <Card>

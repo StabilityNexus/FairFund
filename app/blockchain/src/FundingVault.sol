@@ -197,7 +197,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (bytes(_metadata).length == 0) {
             revert FundingVault__MetadataCannotBeEmpty();
         }
-        if (_minimumAmount <= s_minRequestableAmount || _maximumAmount >= s_maxRequestableAmount) {
+        if (_minimumAmount < s_minRequestableAmount || _maximumAmount > s_maxRequestableAmount) {
             revert FundingVault__AmountExceededsLimit();
         }
         if (_minimumAmount > _maximumAmount) {

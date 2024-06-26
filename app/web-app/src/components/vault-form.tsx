@@ -23,11 +23,11 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { writeContract, simulateContract } from '@wagmi/core';
+import { writeContract, simulateContract,readContract } from '@wagmi/core';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { parseUnits } from 'viem';
-import { fairFund } from '@/blockchain/constants';
+import { erc20ABI, fairFund } from '@/blockchain/constants';
 import axios from 'axios';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { Textarea } from './ui/textarea';
@@ -78,13 +78,19 @@ export default function VaultForm() {
                 return;
             }
             const unixTime = getUnixTime(data.tallyDate);
+            const decimals = await readContract(wagmiConfig, {
+                // @ts-ignore
+                address: data.fundingTokenAddress,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
             const minRequestableAmount = parseUnits(
                 data.minRequestableAmount,
-                18
+                decimals as number
             );
             const maxRequestableAmount = parseUnits(
                 data.maxRequestableAmount,
-                18
+                decimals as number
             );
 
             const { result, request } = await simulateContract(wagmiConfig, {
