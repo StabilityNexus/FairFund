@@ -1,6 +1,4 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { useAccount } from 'wagmi';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,9 +17,9 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
-import { useCustomToast } from '@/hooks/use-custom-toast';
+import { Input } from '@/components/ui/input';
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from '@/components/web3-submit-button';
 
 interface RegisterTokenFormProps {
     votingTokenAddress: string;
@@ -30,8 +28,8 @@ interface RegisterTokenFormProps {
 }
 
 const registerTokensForm = z.object({
-    amountOfTokens: z.string({
-        required_error: 'Amount of tokens is required',
+    amountOfTokens: z.string().min(1, {
+        message: 'Please enter the amount of tokens',
     }),
 });
 
@@ -40,10 +38,7 @@ export function RegisterTokenForm({
     vaultId,
     vaultAddress,
 }: RegisterTokenFormProps) {
-    const { address, isConnected } = useAccount();
-    const router = useRouter();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const {handleSubmit,isLoading}=useWeb3FormSubmit<z.infer<typeof registerTokensForm>>();
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
         resolver: zodResolver(registerTokensForm),
@@ -52,54 +47,39 @@ export function RegisterTokenForm({
         },
     });
 
-    async function handleSubmit(data: z.infer<typeof registerTokensForm>) {
-        if (!isConnected || !address) {
-            showConnectWalletMessage();
-            return;
-        }
-        try {
-            const decimals = await readContract(wagmiConfig, {
-                // @ts-ignore
-                address: votingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const amountOfTokens = parseUnits(
-                data.amountOfTokens,
-                decimals as number
-            );
+    const onSubmit = handleSubmit(async (data: z.infer<typeof registerTokensForm>)=>{
+        const decimals = await readContract(wagmiConfig, {
+            // @ts-ignore
+            address: votingTokenAddress,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        });
+        const amountOfTokens = parseUnits(
+            data.amountOfTokens,
+            decimals as number
+        );
 
-            await writeContract(wagmiConfig, {
-                // @ts-ignore
-                address: votingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'approve',
-                args: [vaultAddress, amountOfTokens],
-            });
-            const hash = await writeContract(wagmiConfig, {
-                // @ts-ignore
-                address: vaultAddress,
-                abi: fundingVaultABI,
-                functionName: 'register',
-                args: [amountOfTokens],
-            });
-            await axios.post('/api/vault/register', {
-                vaultId: vaultId,
-                amountOfTokens: data.amountOfTokens,
-            });
-            if (hash) {
-                showHashMessage('Successfully registered', hash);
-            }
-            router.push(`/vault/${vaultId}`);
-            router.refresh();
-        } catch (err) {
-            showErrorMessage(err);
-            console.log(
-                '[REGISTER_TOKEN_FORM] Error while registering to vote.',
-                err
-            );
-        }
-    }
+        await writeContract(wagmiConfig, {
+            // @ts-ignore
+            address: votingTokenAddress,
+            abi: erc20ABI,
+            functionName: 'approve',
+            args: [vaultAddress, amountOfTokens],
+        });
+        const hash = await writeContract(wagmiConfig, {
+            // @ts-ignore
+            address: vaultAddress,
+            abi: fundingVaultABI,
+            functionName: 'register',
+            args: [amountOfTokens],
+        });
+        await axios.post('/api/vault/register', {
+            vaultId: vaultId,
+            amountOfTokens: data.amountOfTokens,
+        });
+        return {hash,message:"Successfully registered."}
+    },`/vault/${vaultId}`)
+
 
     return (
         <Card className="m-6">
@@ -108,7 +88,7 @@ export function RegisterTokenForm({
             </CardHeader>
             <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             name="amountOfTokens"
                             control={form.control}
@@ -133,7 +113,11 @@ export function RegisterTokenForm({
                             }}
                         />
                         <div className="w-full flex justify-center">
-                            <Button size={'lg'}>Submit</Button>
+                            <Web3SubmitButton
+                                isLoading={isLoading}
+                            >
+                                Submit
+                            </Web3SubmitButton>
                         </div>
                     </form>
                 </Form>

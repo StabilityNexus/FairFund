@@ -1,11 +1,18 @@
 'use client';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Separator } from '@/components/ui/separator';
 import { format, getUnixTime } from 'date-fns';
 import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { writeContract, simulateContract, readContract } from '@wagmi/core';
+import { parseUnits } from 'viem';
+import axios from 'axios';
+
+import { cn } from '@/lib/utils';
+import { config as wagmiConfig } from '@/wagmi/config';
+import { erc20ABI, fairFund } from '@/blockchain/constants';
+
+import { Separator } from '@/components/ui/separator';
 import {
     Form,
     FormControl,
@@ -23,42 +30,27 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { writeContract, simulateContract,readContract } from '@wagmi/core';
-import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/textarea';
+
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from '@/components/web3-submit-button';
+
 import { CalendarIcon } from 'lucide-react';
-import { parseUnits } from 'viem';
-import { erc20ABI, fairFund } from '@/blockchain/constants';
-import axios from 'axios';
-import { config as wagmiConfig } from '@/wagmi/config';
-import { Textarea } from './ui/textarea';
-import { useCustomToast } from '@/hooks/use-custom-toast';
 
 const createVaultFormSchema = z.object({
-    description: z.string({
-        required_error: 'Description is required.',
-    }),
-    fundingTokenAddress: z.string({
-        required_error: 'Funding Token Address is required.',
-    }),
-    votingTokenAddress: z.string({
-        required_error: 'Voting Token Address is required.',
-    }),
-    minRequestableAmount: z.string({
-        required_error: 'Minimum Requestable Amount is required.',
-    }),
-    maxRequestableAmount: z.string({
-        required_error: 'Maximum Requestable Amount is required.',
-    }),
+    description: z.string().min(1, 'Description is required.'),
+    fundingTokenAddress: z.string().min(1, 'Funding Token Address is required.'),
+    votingTokenAddress: z.string().min(1, 'Voting Token Address is required.'),
+    minRequestableAmount: z.string().min(1, 'Minimum Requestable Amount is required.'),
+    maxRequestableAmount: z.string().min(1, 'Maximum Requestable Amount is required.'),
     tallyDate: z.date({
         required_error: 'Tally Date is required.',
     }),
 });
 
 export default function VaultForm() {
-    const { address, isConnected } = useAccount();
-    const router = useRouter();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const { address } = useAccount();
+    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -69,71 +61,58 @@ export default function VaultForm() {
             maxRequestableAmount: '',
         },
     });
-    const isLoading = form.formState.isLoading;
+    const formIsLoading = form.formState.isLoading;
 
-    async function handleSubmit(data: z.infer<typeof createVaultFormSchema>) {
-        try {
-            if (!isConnected || !address) {
-                showConnectWalletMessage();
-                return;
-            }
-            const unixTime = getUnixTime(data.tallyDate);
-            const decimals = await readContract(wagmiConfig, {
-                // @ts-ignore
-                address: data.fundingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const minRequestableAmount = parseUnits(
-                data.minRequestableAmount,
-                decimals as number
-            );
-            const maxRequestableAmount = parseUnits(
-                data.maxRequestableAmount,
-                decimals as number
-            );
+    const onSubmit = handleSubmit(async (data: z.infer<typeof createVaultFormSchema>) => {
 
-            const { result, request } = await simulateContract(wagmiConfig, {
-                // @ts-ignore
-                address: fairFund.address,
-                abi: fairFund.abi,
-                functionName: 'deployFundingVault',
-                args: [
-                    data.fundingTokenAddress,
-                    data.votingTokenAddress,
-                    minRequestableAmount,
-                    maxRequestableAmount,
-                    unixTime,
-                    address,
-                ],
-            });
-            const hash = await writeContract(wagmiConfig, request);
-            await axios.post('/api/vault/new', {
-                description: data.description,
-                creatorAddress: address,
-                vaultAddress: result,
-                amountFundingTokens: 0,
-                amountVotingTokens: 0,
-                fundingTokenAddress: data.fundingTokenAddress,
-                votingTokenAddress: data.votingTokenAddress,
-                tallyDate: data.tallyDate,
-            });
-            if (hash) {
-                showHashMessage('Funding vault created.', hash);
-            }
-            router.push('/dashboard');
-            router.refresh();
-        } catch (err) {
-            showErrorMessage(err);
-            console.log('[VAULT_FORM]: Error creating vault: ', err);
-        }
-    }
+        const unixTime = getUnixTime(data.tallyDate);
+        const decimals = await readContract(wagmiConfig, {
+            address: data.fundingTokenAddress as `0x${string}`,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        });
+        const minRequestableAmount = parseUnits(
+            data.minRequestableAmount,
+            decimals as number
+        );
+        const maxRequestableAmount = parseUnits(
+            data.maxRequestableAmount,
+            decimals as number
+        );
+
+        const { result, request } = await simulateContract(wagmiConfig, {
+            address: fairFund.address as `0x${string}`,
+            abi: fairFund.abi,
+            functionName: 'deployFundingVault',
+            args: [
+                data.fundingTokenAddress,
+                data.votingTokenAddress,
+                minRequestableAmount,
+                maxRequestableAmount,
+                unixTime,
+                address!,
+            ],
+        });
+        const hash = await writeContract(wagmiConfig, request);
+        await axios.post('/api/vault/new', {
+            description: data.description,
+            creatorAddress: address,
+            vaultAddress: result,
+            amountFundingTokens: 0,
+            amountVotingTokens: 0,
+            fundingTokenAddress: data.fundingTokenAddress,
+            votingTokenAddress: data.votingTokenAddress,
+            tallyDate: data.tallyDate,
+        });
+        return { hash, message: "Vault created successfully." }
+    }, '/dashboard')
+
 
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(handleSubmit)}
+                    onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 pb-10"
                 >
                     <div className="space-y-2 w-full">
@@ -290,7 +269,7 @@ export default function VaultForm() {
                                                         className={cn(
                                                             'font-normal w-full flex justify-between items-center',
                                                             !field.value &&
-                                                                'text-muted-foreground'
+                                                            'text-muted-foreground'
                                                         )}
                                                     >
                                                         {field.value ? (
@@ -331,9 +310,11 @@ export default function VaultForm() {
                         />
                     </div>
                     <div className="w-full flex justify-center">
-                        <Button size={'lg'} disabled={isLoading}>
+                        <Web3SubmitButton
+                            isLoading={isLoading || formIsLoading}
+                        >
                             Submit
-                        </Button>
+                        </Web3SubmitButton>
                     </div>
                 </form>
             </Form>

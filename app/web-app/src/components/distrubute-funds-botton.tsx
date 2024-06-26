@@ -1,12 +1,11 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import { type FundingVault } from '@prisma/client';
-import { useAccount } from 'wagmi';
 import { writeContract } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { fundingVaultABI } from '@/blockchain/constants';
-import { useCustomToast } from '@/hooks/use-custom-toast';
-import {BarChart3} from "lucide-react";
+import { BarChart3 } from "lucide-react";
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from '@/components/web3-submit-button';
 
 interface DistributeFundsButtonProps {
     className?: string;
@@ -17,43 +16,31 @@ export default function DistributeFundsButton({
     className,
     fundingVault,
 }: DistributeFundsButtonProps) {
-    const { address, isConnected } = useAccount();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const { handleSubmit, isLoading } = useWeb3FormSubmit();
+    const onSubmit = handleSubmit(async () => {
+        const hash = await writeContract(wagmiConfig, {
+            address: fundingVault.vaultAddress as `0x${string}`,
+            abi: fundingVaultABI,
+            functionName: 'distributeFunds',
+            args: [],
+        });
 
-    async function handleClick() {
-        if (!isConnected || !address) {
-            showConnectWalletMessage();
-            return;
-        }
-        try {
-            const hash = await writeContract(wagmiConfig, {
-                // @ts-ignore
-                address: fundingVault.vaultAddress,
-                abi: fundingVaultABI,
-                functionName: 'distributeFunds',
-                args: [],
-            });
-            if (hash) {
-                showHashMessage('Funds distributed successfully.', hash);
-            }
-        } catch (err) {
-            showErrorMessage(err);
-            console.log(
-                '[DISTRIBUTE_FUNDS]: Error while trying to distribute funds.',
-                err
-            );
-        }
-    }
+        return {
+            hash,
+            message: 'Funds distributed successfully.'
+        };
+    });
+    const isDisabled = fundingVault.tallyDate?.getTime() > Date.now();
 
     return (
-        <Button
+        <Web3SubmitButton
+            isLoading={isLoading}
+            onClick={onSubmit}
             className={className}
-            disabled={fundingVault.tallyDate?.getTime() > Date.now()}
-            onClick={handleClick}
+            disabled={isDisabled}
         >
             <BarChart3 className="mr-2 h-4 w-4" />
             Distribute Funds
-        </Button>
+        </Web3SubmitButton>
     );
 }

@@ -2,7 +2,6 @@
 
 import axios from 'axios';
 import { type FundingVault } from '@prisma/client';
-import { useRouter } from 'next/navigation';
 import { useAccount } from 'wagmi';
 import { z } from 'zod';
 
@@ -20,12 +19,12 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { writeContract, readContract, simulateContract } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { parseUnits } from 'viem';
-import { useCustomToast } from '@/hooks/use-custom-toast';
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from '@/components/web3-submit-button';
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -47,10 +46,8 @@ const proposalFormSchema = z.object({
 });
 
 export default function ProposalForm({ fundingVault }: ProposalFormProps) {
-    const { address, isConnected } = useAccount();
-    const router = useRouter();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const { address } = useAccount();
+    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof proposalFormSchema>>();
 
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
@@ -61,66 +58,51 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
             recipient: '',
         },
     });
-    const isLoading = form.formState.isLoading;
+    const formIsLoading = form.formState.isLoading;
 
-    async function handleSubmit(data: z.infer<typeof proposalFormSchema>) {
-        try {
-            if (!isConnected || !address) {
-                showConnectWalletMessage();
-                return;
-            }
-            const decimals = await readContract(wagmiConfig, {
-                // @ts-ignore
-                address: fundingVault.fundingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const minRequestAmount = parseUnits(
-                data.minRequestAmount,
-                decimals as number
-            );
-            const maxRequestAmount = parseUnits(
-                data.maxRequestAmount,
-                decimals as number
-            );
-            const { result, request } = await simulateContract(wagmiConfig, {
-                // @ts-ignore
-                address: fundingVault.vaultAddress,
-                abi: fundingVaultABI,
-                functionName: 'submitProposal',
-                args: [
-                    'TODO',
-                    minRequestAmount,
-                    maxRequestAmount,
-                    data.recipient,
-                ],
-            });
-            const hash = await writeContract(wagmiConfig, request);
-            await axios.post('/api/proposal/new', {
-                description: data.description,
-                proposerAddress: address,
-                minRequestAmount: data.minRequestAmount,
-                maxRequestAmount: data.maxRequestAmount,
-                recipient: data.recipient,
-                fundingVaultId: fundingVault.id,
-                proposalId: parseInt(result),
-            });
-            if (hash) {
-                showHashMessage('Successfully submitted proposal', hash);
-            }
-            router.push(`/vault/${fundingVault.id}`);
-            router.refresh();
-        } catch (err) {
-            showErrorMessage(err);
-            console.log('[PROPOSAL_FORM]: Error submitting proposal.', err);
-        }
-    }
+    const onSubmit = handleSubmit((async (data: z.infer<typeof proposalFormSchema>) => {
+        const decimals = await readContract(wagmiConfig, {
+            address: fundingVault.fundingTokenAddress as `0x${string}`,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        });
+        const minRequestAmount = parseUnits(
+            data.minRequestAmount,
+            decimals as number
+        );
+        const maxRequestAmount = parseUnits(
+            data.maxRequestAmount,
+            decimals as number
+        );
+        const { result, request } = await simulateContract(wagmiConfig, {
+            address: fundingVault.vaultAddress as `0x${string}`,
+            abi: fundingVaultABI,
+            functionName: 'submitProposal',
+            args: [
+                'TODO',
+                minRequestAmount,
+                maxRequestAmount,
+                data.recipient,
+            ],
+        });
+        const hash = await writeContract(wagmiConfig, request);
+        await axios.post('/api/proposal/new', {
+            description: data.description,
+            proposerAddress: address,
+            minRequestAmount: data.minRequestAmount,
+            maxRequestAmount: data.maxRequestAmount,
+            recipient: data.recipient,
+            fundingVaultId: fundingVault.id,
+            proposalId: parseInt(result),
+        });
+        return { hash, message: "Proposal created successfully." }
+    }), `/vault/${fundingVault.id}`)
 
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(handleSubmit)}
+                    onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 pb-10"
                 >
                     <div className="space-y-2 w-full">
@@ -240,9 +222,12 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                         />
                     </div>
                     <div className="w-full flex justify-center">
-                        <Button size={'lg'} disabled={isLoading}>
+                        <Web3SubmitButton
+                            isLoading={isLoading}
+                            disabled={isLoading || formIsLoading}
+                        >
                             Submit
-                        </Button>
+                        </Web3SubmitButton>
                     </div>
                 </form>
             </Form>

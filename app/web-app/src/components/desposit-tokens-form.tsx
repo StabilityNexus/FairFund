@@ -1,38 +1,27 @@
 'use client';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAccount } from 'wagmi';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { parseUnits } from 'viem';
-import { writeContract, readContract } from '@wagmi/core';
+import { writeContract, readContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI } from '@/blockchain/constants';
 import axios from 'axios';
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from './ui/form';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
-import { useCustomToast } from '@/hooks/use-custom-toast';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from '@/components/web3-submit-button';
 
 interface DepositTokensFormProps {
-    fundingTokenAddress: string;
-    vaultAddress: string;
+    fundingTokenAddress: `0x${string}`;
+    vaultAddress: `0x${string}`;
     vaultId: number;
 }
 
 const depositTokensForm = z.object({
-    amountOfTokens: z.string({
-        required_error: 'Amount of tokens is required',
-    }),
+    amountOfTokens: z.string().min(1, 'Amount of tokens is required'),
 });
 
 export default function DepositTokensForm({
@@ -40,10 +29,7 @@ export default function DepositTokensForm({
     vaultAddress,
     vaultId,
 }: DepositTokensFormProps) {
-    const { address, isConnected } = useAccount();
-    const router = useRouter();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof depositTokensForm>>();
 
     const form = useForm<z.infer<typeof depositTokensForm>>({
         resolver: zodResolver(depositTokensForm),
@@ -52,43 +38,33 @@ export default function DepositTokensForm({
         },
     });
 
-    async function handleSubmit(data: z.infer<typeof depositTokensForm>) {
-        if (!isConnected || !address) {
-            showConnectWalletMessage();
-            return;
-        }
-        try {
-            const decimals = await readContract(wagmiConfig, {
-                // @ts-ignore
-                address: fundingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const amountOfTokens = parseUnits(
-                data.amountOfTokens,
-                decimals as number
-            );
-            const hash = await writeContract(wagmiConfig, {
-                // @ts-ignore
-                address: fundingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'transfer',
-                args: [vaultAddress, amountOfTokens],
-            });
-            await axios.post('/api/vault/deposit', {
-                vaultId: vaultId,
-                amountOfTokens: data.amountOfTokens,
-            });
-            if (hash) {
-                showHashMessage('Tokens deposited successfully.', hash);
-            }
-            router.push(`/vault/${vaultId}`);
-            router.refresh();
-        } catch (err) {
-            showErrorMessage(err);
-            console.log('[DEPOSIT_TOKENS_FORM]: ', err);
-        }
-    }
+    const onSubmit = handleSubmit(async (data: z.infer<typeof depositTokensForm>) => {
+        const decimals = await readContract(wagmiConfig, {
+            address: fundingTokenAddress,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        }) as number;
+        const amountOfTokens = parseUnits(
+            data.amountOfTokens,
+            decimals
+        );
+        const hash = await writeContract(wagmiConfig, {
+            address: fundingTokenAddress,
+            abi: erc20ABI,
+            functionName: 'transfer',
+            args: [vaultAddress, amountOfTokens],
+        });
+        await waitForTransactionReceipt(wagmiConfig, {
+            hash: hash
+        })
+        await axios.post('/api/vault/deposit', {
+            vaultId: vaultId,
+            amountOfTokens: data.amountOfTokens,
+        });
+        return { hash, message: 'Tokens deposited successfully.' };
+    }, `/vault/${vaultId}`)
+
+
 
     return (
         <Card className="m-6">
@@ -97,7 +73,7 @@ export default function DepositTokensForm({
             </CardHeader>
             <CardContent>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             name="amountOfTokens"
                             control={form.control}
@@ -121,7 +97,11 @@ export default function DepositTokensForm({
                             }}
                         />
                         <div className="w-full flex justify-center">
-                            <Button size={'lg'}>Submit</Button>
+                            <Web3SubmitButton
+                                isLoading={isLoading}
+                            >
+                                Submit
+                            </Web3SubmitButton>
                         </div>
                     </form>
                 </Form>
