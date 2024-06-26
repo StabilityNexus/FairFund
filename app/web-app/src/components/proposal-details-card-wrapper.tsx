@@ -1,5 +1,5 @@
-import { type Proposal } from '@prisma/client';
-import { Coins, File, Fingerprint, User2 } from 'lucide-react';
+import type { FundingVault, Proposal } from '@prisma/client';
+import { Coins, File, Fingerprint, User2, Vault } from 'lucide-react';
 import CardBody from '@/components/card-body';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -21,10 +21,16 @@ const iconMap = {
 
 interface ProposalDetailsCardWrapperProps {
     proposal: Proposal;
+    vault: {
+        fundingTokenSymbol: string,
+        votingTokenAddress: string,
+        vaultAddress: string,
+    };
 }
 
 export default function ProposalDetailsCardWrapper({
     proposal,
+    vault
 }: ProposalDetailsCardWrapperProps) {
     return (
         <div className="space-y-6">
@@ -33,20 +39,20 @@ export default function ProposalDetailsCardWrapper({
                 icon={iconMap['description']}
                 body={
                     <Dialog>
-                    <DialogTrigger asChild>
-                        <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
-                            {proposal.description}
-                        </p>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-3xl max-h-[80vh]">
-                        <DialogHeader>
-                            <DialogTitle>Proposal Description</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
-                            {proposal.description}
-                        </DialogDescription>
-                    </DialogContent>
-                </Dialog>
+                        <DialogTrigger asChild>
+                            <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
+                                {proposal.description}
+                            </p>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl max-h-[80vh]">
+                            <DialogHeader>
+                                <DialogTitle>Proposal Description</DialogTitle>
+                            </DialogHeader>
+                            <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
+                                {proposal.description}
+                            </DialogDescription>
+                        </DialogContent>
+                    </Dialog>
                 }
                 bodyClassName="text-base font-normal"
                 className="h-auto"
@@ -81,13 +87,13 @@ export default function ProposalDetailsCardWrapper({
                 <CardBody
                     title="Min Request Amount"
                     icon={iconMap['money']}
-                    body={proposal.minRequestAmount}
+                    body={`${proposal.minRequestAmount} ${vault.fundingTokenSymbol}`}
                     bodyClassName="text-xl font-semibold"
                 />
                 <CardBody
                     title="Max Request Amount"
                     icon={iconMap['money']}
-                    body={proposal.maxRequestAmount}
+                    body={`${proposal.maxRequestAmount} ${vault.fundingTokenSymbol}`}
                     bodyClassName="text-xl font-semibold"
                 />
             </div>

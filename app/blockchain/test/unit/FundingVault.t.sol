@@ -25,7 +25,7 @@ contract FundingVaultTest is Test {
             address(fundingToken),
             address(votingToken),
             address(votingPowerToken),
-            0,
+            1,
             10 ether,
             block.timestamp + 1 days,
             owner
@@ -107,7 +107,7 @@ contract FundingVaultTest is Test {
         fundingVault.submitProposal("<Proposal Link>", 0, 5 ether, address(randomUser));
 
         vm.expectRevert(FundingVault.FundingVault__AmountExceededsLimit.selector);
-        fundingVault.submitProposal("<Proposal Link>", 1 ether, 11 ether, address(randomUser));
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 12 ether, address(randomUser));
     }
 
     function testSubmitProposalWithZeroAddress() public {
@@ -296,7 +296,7 @@ contract FundingVaultTest is Test {
     }
 
     function testGetMinRequestableAmount() public {
-        assertEq(fundingVault.getMinRequestableAmount(), 0);
+        assertEq(fundingVault.getMinRequestableAmount(), 1);
 
         vm.prank(owner);
         fundingVault.setMinRequestableAmount(2 ether);

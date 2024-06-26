@@ -13,6 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { type FundingVault } from '@prisma/client';
+import { readContract } from '@wagmi/core';
+import { config as wagmiConfig } from '@/wagmi/config';
+import { erc20ABI } from '@/blockchain/constants';
+import { formatUnits } from 'viem'
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
@@ -56,6 +60,23 @@ const InfoCard = ({ title, icon:Icon, body, tooltip }:{
 export default async function VaultDetailsCardWrapper({
     fundingVault: vault,
 }: VaultDetailsCardWrapperProps) {
+    const vaultBalance = await readContract(wagmiConfig, {
+        // @ts-ignore
+        address: vault.fundingTokenAddress,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+        args:[
+            vault.vaultAddress
+        ]
+    });
+    const decimals = await readContract(wagmiConfig, {
+        // @ts-ignore
+        address: vault.fundingTokenAddress,
+        abi: erc20ABI,
+        functionName: 'decimals',
+    });
+    // @ts-ignore
+    const formattedVaultBalance = formatUnits(vaultBalance,decimals);
     const proposals = await prisma.proposal.count({
         where: {
             fundingVaultId: vault.id,
@@ -74,7 +95,7 @@ export default async function VaultDetailsCardWrapper({
                 <InfoCard
                     title="Locked Tokens"
                     icon={iconMap['locked']}
-                    body={`${vault.amountFundingTokens} ${vault.fundingTokenSymbol}`}
+                    body={`${formattedVaultBalance} ${vault.fundingTokenSymbol}`}
                     tooltip="Amount of funding tokens locked in this vault"
                 />
                 <InfoCard

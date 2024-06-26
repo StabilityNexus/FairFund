@@ -23,6 +23,7 @@ export default async function ProposalDetailsPage({
             id: proposal?.fundingVaultId,
         },
         select: {
+            fundingTokenSymbol:true,
             votingTokenAddress: true,
             vaultAddress: true,
         },
@@ -43,7 +44,7 @@ export default async function ProposalDetailsPage({
                 <p className="text-muted-foreground mb-4">
                     View the details of the proposal.
                 </p>
-                <CardWrapper proposal={proposal} />
+                <CardWrapper proposal={proposal} vault={vault} />
             </CardContent>
         </Card>
 

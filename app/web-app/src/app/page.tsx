@@ -18,9 +18,11 @@ const FeatureCard = ({ icon, title, description }: {
     title: string;
     description: string;
 }) => (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
-        {icon}
-        <h3 className="text-xl font-semibold mt-4 mb-2">{title}</h3>
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+        <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full">
+            {icon}
+        </div>
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
         <p className="text-gray-600 dark:text-gray-300">{description}</p>
     </div>
 );
