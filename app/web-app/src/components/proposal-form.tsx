@@ -19,7 +19,12 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { writeContract, readContract, simulateContract,waitForTransactionReceipt } from '@wagmi/core';
+import {
+    writeContract,
+    readContract,
+    simulateContract,
+    waitForTransactionReceipt,
+} from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { parseUnits } from 'viem';
@@ -47,7 +52,8 @@ const proposalFormSchema = z.object({
 
 export default function ProposalForm({ fundingVault }: ProposalFormProps) {
     const { address } = useAccount();
-    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof proposalFormSchema>>();
+    const { handleSubmit, isLoading } =
+        useWeb3FormSubmit<z.infer<typeof proposalFormSchema>>();
 
     const form = useForm<z.infer<typeof proposalFormSchema>>({
         resolver: zodResolver(proposalFormSchema),
@@ -60,46 +66,49 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
     });
     const formIsLoading = form.formState.isLoading;
 
-    const onSubmit = handleSubmit((async (data: z.infer<typeof proposalFormSchema>) => {
-        const decimals = await readContract(wagmiConfig, {
-            address: fundingVault.fundingTokenAddress as `0x${string}`,
-            abi: erc20ABI,
-            functionName: 'decimals',
-        });
-        const minRequestAmount = parseUnits(
-            data.minRequestAmount,
-            decimals as number
-        );
-        const maxRequestAmount = parseUnits(
-            data.maxRequestAmount,
-            decimals as number
-        );
-        const { result, request } = await simulateContract(wagmiConfig, {
-            address: fundingVault.vaultAddress as `0x${string}`,
-            abi: fundingVaultABI,
-            functionName: 'submitProposal',
-            args: [
-                'TODO',
-                minRequestAmount,
-                maxRequestAmount,
-                data.recipient,
-            ],
-        });
-        const hash = await writeContract(wagmiConfig, request);
-        await waitForTransactionReceipt(wagmiConfig,{
-            hash:hash
-        })
-        await axios.post('/api/proposal/new', {
-            description: data.description,
-            proposerAddress: address,
-            minRequestAmount: data.minRequestAmount,
-            maxRequestAmount: data.maxRequestAmount,
-            recipient: data.recipient,
-            fundingVaultId: fundingVault.id,
-            proposalId: parseInt(result),
-        });
-        return { hash, message: "Proposal created successfully." }
-    }), `/vault/${fundingVault.id}`)
+    const onSubmit = handleSubmit(
+        async (data: z.infer<typeof proposalFormSchema>) => {
+            const decimals = await readContract(wagmiConfig, {
+                address: fundingVault.fundingTokenAddress as `0x${string}`,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
+            const minRequestAmount = parseUnits(
+                data.minRequestAmount,
+                decimals as number
+            );
+            const maxRequestAmount = parseUnits(
+                data.maxRequestAmount,
+                decimals as number
+            );
+            const { result, request } = await simulateContract(wagmiConfig, {
+                address: fundingVault.vaultAddress as `0x${string}`,
+                abi: fundingVaultABI,
+                functionName: 'submitProposal',
+                args: [
+                    'TODO',
+                    minRequestAmount,
+                    maxRequestAmount,
+                    data.recipient,
+                ],
+            });
+            const hash = await writeContract(wagmiConfig, request);
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: hash,
+            });
+            await axios.post('/api/proposal/new', {
+                description: data.description,
+                proposerAddress: address,
+                minRequestAmount: data.minRequestAmount,
+                maxRequestAmount: data.maxRequestAmount,
+                recipient: data.recipient,
+                fundingVaultId: fundingVault.id,
+                proposalId: parseInt(result),
+            });
+            return { hash, message: 'Proposal created successfully.' };
+        },
+        `/vault/${fundingVault.id}`
+    );
 
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">

@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import prisma from '@/lib/db';
 import { redirect } from 'next/navigation';
@@ -11,7 +10,12 @@ import CardWrapper from '@/components/vault-details-card-wrapper';
 import { BlockchainActionButton } from '@/components/blockchain-action-button';
 import { ArrowRight, PlusCircle, Coins, UserPlus } from 'lucide-react';
 
-const ActionButton = ({ href, icon, text, disabled }: {
+const ActionButton = ({
+    href,
+    icon,
+    text,
+    disabled,
+}: {
     href: string;
     icon: React.ReactNode;
     text: string;
@@ -25,7 +29,10 @@ const ActionButton = ({ href, icon, text, disabled }: {
                 disabled && 'pointer-events-none opacity-50'
             )}
         >
-            <Button className="w-full h-full flex items-center justify-between" disabled={disabled}>
+            <Button
+                className="w-full h-full flex items-center justify-between"
+                disabled={disabled}
+            >
                 <span className="flex items-center">
                     {icon}
                     {text}
@@ -33,8 +40,7 @@ const ActionButton = ({ href, icon, text, disabled }: {
                 <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
         </Link>
-    )
-
+    );
 };
 
 export default async function VaultDetailsPage({
@@ -59,7 +65,9 @@ export default async function VaultDetailsPage({
         <div className="container mx-auto p-6 space-y-8">
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">Vault Details</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        Vault Details
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <CardWrapper fundingVault={vault} />
@@ -68,7 +76,9 @@ export default async function VaultDetailsPage({
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">All Proposals</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        All Proposals
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <TableWrapper fundingVaultId={Number(id)} />
@@ -76,7 +86,9 @@ export default async function VaultDetailsPage({
             </Card>
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">Actions</CardTitle>
+                    <CardTitle className="text-2xl font-bold">
+                        Actions
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -99,24 +111,28 @@ export default async function VaultDetailsPage({
                             disabled={isTallyDatePassed}
                         />
                         <BlockchainActionButton
-                            smartContractAddress={vault.vaultAddress as `0x${string}`}
-                            functionName='distributeFunds'
+                            smartContractAddress={
+                                vault.vaultAddress as `0x${string}`
+                            }
+                            functionName="distributeFunds"
                             smartContractABI={fundingVaultABI}
-                            buttonText='Distrubute Funds'
-                            iconName='distrubuteFunds'
+                            buttonText="Distrubute Funds"
+                            iconName="distrubuteFunds"
                             isDisabled={!isTallyDatePassed}
-                            successMessage='Funds distributed successfully.'
+                            successMessage="Funds distributed successfully."
                             className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                         />
                         <BlockchainActionButton
-                            smartContractAddress={vault.vaultAddress as `0x${string}`}
-                            functionName='releaseVotingTokens'
+                            smartContractAddress={
+                                vault.vaultAddress as `0x${string}`
+                            }
+                            functionName="releaseVotingTokens"
                             smartContractABI={fundingVaultABI}
-                            buttonText='Withdraw Voting Tokens'
-                            iconName='creditCard'
+                            buttonText="Withdraw Voting Tokens"
+                            iconName="creditCard"
                             isDisabled={!isTallyDatePassed}
-                            successMessage='Voting tokens withdrawn successfully.'
-                            className='w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md'
+                            successMessage="Voting tokens withdrawn successfully."
+                            className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                         />
                     </div>
                 </CardContent>

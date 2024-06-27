@@ -11,12 +11,17 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { type FundingVault } from '@prisma/client';
 import { readContract } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI } from '@/blockchain/constants';
-import { formatUnits } from 'viem'
+import { formatUnits } from 'viem';
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
@@ -31,7 +36,12 @@ const iconMap = {
     description: File,
 };
 
-const InfoCard = ({ title, icon:Icon, body, tooltip }:{
+const InfoCard = ({
+    title,
+    icon: Icon,
+    body,
+    tooltip,
+}: {
     title: string;
     icon: React.ElementType;
     body: string | number;
@@ -42,7 +52,9 @@ const InfoCard = ({ title, icon:Icon, body, tooltip }:{
             <TooltipTrigger asChild>
                 <Card className="hover:shadow-md transition-shadow duration-200">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                        <CardTitle className="text-sm font-medium">
+                            {title}
+                        </CardTitle>
                         <Icon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -61,22 +73,20 @@ export default async function VaultDetailsCardWrapper({
     fundingVault: vault,
 }: VaultDetailsCardWrapperProps) {
     const vaultBalance = await readContract(wagmiConfig, {
-        // @ts-ignore
-        address: vault.fundingTokenAddress,
+        address: vault.fundingTokenAddress as `0x${string}`,
         abi: erc20ABI,
         functionName: 'balanceOf',
-        args:[
-            vault.vaultAddress
-        ]
+        args: [vault.vaultAddress],
     });
     const decimals = await readContract(wagmiConfig, {
-        // @ts-ignore
-        address: vault.fundingTokenAddress,
+        address: vault.fundingTokenAddress as `0x${string}`,
         abi: erc20ABI,
         functionName: 'decimals',
     });
-    // @ts-ignore
-    const formattedVaultBalance = formatUnits(vaultBalance,decimals);
+    const formattedVaultBalance = formatUnits(
+        vaultBalance as bigint,
+        decimals as number
+    );
     const proposals = await prisma.proposal.count({
         where: {
             fundingVaultId: vault.id,
@@ -121,8 +131,13 @@ export default async function VaultDetailsCardWrapper({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-muted-foreground mb-2">Wallet Address:</p>
-                        <Badge variant="secondary" className="px-3 py-1 text-xs font-mono w-full break-all">
+                        <p className="text-sm text-muted-foreground mb-2">
+                            Wallet Address:
+                        </p>
+                        <Badge
+                            variant="secondary"
+                            className="px-3 py-1 text-xs font-mono w-full break-all"
+                        >
                             {vault.creatorAddress}
                         </Badge>
                     </CardContent>

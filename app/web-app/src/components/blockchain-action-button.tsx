@@ -1,14 +1,13 @@
-"use client";
+'use client';
 import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
 import { BarChart3, CreditCard } from 'lucide-react';
 
-
 const iconMap = {
-    distrubuteFunds:BarChart3,
-    creditCard:CreditCard
+    distrubuteFunds: BarChart3,
+    creditCard: CreditCard,
 };
 
 interface BlockchainActionButtonProps {
@@ -32,7 +31,7 @@ export function BlockchainActionButton({
     iconName,
     isDisabled = false,
     successMessage,
-    smartContractABI
+    smartContractABI,
 }: BlockchainActionButtonProps) {
     const Icon = iconMap[iconName];
     const { handleSubmit, isLoading } = useWeb3FormSubmit();
@@ -44,11 +43,11 @@ export function BlockchainActionButton({
             args: args,
         });
         await waitForTransactionReceipt(wagmiConfig, {
-            hash: hash
+            hash: hash,
         });
         return {
             hash,
-            message: successMessage
+            message: successMessage,
         };
     });
 

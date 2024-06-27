@@ -22,15 +22,15 @@ const iconMap = {
 interface ProposalDetailsCardWrapperProps {
     proposal: Proposal;
     vault: {
-        fundingTokenSymbol: string,
-        votingTokenAddress: string,
-        vaultAddress: string,
+        fundingTokenSymbol: string;
+        votingTokenAddress: string;
+        vaultAddress: string;
     };
 }
 
 export default function ProposalDetailsCardWrapper({
     proposal,
-    vault
+    vault,
 }: ProposalDetailsCardWrapperProps) {
     return (
         <div className="space-y-6">
@@ -63,8 +63,13 @@ export default function ProposalDetailsCardWrapper({
                     icon={iconMap['creator']}
                     body={
                         <div className="flex flex-col items-start">
-                            <p className="text-xs text-muted-foreground mb-1">Wallet Address:</p>
-                            <Badge variant="secondary" className="text-xs font-mono break-all w-full">
+                            <p className="text-xs text-muted-foreground mb-1">
+                                Wallet Address:
+                            </p>
+                            <Badge
+                                variant="secondary"
+                                className="text-xs font-mono break-all w-full"
+                            >
                                 {proposal.proposerAddress}
                             </Badge>
                         </div>
@@ -76,8 +81,13 @@ export default function ProposalDetailsCardWrapper({
                     icon={iconMap['recipient']}
                     body={
                         <div className="flex flex-col items-start">
-                            <p className="text-xs text-muted-foreground mb-1">Wallet Address:</p>
-                            <Badge variant="secondary" className="text-xs font-mono break-all w-full">
+                            <p className="text-xs text-muted-foreground mb-1">
+                                Wallet Address:
+                            </p>
+                            <Badge
+                                variant="secondary"
+                                className="text-xs font-mono break-all w-full"
+                            >
                                 {proposal.recipient}
                             </Badge>
                         </div>
