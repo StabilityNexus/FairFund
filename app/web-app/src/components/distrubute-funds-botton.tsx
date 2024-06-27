@@ -1,6 +1,6 @@
 'use client';
 import { type FundingVault } from '@prisma/client';
-import { writeContract } from '@wagmi/core';
+import { writeContract,waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { fundingVaultABI } from '@/blockchain/constants';
 import { BarChart3 } from "lucide-react";
@@ -24,7 +24,9 @@ export default function DistributeFundsButton({
             functionName: 'distributeFunds',
             args: [],
         });
-
+        await waitForTransactionReceipt(wagmiConfig,{
+            hash:hash
+        })
         return {
             hash,
             message: 'Funds distributed successfully.'

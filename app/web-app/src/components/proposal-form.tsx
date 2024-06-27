@@ -19,7 +19,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { writeContract, readContract, simulateContract } from '@wagmi/core';
+import { writeContract, readContract, simulateContract,waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { parseUnits } from 'viem';
@@ -86,6 +86,9 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
             ],
         });
         const hash = await writeContract(wagmiConfig, request);
+        await waitForTransactionReceipt(wagmiConfig,{
+            hash:hash
+        })
         await axios.post('/api/proposal/new', {
             description: data.description,
             proposerAddress: address,
