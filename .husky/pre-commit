@@ -1,6 +1,7 @@
-cd app/blockchain 
-forge fmt
-forge compile
+cd app/blockchain && forge build
 
-cd ../../app/web-app
-npm run lint
+cd ../../app/web-app && npm run lint 
+
+cd ../../
+
+npx lint-staged
