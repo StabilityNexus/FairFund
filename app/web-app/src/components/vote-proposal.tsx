@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { useAccount } from 'wagmi';
-import { writeContract, readContract } from '@wagmi/core';
+import { writeContract, readContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { type Proposal } from '@prisma/client';
@@ -20,7 +19,8 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useCustomToast } from '@/hooks/use-custom-toast';
+import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
+import { Web3SubmitButton } from './web3-submit-button';
 
 interface VoteProposalButtonProps {
     className?: string;
@@ -30,9 +30,7 @@ interface VoteProposalButtonProps {
 }
 
 const voteProposalForm = z.object({
-    amountOfTokens: z.string({
-        required_error: 'Amount of tokens is required',
-    }),
+    amountOfTokens: z.string().min(1, 'Amount of tokens is required.'),
 });
 
 export default function VoteProposal({
@@ -40,9 +38,7 @@ export default function VoteProposal({
     votingTokenAddress,
     vaultAddress,
 }: VoteProposalButtonProps) {
-    const { address, isConnected } = useAccount();
-    const { showConnectWalletMessage, showHashMessage, showErrorMessage } =
-        useCustomToast();
+    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof voteProposalForm>>();
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
         resolver: zodResolver(voteProposalForm),
@@ -51,50 +47,34 @@ export default function VoteProposal({
         },
     });
 
-    async function handleSubmit(data: z.infer<typeof voteProposalForm>) {
-        if (!isConnected || !address) {
-            showConnectWalletMessage();
-            return;
-        }
-        try {
-            const decimals = await readContract(wagmiConfig, {
-                // @ts-ignore
-                address: votingTokenAddress,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const amountOfTokens = parseUnits(
-                data.amountOfTokens,
-                decimals as number
-            );
-
-            const hash: string = await writeContract(wagmiConfig, {
-                // @ts-ignore
-                address: vaultAddress,
-                abi: fundingVaultABI,
-                functionName: 'voteOnProposal',
-                args: [proposal.proposalId, amountOfTokens],
-            });
-            if (hash) {
-                showHashMessage('Successfully voted to proposal', hash);
-            }
-        } catch (err) {
-            if (
-                err instanceof Error &&
-                err.message.includes('FundingVault__AmountExceededsLimit()')
-            ) {
-                showErrorMessage(err);
-            }
-            console.log('[VOTE_PROPOSAL]: ', err);
-        }
-    }
+    const onSubmit = handleSubmit((async (data:z.infer<typeof voteProposalForm>)=>{
+        const decimals = await readContract(wagmiConfig, {
+            address: votingTokenAddress as `0x${string}`,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        });
+        const amountOfTokens = parseUnits(
+            data.amountOfTokens,
+            decimals as number
+        );
+        const hash = await writeContract(wagmiConfig, {
+            address: vaultAddress as `0x${string}`,
+            abi: fundingVaultABI,
+            functionName: 'voteOnProposal',
+            args: [proposal.proposalId, amountOfTokens],
+        });
+        await waitForTransactionReceipt(wagmiConfig, {
+            hash: hash as `0x${string}`
+        })
+        return {hash,message:"Successfully voted on the proposal."}
+    }))
 
     return (
         <Card className="m-6 pt-4 w-full">
             <CardContent>
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(handleSubmit)}
+                        onSubmit={form.handleSubmit(onSubmit)}
                         className="flex flex-col gap-4"
                     >
                         <FormField
@@ -120,7 +100,11 @@ export default function VoteProposal({
                             }}
                         />
                         <div className="w-full flex justify-center">
-                            <Button size={'lg'}>Submit</Button>
+                            <Web3SubmitButton
+                                isLoading={isLoading}
+                            >
+                                Submit
+                            </Web3SubmitButton>
                         </div>
                     </form>
                 </Form>

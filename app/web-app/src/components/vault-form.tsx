@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { format, getUnixTime } from 'date-fns';
 import { useAccount } from 'wagmi';
 import { useForm } from 'react-hook-form';
-import { writeContract, simulateContract, readContract } from '@wagmi/core';
+import { writeContract, simulateContract, readContract,waitForTransactionReceipt } from '@wagmi/core';
 import { parseUnits } from 'viem';
 import axios from 'axios';
 
@@ -94,6 +94,9 @@ export default function VaultForm() {
             ],
         });
         const hash = await writeContract(wagmiConfig, request);
+        await waitForTransactionReceipt(wagmiConfig,{
+            hash:hash
+        })
         await axios.post('/api/vault/new', {
             description: data.description,
             creatorAddress: address,
