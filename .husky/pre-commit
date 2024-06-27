@@ -2,6 +2,6 @@ cd app/blockchain && forge build
 
 cd ../../app/web-app && npm run lint 
 
-cd ../
+cd ../../
 
 npx lint-staged

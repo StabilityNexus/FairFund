@@ -8,7 +8,7 @@
   },
   "lint-staged": {
     "app/blockchain/**/*.sol": [
-      "cd app/blockchain && forge fmt"
+      "forge fmt"
     ],
     "app/web-app/**/*.{js,jsx,ts,tsx}": [
       "cd app/web-app && npm run format"
