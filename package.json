@@ -5,13 +5,5 @@
   },
   "scripts": {
     "prepare": "husky"
-  },
-  "lint-staged": {
-    "app/blockchain/**/*.sol": [
-      "forge fmt"
-    ],
-    "app/web-app/**/*.{js,jsx,ts,tsx}": [
-      "cd app/web-app && npm run format"
-    ]
   }
 }
