@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
     const pathname = usePathname();
-    
+
     return (
         <div className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/80">
             <Link href={'/'} className="flex items-center group">
@@ -23,16 +23,16 @@ export default function Navbar() {
                 <div className="flex flex-row gap-x-6 mr-4">
                     {routes.map((route) => {
                         const isActive = pathname === route.href;
-                        
+
                         return (
                             <Link
                                 href={route.href}
                                 key={route.href}
                                 className={cn(
-                                    "flex items-center space-x-1 py-2 px-3 rounded-md transition-colors",
-                                    isActive 
-                                        ? "text-primary font-medium" 
-                                        : "text-primary/70 hover:text-primary hover:bg-primary/5"
+                                    'flex items-center space-x-1 py-2 px-3 rounded-md transition-colors',
+                                    isActive
+                                        ? 'text-primary font-medium'
+                                        : 'text-primary/70 hover:text-primary hover:bg-primary/5'
                                 )}
                             >
                                 <route.icon className="h-5 w-5" />

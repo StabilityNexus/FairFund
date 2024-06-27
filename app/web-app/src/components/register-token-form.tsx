@@ -2,7 +2,11 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { writeContract, readContract,waitForTransactionReceipt } from '@wagmi/core';
+import {
+    writeContract,
+    readContract,
+    waitForTransactionReceipt,
+} from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import axios from 'axios';
@@ -38,7 +42,8 @@ export function RegisterTokenForm({
     vaultId,
     vaultAddress,
 }: RegisterTokenFormProps) {
-    const {handleSubmit,isLoading}=useWeb3FormSubmit<z.infer<typeof registerTokensForm>>();
+    const { handleSubmit, isLoading } =
+        useWeb3FormSubmit<z.infer<typeof registerTokensForm>>();
 
     const form = useForm<z.infer<typeof registerTokensForm>>({
         resolver: zodResolver(registerTokensForm),
@@ -47,45 +52,44 @@ export function RegisterTokenForm({
         },
     });
 
-    const onSubmit = handleSubmit(async (data: z.infer<typeof registerTokensForm>)=>{
-        const decimals = await readContract(wagmiConfig, {
-            // @ts-ignore
-            address: votingTokenAddress,
-            abi: erc20ABI,
-            functionName: 'decimals',
-        });
-        const amountOfTokens = parseUnits(
-            data.amountOfTokens,
-            decimals as number
-        );
+    const onSubmit = handleSubmit(
+        async (data: z.infer<typeof registerTokensForm>) => {
+            const decimals = await readContract(wagmiConfig, {
+                address: votingTokenAddress as `0x${string}`,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
+            const amountOfTokens = parseUnits(
+                data.amountOfTokens,
+                decimals as number
+            );
 
-        const approveHash=await writeContract(wagmiConfig, {
-            // @ts-ignore
-            address: votingTokenAddress,
-            abi: erc20ABI,
-            functionName: 'approve',
-            args: [vaultAddress, amountOfTokens],
-        });
-        await waitForTransactionReceipt(wagmiConfig,{
-            hash:approveHash
-        })
-        const hash = await writeContract(wagmiConfig, {
-            // @ts-ignore
-            address: vaultAddress,
-            abi: fundingVaultABI,
-            functionName: 'register',
-            args: [amountOfTokens],
-        });
-        await waitForTransactionReceipt(wagmiConfig,{
-            hash:hash
-        })
-        await axios.post('/api/vault/register', {
-            vaultId: vaultId,
-            amountOfTokens: data.amountOfTokens,
-        });
-        return {hash,message:"Successfully registered."}
-    },`/vault/${vaultId}`)
-
+            const approveHash = await writeContract(wagmiConfig, {
+                address: votingTokenAddress as `0x${string}`,
+                abi: erc20ABI,
+                functionName: 'approve',
+                args: [vaultAddress, amountOfTokens],
+            });
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: approveHash,
+            });
+            const hash = await writeContract(wagmiConfig, {
+                address: vaultAddress as `0x${string}`,
+                abi: fundingVaultABI,
+                functionName: 'register',
+                args: [amountOfTokens],
+            });
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: hash,
+            });
+            await axios.post('/api/vault/register', {
+                vaultId: vaultId,
+                amountOfTokens: data.amountOfTokens,
+            });
+            return { hash, message: 'Successfully registered.' };
+        },
+        `/vault/${vaultId}`
+    );
 
     return (
         <Card className="m-6">
@@ -119,9 +123,7 @@ export function RegisterTokenForm({
                             }}
                         />
                         <div className="w-full flex justify-center">
-                            <Web3SubmitButton
-                                isLoading={isLoading}
-                            >
+                            <Web3SubmitButton isLoading={isLoading}>
                                 Submit
                             </Web3SubmitButton>
                         </div>

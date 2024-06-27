@@ -33,11 +33,11 @@ export default async function CardWrapper() {
             <CardBody
                 title="Locked"
                 icon={iconMap['locked']}
-                body={
-                    `${totalLocked._sum.amountFundingTokens
+                body={`${
+                    totalLocked._sum.amountFundingTokens
                         ? totalLocked._sum.amountFundingTokens
-                        : 0} FT`
-                }
+                        : 0
+                } FT`}
             />
             <CardBody
                 title="Proposals"

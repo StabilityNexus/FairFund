@@ -15,7 +15,7 @@ export function Web3SubmitButton({
 }: Web3SubmitButtonProps) {
     return (
         <Button
-            type={onClick ? "button" : "submit"}
+            type={onClick ? 'button' : 'submit'}
             disabled={isLoading || props.disabled}
             onClick={onClick}
             {...props}

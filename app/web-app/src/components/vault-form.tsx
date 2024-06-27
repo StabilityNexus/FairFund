@@ -4,7 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { format, getUnixTime } from 'date-fns';
 import { useAccount } from 'wagmi';
 import { useForm } from 'react-hook-form';
-import { writeContract, simulateContract, readContract,waitForTransactionReceipt } from '@wagmi/core';
+import {
+    writeContract,
+    simulateContract,
+    readContract,
+    waitForTransactionReceipt,
+} from '@wagmi/core';
 import { parseUnits } from 'viem';
 import axios from 'axios';
 
@@ -39,10 +44,16 @@ import { CalendarIcon } from 'lucide-react';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),
-    fundingTokenAddress: z.string().min(1, 'Funding Token Address is required.'),
+    fundingTokenAddress: z
+        .string()
+        .min(1, 'Funding Token Address is required.'),
     votingTokenAddress: z.string().min(1, 'Voting Token Address is required.'),
-    minRequestableAmount: z.string().min(1, 'Minimum Requestable Amount is required.'),
-    maxRequestableAmount: z.string().min(1, 'Maximum Requestable Amount is required.'),
+    minRequestableAmount: z
+        .string()
+        .min(1, 'Minimum Requestable Amount is required.'),
+    maxRequestableAmount: z
+        .string()
+        .min(1, 'Maximum Requestable Amount is required.'),
     tallyDate: z.date({
         required_error: 'Tally Date is required.',
     }),
@@ -50,7 +61,8 @@ const createVaultFormSchema = z.object({
 
 export default function VaultForm() {
     const { address } = useAccount();
-    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
+    const { handleSubmit, isLoading } =
+        useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
@@ -63,53 +75,54 @@ export default function VaultForm() {
     });
     const formIsLoading = form.formState.isLoading;
 
-    const onSubmit = handleSubmit(async (data: z.infer<typeof createVaultFormSchema>) => {
+    const onSubmit = handleSubmit(
+        async (data: z.infer<typeof createVaultFormSchema>) => {
+            const unixTime = getUnixTime(data.tallyDate);
+            const decimals = await readContract(wagmiConfig, {
+                address: data.fundingTokenAddress as `0x${string}`,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
+            const minRequestableAmount = parseUnits(
+                data.minRequestableAmount,
+                decimals as number
+            );
+            const maxRequestableAmount = parseUnits(
+                data.maxRequestableAmount,
+                decimals as number
+            );
 
-        const unixTime = getUnixTime(data.tallyDate);
-        const decimals = await readContract(wagmiConfig, {
-            address: data.fundingTokenAddress as `0x${string}`,
-            abi: erc20ABI,
-            functionName: 'decimals',
-        });
-        const minRequestableAmount = parseUnits(
-            data.minRequestableAmount,
-            decimals as number
-        );
-        const maxRequestableAmount = parseUnits(
-            data.maxRequestableAmount,
-            decimals as number
-        );
-
-        const { result, request } = await simulateContract(wagmiConfig, {
-            address: fairFund.address as `0x${string}`,
-            abi: fairFund.abi,
-            functionName: 'deployFundingVault',
-            args: [
-                data.fundingTokenAddress,
-                data.votingTokenAddress,
-                minRequestableAmount,
-                maxRequestableAmount,
-                unixTime,
-                address!,
-            ],
-        });
-        const hash = await writeContract(wagmiConfig, request);
-        await waitForTransactionReceipt(wagmiConfig,{
-            hash:hash
-        })
-        await axios.post('/api/vault/new', {
-            description: data.description,
-            creatorAddress: address,
-            vaultAddress: result,
-            amountFundingTokens: 0,
-            amountVotingTokens: 0,
-            fundingTokenAddress: data.fundingTokenAddress,
-            votingTokenAddress: data.votingTokenAddress,
-            tallyDate: data.tallyDate,
-        });
-        return { hash, message: "Vault created successfully." }
-    }, '/dashboard')
-
+            const { result, request } = await simulateContract(wagmiConfig, {
+                address: fairFund.address as `0x${string}`,
+                abi: fairFund.abi,
+                functionName: 'deployFundingVault',
+                args: [
+                    data.fundingTokenAddress,
+                    data.votingTokenAddress,
+                    minRequestableAmount,
+                    maxRequestableAmount,
+                    unixTime,
+                    address!,
+                ],
+            });
+            const hash = await writeContract(wagmiConfig, request);
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: hash,
+            });
+            await axios.post('/api/vault/new', {
+                description: data.description,
+                creatorAddress: address,
+                vaultAddress: result,
+                amountFundingTokens: 0,
+                amountVotingTokens: 0,
+                fundingTokenAddress: data.fundingTokenAddress,
+                votingTokenAddress: data.votingTokenAddress,
+                tallyDate: data.tallyDate,
+            });
+            return { hash, message: 'Vault created successfully.' };
+        },
+        '/dashboard'
+    );
 
     return (
         <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
@@ -272,7 +285,7 @@ export default function VaultForm() {
                                                         className={cn(
                                                             'font-normal w-full flex justify-between items-center',
                                                             !field.value &&
-                                                            'text-muted-foreground'
+                                                                'text-muted-foreground'
                                                         )}
                                                     >
                                                         {field.value ? (

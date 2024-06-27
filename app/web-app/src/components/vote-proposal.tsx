@@ -1,6 +1,10 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { writeContract, readContract, waitForTransactionReceipt } from '@wagmi/core';
+import {
+    writeContract,
+    readContract,
+    waitForTransactionReceipt,
+} from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { type Proposal } from '@prisma/client';
@@ -38,7 +42,8 @@ export default function VoteProposal({
     votingTokenAddress,
     vaultAddress,
 }: VoteProposalButtonProps) {
-    const { handleSubmit, isLoading } = useWeb3FormSubmit<z.infer<typeof voteProposalForm>>();
+    const { handleSubmit, isLoading } =
+        useWeb3FormSubmit<z.infer<typeof voteProposalForm>>();
 
     const form = useForm<z.infer<typeof voteProposalForm>>({
         resolver: zodResolver(voteProposalForm),
@@ -47,27 +52,29 @@ export default function VoteProposal({
         },
     });
 
-    const onSubmit = handleSubmit((async (data:z.infer<typeof voteProposalForm>)=>{
-        const decimals = await readContract(wagmiConfig, {
-            address: votingTokenAddress as `0x${string}`,
-            abi: erc20ABI,
-            functionName: 'decimals',
-        });
-        const amountOfTokens = parseUnits(
-            data.amountOfTokens,
-            decimals as number
-        );
-        const hash = await writeContract(wagmiConfig, {
-            address: vaultAddress as `0x${string}`,
-            abi: fundingVaultABI,
-            functionName: 'voteOnProposal',
-            args: [proposal.proposalId, amountOfTokens],
-        });
-        await waitForTransactionReceipt(wagmiConfig, {
-            hash: hash as `0x${string}`
-        })
-        return {hash,message:"Successfully voted on the proposal."}
-    }))
+    const onSubmit = handleSubmit(
+        async (data: z.infer<typeof voteProposalForm>) => {
+            const decimals = await readContract(wagmiConfig, {
+                address: votingTokenAddress as `0x${string}`,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
+            const amountOfTokens = parseUnits(
+                data.amountOfTokens,
+                decimals as number
+            );
+            const hash = await writeContract(wagmiConfig, {
+                address: vaultAddress as `0x${string}`,
+                abi: fundingVaultABI,
+                functionName: 'voteOnProposal',
+                args: [proposal.proposalId, amountOfTokens],
+            });
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: hash as `0x${string}`,
+            });
+            return { hash, message: 'Successfully voted on the proposal.' };
+        }
+    );
 
     return (
         <Card className="m-6 pt-4 w-full">
@@ -100,9 +107,7 @@ export default function VoteProposal({
                             }}
                         />
                         <div className="w-full flex justify-center">
-                            <Web3SubmitButton
-                                isLoading={isLoading}
-                            >
+                            <Web3SubmitButton isLoading={isLoading}>
                                 Submit
                             </Web3SubmitButton>
                         </div>
