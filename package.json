@@ -1,8 +1,17 @@
 {
   "devDependencies": {
-    "husky": "^9.0.11"
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7"
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "app/blockchain/**/*.sol": [
+      "cd app/blockchain && forge fmt"
+    ],
+    "app/web-app/**/*.{js,jsx,ts,tsx}": [
+      "cd app/web-app && npm run format"
+    ]
   }
 }
