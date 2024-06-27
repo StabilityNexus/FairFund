@@ -14,9 +14,6 @@ export async function POST(req: Request) {
             votingTokenAddress,
             tallyDate,
         } = await req.json();
-        console.log(fundingTokenAddress);
-        console.log(votingTokenAddress);
-
         const fundingTokenSymbol = await getTokenName(fundingTokenAddress);
         const votingTokenSymbol = await getTokenName(votingTokenAddress);
         const vault = await prisma.fundingVault.create({
