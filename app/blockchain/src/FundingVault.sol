@@ -149,9 +149,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
      * @notice Only the owner can call this function
      */
     function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
-        if (_maxRequestableAmount <= 0) {
-            revert FundingVault__AmountCannotBeZero();
-        }
         if (_maxRequestableAmount <= s_minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }

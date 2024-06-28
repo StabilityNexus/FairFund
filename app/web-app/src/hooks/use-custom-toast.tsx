@@ -36,14 +36,17 @@ export function useCustomToast() {
                 case error.message.includes('FundingVault__AmountCannotBeZero'):
                     toast({
                         variant: 'destructive',
+                        title: 'Invalid Amount',
                         description:
-                            'Amount of tokens cannot be zero or less than zero.',
+                            'The amount of tokens must be greater than zero. Please enter a valid amount.',
                     });
                     break;
                 case error.message.includes('FundingVault__NotEnoughBalance'):
                     toast({
                         variant: 'destructive',
-                        description: 'You do not have enough tokens.',
+                        title: 'Insufficient Balance',
+                        description:
+                            'You do not have enough tokens to perform this action. Please check your balance and try again.',
                     });
                     break;
 
@@ -52,7 +55,9 @@ export function useCustomToast() {
                 ):
                     toast({
                         variant: 'destructive',
-                        description: 'Amount of tokens exceeds the limit.',
+                        title: 'Amount Limit Exceeded',
+                        description:
+                            'The requested amount exceeds the allowed limit. Please enter an amount within the specified range.',
                     });
                     break;
                 case error.message.includes(
@@ -60,25 +65,42 @@ export function useCustomToast() {
                 ):
                     toast({
                         variant: 'destructive',
+                        title: 'Invalid Address',
                         description: 'Cannot enter a zero address.',
                     });
                     break;
                 case error.message.includes('FundingVault__TallyDateNotPassed'):
                     toast({
                         variant: 'destructive',
-                        description: 'Tally date has not passed yet.',
+                        title: 'Voting Period Active',
+                        description:
+                            'The tally date has not passed yet. Please wait until the voting period ends to perform this action.',
+                    });
+                    break;
+                case error.message.includes(
+                    'FundingVault__AlreadyDistributedFunds'
+                ):
+                    toast({
+                        variant: 'destructive',
+                        title: 'Funds Already Distributed',
+                        description:
+                            'The funds for this funding round have already been distributed. No further distribution is possible.',
                     });
                     break;
                 default:
                     toast({
                         variant: 'destructive',
-                        description: 'Something went wrong. Please try again.',
+                        title: 'Unexpected Error',
+                        description:
+                            'An unexpected error occurred. Please try again or contact support if the issue persists.',
                     });
             }
         } else {
             toast({
                 variant: 'destructive',
-                description: 'Something went wrong. Please try again.',
+                title: 'Unknown Error',
+                description:
+                    'An unknown error occurred. Please try again or contact support if the issue persists.',
             });
         }
     }
