@@ -298,6 +298,8 @@ contract FundingVault is Ownable, ReentrancyGuard {
                 emit FundsDistributed(i, proposal.recipient, amount);
             }
         }
+        uint256 remainingTokens = i_votingPowerToken.balanceOf(address(this));
+        i_votingPowerToken.burn(address(this), remainingTokens);
     }
 
     /**

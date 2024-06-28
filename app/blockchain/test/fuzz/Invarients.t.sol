@@ -41,6 +41,7 @@ contract InvarientsTest is StdInvariant, Test {
         public
         view
     {
+        bound(block.timestamp, 0, block.timestamp + 1 days);
         assertEq(votingToken.balanceOf(address(fundingVault)), votingPowerToken.totalSupply());
     }
 }
