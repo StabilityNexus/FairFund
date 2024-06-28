@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
 import {FundingVault} from "../../src/FundingVault.sol";
-import {MockERC20} from "../mocks/MockERC20.sol";
+import {MockERC20} from "../../src/mocks/MockERC20.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {console} from "forge-std/console.sol";

@@ -362,7 +362,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         return i_votingPowerToken.balanceOf(address(this));
     }
 
-    function getTotalBalanceAvaiableForDistribution() public view returns (uint256) {
+    function getTotalBalanceAvailbleForDistribution() public view returns (uint256) {
         return s_totalBalanceAvailableForDistribution;
     }
 

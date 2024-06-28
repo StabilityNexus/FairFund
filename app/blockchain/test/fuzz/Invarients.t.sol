@@ -7,7 +7,7 @@ import {FundingVault} from "../../src/FundingVault.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {MockERC20} from "../mocks/MockERC20.sol";
+import {MockERC20} from "../../src/mocks/MockERC20.sol";
 import {Handler} from "./Handler.t.sol";
 
 contract InvarientsTest is StdInvariant, Test {
