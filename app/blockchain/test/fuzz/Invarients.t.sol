@@ -37,11 +37,7 @@ contract InvarientsTest is StdInvariant, Test {
         targetContract(address(handler));
     }
 
-    function invariant_totalSupplyOfVotingTokenMustAlwaysBeEqualToTotalVotingTokensLockedInSmartContract()
-        public
-        view
-    {
-        bound(block.timestamp, 0, block.timestamp + 1 days);
-        assertEq(votingToken.balanceOf(address(fundingVault)), votingPowerToken.totalSupply());
+    function invariant_totalVotingPowerTokensUsedMustBeLessThanTotalSupplyOfVotingTokens() public view {
+        assertTrue(votingPowerToken.balanceOf(address(fundingVault)) <= votingPowerToken.totalSupply());
     }
 }

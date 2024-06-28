@@ -298,8 +298,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
                 emit FundsDistributed(i, proposal.recipient, amount);
             }
         }
-        uint256 remainingTokens = i_votingPowerToken.balanceOf(address(this));
-        i_votingPowerToken.burn(address(this), remainingTokens);
     }
 
     /**
@@ -312,7 +310,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
             revert FundingVault__AmountCannotBeZero();
         }
         s_voterToVotingTokens[msg.sender] = 0;
-        i_votingPowerToken.burn(msg.sender, votingPower);
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
     }
@@ -353,6 +350,14 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     function getVotingPowerToken() public view returns (address) {
         return address(i_votingPowerToken);
+    }
+
+    function getTotalVotingPowerTokensMinted() public view returns (uint256) {
+        return i_votingPowerToken.totalSupply();
+    }
+
+    function getTotalVotingPowerTokensUsed() public view returns (uint256) {
+        return i_votingPowerToken.balanceOf(address(this));
     }
 
     function getVotingPowerOf(address _voter) public view returns (uint256) {
