@@ -77,6 +77,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     uint256 private s_minRequestableAmount;
     uint256 private s_maxRequestableAmount;
+    uint256 private s_totalBalanceAvailableForDistribution;
     bool private s_fundsDistributed;
 
     /**
@@ -130,6 +131,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         i_votingPowerToken = VotingPowerToken(_votingPowerToken);
         s_minRequestableAmount = _minRequestableAmount;
         s_maxRequestableAmount = _maxRequestableAmount;
+        s_totalBalanceAvailableForDistribution = 0;
         s_fundsDistributed = false;
     }
 
@@ -163,6 +165,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
+        s_totalBalanceAvailableForDistribution += _amount;
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
         emit FundingTokenDeposited(msg.sender, _amount);
     }
@@ -248,7 +251,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (totalVotingPowerTokens == 0) {
             revert FundingVault__NoVotingPowerTokenMinted();
         }
-        uint256 totalBalance = i_fundingToken.balanceOf(address(this));
         // Floating point adjustment:
         // 1.totalVotes is multiplied by 1e18 to avoid rounding errors
         // 2.transferable is divided by 1e18 to get the actual amount
@@ -263,7 +265,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
          * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
          * The funding to be received by a rejected proposal `p` is `0`.
          */
-        uint256 transferable = (totalBalance * (totalVotes / totalVotingPowerTokens)) / 1e18;
+        uint256 transferable = (s_totalBalanceAvailableForDistribution * (totalVotes / totalVotingPowerTokens)) / 1e18;
 
         bool isProposalAccepted = transferable >= proposal.minimumAmount;
 
@@ -358,6 +360,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     function getTotalVotingPowerTokensUsed() public view returns (uint256) {
         return i_votingPowerToken.balanceOf(address(this));
+    }
+
+    function getTotalBalanceAvaiableForDistribution() public view returns (uint256) {
+        return s_totalBalanceAvailableForDistribution;
     }
 
     function getVotingPowerOf(address _voter) public view returns (uint256) {
