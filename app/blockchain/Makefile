@@ -6,24 +6,24 @@ LEGACY := --legacy
 FORGE_SCRIPT := forge script
 
 
-deploy-fair-fund:
+deploy-mock-fair-fund:
 	$(FORGE_SCRIPT) script/mocks/DeployMockFairFund.s.sol:DeployMockFairFund --rpc-url $(RPC_URL) $(VERBOSITY) $(BROADCAST) $(LEGACY)
 
 deploy-mock-erc20:
 	$(FORGE_SCRIPT) script/mocks/DeployMockERC20.s.sol:DeployMockERC20 --rpc-url $(RPC_URL) $(VERBOSITY) $(BROADCAST) $(LEGACY)
 
 
-df: deploy-fair-fund
-dm: deploy-mock-erc20
+dmf: deploy-mock-fair-fund
+dme: deploy-mock-erc20
 
 
-all: deploy-fair-fund deploy-mock-erc20
+all: deploy-mock-fair-fund deploy-mock-erc20
 
 help:
 	@echo "Available targets:"
-	@echo "  deploy-fair-fund (df)  : Deploy FairFund contract"
-	@echo "  deploy-mock-erc20 (dm) : Deploy MockERC20 contract"
+	@echo "  deploy-fair-fund (dmf)  : Deploy FairFund contract"
+	@echo "  deploy-mock-erc20 (dme) : Deploy MockERC20 contract"
 	@echo "  all                    : Deploy both contracts"
 	@echo "  help                   : Show this help message"
 
-.PHONY: deploy-fair-fund deploy-mock-erc20 df dm all help
+.PHONY: deploy-mock-fair-fund deploy-mock-erc20 dmf dme all help

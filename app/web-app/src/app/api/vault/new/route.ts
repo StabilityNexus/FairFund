@@ -8,8 +8,6 @@ export async function POST(req: Request) {
             vaultAddress,
             description,
             creatorAddress,
-            amountVotingTokens,
-            amountFundingTokens,
             fundingTokenAddress,
             votingTokenAddress,
             tallyDate,
@@ -21,13 +19,12 @@ export async function POST(req: Request) {
                 description,
                 creatorAddress,
                 vaultAddress,
-                amountFundingTokens,
                 fundingTokenSymbol,
-                amountVotingTokens,
                 votingTokenSymbol,
                 fundingTokenAddress,
                 votingTokenAddress,
                 tallyDate,
+                isTallied: false,
             },
         });
         return NextResponse.json(vault);

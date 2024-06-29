@@ -3,11 +3,12 @@ import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
-import { BarChart3, CreditCard } from 'lucide-react';
+import { BarChart3, CreditCard, TrendingUp } from 'lucide-react';
 
 const iconMap = {
     distrubuteFunds: BarChart3,
     creditCard: CreditCard,
+    trendingUp: TrendingUp,
 };
 
 interface BlockchainActionButtonProps {

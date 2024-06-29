@@ -9,40 +9,40 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-
 model FundingVault {
-  id                  Int         @id @default(autoincrement())
+  id                  Int        @id @default(autoincrement())
   description         String
   creatorAddress      String
-  fundingTokenAddress String 
+  fundingTokenAddress String
   fundingTokenSymbol  String
   votingTokenAddress  String
   votingTokenSymbol   String
   vaultAddress        String
+  isTallied           Boolean
   tallyDate           DateTime
-  createdAt DateTime @default(now())
+  createdAt           DateTime   @default(now())
   proposals           Proposal[]
 
   @@index([creatorAddress])
 }
 
 model Proposal {
-  id                 Int         @id @default(autoincrement())
-  description        String
-  proposerAddress    String
-  minRequestAmount   Int
-  maxRequestAmount   Int
-  recipient          String
-  proposalId         Int    // proposal id w.r.t the funding vault.
-  fundingVaultId     Int
-  fundAllocated      Int?
-  createdAt DateTime @default(now())
-  fundingVault       FundingVault @relation(fields: [fundingVaultId], references: [id])
+  id               Int          @id @default(autoincrement())
+  description      String
+  proposerAddress  String
+  minRequestAmount Int
+  maxRequestAmount Int
+  recipient        String
+  proposalId       Int // proposal id w.r.t the funding vault.
+  fundingVaultId   Int
+  fundAllocated    Int?
+  createdAt        DateTime     @default(now())
+  fundingVault     FundingVault @relation(fields: [fundingVaultId], references: [id])
 
   @@index([proposerAddress])
   @@index([fundingVaultId])

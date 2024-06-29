@@ -15,6 +15,6 @@ contract DeployMockERC20 is Script {
         mockERC20.mint(vm.addr(deployerKey), 1000000000000000000000000);
         vm.stopBroadcast();
         string memory deploymentInfo = string.concat('{"mockERC20":"', vm.toString(address(mockERC20)), '"}');
-        vm.writeFile("constants/anvil/erc20_deployment.json", deploymentInfo);
+        vm.writeFile("../web-app/src/blockchain/deployments/anvil/erc20_deployment.json", deploymentInfo);
     }
 }

@@ -37,7 +37,6 @@ import {MockVotingPowerToken} from "./MockVotingPowerToken.sol";
 contract MockFairFund {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
-    error FairFund__TallyDateCannotBeInThePast();
     error FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
     error FairFund__MaxRequestableAmountCannotBeZero();
 
@@ -68,9 +67,6 @@ contract MockFairFund {
     ) external returns (address) {
         if (_fundingToken == address(0) || _votingToken == address(0) || _owner == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
-        }
-        if (_tallyDate < block.timestamp) {
-            revert FairFund__TallyDateCannotBeInThePast();
         }
         if (_minRequestableAmount > _maxRequestableAmount) {
             revert FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();

@@ -14,6 +14,6 @@ contract DeployMockFairFund is Script {
         mockFairFund = new MockFairFund();
         vm.stopBroadcast();
         string memory deploymentInfo = string.concat('{"mockFairFund":"', vm.toString(address(mockFairFund)), '"}');
-        vm.writeFile("constants/anvil/fairFund_deployment.json", deploymentInfo);
+        vm.writeFile("../web-app/src/blockchain/deployments/anvil/fairFund_deployment.json", deploymentInfo);
     }
 }

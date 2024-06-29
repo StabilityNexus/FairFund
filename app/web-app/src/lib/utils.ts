@@ -1,8 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI } from '@/blockchain/constants';
+import { erc20ABI, fairFund } from '@/blockchain/constants';
 import { readContract } from '@wagmi/core';
+import fs from 'fs';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));

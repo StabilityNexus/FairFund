@@ -1,6 +1,6 @@
-import type { FundingVault, Proposal } from '@prisma/client';
-import { Coins, File, Fingerprint, User2, Vault } from 'lucide-react';
-import CardBody from '@/components/card-body';
+import type { Proposal } from '@prisma/client';
+import { Coins, File, User2 } from 'lucide-react';
+import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
@@ -10,14 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-
-const iconMap = {
-    id: Fingerprint,
-    money: Coins,
-    creator: User2,
-    recipient: User2,
-    description: File,
-};
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 interface ProposalDetailsCardWrapperProps {
     proposal: Proposal;
@@ -34,10 +27,16 @@ export default function ProposalDetailsCardWrapper({
 }: ProposalDetailsCardWrapperProps) {
     return (
         <div className="space-y-6">
-            <CardBody
-                title="Description"
-                icon={iconMap['description']}
-                body={
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg font-semibold flex items-center">
+                        <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                            <File className="h-6 w-6" />
+                        </div>
+                        Description
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
                     <Dialog>
                         <DialogTrigger asChild>
                             <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
@@ -53,15 +52,13 @@ export default function ProposalDetailsCardWrapper({
                             </DialogDescription>
                         </DialogContent>
                     </Dialog>
-                }
-                bodyClassName="text-base font-normal"
-                className="h-auto"
-            />
+                </CardContent>
+            </Card>
             <div className="grid gap-6 md:grid-cols-2">
-                <CardBody
+                <StatCard
                     title="Creator"
-                    icon={iconMap['creator']}
-                    body={
+                    icon={<User2 className="h-6 w-6 " />}
+                    value={
                         <div className="flex flex-col items-start">
                             <p className="text-xs text-muted-foreground mb-1">
                                 Wallet Address:
@@ -74,12 +71,12 @@ export default function ProposalDetailsCardWrapper({
                             </Badge>
                         </div>
                     }
-                    bodyClassName="text-sm"
+                    description="Creator's wallet address"
                 />
-                <CardBody
+                <StatCard
                     title="Recipient"
-                    icon={iconMap['recipient']}
-                    body={
+                    icon={<User2 className="h-6 w-6 " />}
+                    value={
                         <div className="flex flex-col items-start">
                             <p className="text-xs text-muted-foreground mb-1">
                                 Wallet Address:
@@ -92,19 +89,19 @@ export default function ProposalDetailsCardWrapper({
                             </Badge>
                         </div>
                     }
-                    bodyClassName="text-sm"
+                    description="Recipient's wallet address"
                 />
-                <CardBody
+                <StatCard
                     title="Min Request Amount"
-                    icon={iconMap['money']}
-                    body={`${proposal.minRequestAmount} ${vault.fundingTokenSymbol}`}
-                    bodyClassName="text-xl font-semibold"
+                    icon={<Coins className="h-6 w-6" />}
+                    value={`${proposal.minRequestAmount} ${vault.fundingTokenSymbol}`}
+                    description="Minimum amount that can be requested"
                 />
-                <CardBody
+                <StatCard
                     title="Max Request Amount"
-                    icon={iconMap['money']}
-                    body={`${proposal.maxRequestAmount} ${vault.fundingTokenSymbol}`}
-                    bodyClassName="text-xl font-semibold"
+                    icon={<Coins className="h-6 w-6 " />}
+                    value={`${proposal.maxRequestAmount} ${vault.fundingTokenSymbol}`}
+                    description="Maximum amount that can be requested"
                 />
             </div>
         </div>

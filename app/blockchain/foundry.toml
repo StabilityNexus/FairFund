@@ -1,8 +1,8 @@
 [profile.default]
 src = "src"
-out = "out"
+out ='../web-app/src/blockchain/out'
 libs = ["lib"]
-fs_permissions = [{ access = "read-write", path = "./"}]
+fs_permissions = [{ access = "read-write", path = "../web-app"}]
 
 remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts"
