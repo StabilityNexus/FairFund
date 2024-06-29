@@ -14,5 +14,7 @@ contract DeployMockERC20 is Script {
         mockERC20 = new MockERC20("MockERC20", "MERC");
         mockERC20.mint(vm.addr(deployerKey), 1000000000000000000000000);
         vm.stopBroadcast();
+        string memory deploymentInfo = string.concat('{"mockERC20":"', vm.toString(address(mockERC20)), '"}');
+        vm.writeFile("constants/anvil/erc20_deployment.json", deploymentInfo);
     }
 }
