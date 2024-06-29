@@ -7,7 +7,9 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "addMock": "ts-node src/mocks/handleMocks.ts add",
+        "removeMock": "ts-node src/mocks/handleMocks.ts remove"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
@@ -16,6 +18,7 @@
         "@radix-ui/react-dropdown-menu": "^2.0.6",
         "@radix-ui/react-label": "^2.0.2",
         "@radix-ui/react-popover": "^1.0.7",
+        "@radix-ui/react-progress": "^1.1.0",
         "@radix-ui/react-separator": "^1.0.3",
         "@radix-ui/react-slot": "^1.0.2",
         "@radix-ui/react-toast": "^1.1.5",
@@ -52,6 +55,7 @@
         "prettier": "^3.3.2",
         "prisma": "^5.15.0",
         "tailwindcss": "^3.4.1",
+        "ts-node": "^10.9.2",
         "typescript": "^5"
     }
 }
