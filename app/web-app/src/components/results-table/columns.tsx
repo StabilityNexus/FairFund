@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
-export const columns: ColumnDef<Proposal>[] = [
+export const getColumn = (totalFunds: number): ColumnDef<Proposal>[] => [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -53,8 +53,11 @@ export const columns: ColumnDef<Proposal>[] = [
         accessorKey: 'distribution',
         header: 'Distribution',
         cell: ({ row }) => {
-            // TODO: Implement Progress bar
-            return <Progress value={50} className="w-full" />;
+            const percentage =
+                totalFunds > 0
+                    ? (row.original.fundAllocated / totalFunds) * 100
+                    : 0;
+            return <Progress value={percentage} className="w-full" />;
         },
     },
     {

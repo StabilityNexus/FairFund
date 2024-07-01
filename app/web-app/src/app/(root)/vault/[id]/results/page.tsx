@@ -70,7 +70,7 @@ export default async function VaultResultsPage({
         functionName: 'getTotalVotingPowerTokensMinted',
     });
     const formattedTotalVotingTokensUsed = formatUnits(
-        totalVotingTokensAvailable as bigint,
+        totalVotingTokensUsed as bigint,
         18
     );
 
@@ -112,7 +112,10 @@ export default async function VaultResultsPage({
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <TableWrapper fundingVaultId={Number(id)} />
+                    <TableWrapper
+                        fundingVaultId={Number(id)}
+                        vaultBalance={Number(formattedVaultBalance)}
+                    />
                 </CardContent>
             </Card>
 
