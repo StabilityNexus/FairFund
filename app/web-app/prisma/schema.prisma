@@ -40,7 +40,7 @@ model Proposal {
   recipient        String
   proposalId       Int // proposal id w.r.t the funding vault.
   fundingVaultId   Int
-  fundAllocated    Int?
+  fundAllocated    Int          @default(0)
   createdAt        DateTime     @default(now())
   fundingVault     FundingVault @relation(fields: [fundingVaultId], references: [id])
 

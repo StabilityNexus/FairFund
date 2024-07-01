@@ -14,6 +14,13 @@ import { Progress } from '@/components/ui/progress';
 
 export const columns: ColumnDef<Proposal>[] = [
     {
+        accessorKey: 'id',
+        header: 'ID',
+        cell: ({ row }) => {
+            return <div>{row.original.id}</div>;
+        },
+    },
+    {
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => {

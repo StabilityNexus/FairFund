@@ -294,6 +294,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
             Proposal memory proposal = s_proposals[i];
             if (amount > 0) {
                 bool success = i_fundingToken.transfer(proposal.recipient, amount);
+                s_totalBalanceAvailableForDistribution -= amount;
                 if (!success) {
                     revert FundingVault__TransferFailed();
                 }

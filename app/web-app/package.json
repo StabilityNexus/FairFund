@@ -9,7 +9,7 @@
         "lint": "next lint",
         "format": "prettier --write .",
         "addMock": "ts-node src/mocks/handleMocks.ts add",
-        "removeMock": "ts-node src/mocks/handleMocks.ts remove"
+        "cleanDB": "ts-node src/mocks/handleMocks.ts remove"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",

@@ -1,21 +1,29 @@
-import mockFairFund from '@/blockchain/deployments/anvil/fairFund_deployment.json';
+// Import statements
+import fairFundDeploymentDev from '@/blockchain/deployments/anvil/fairFund_deployment.json';
+import fairFundDeploymentProd from '@/blockchain/deployments/sepolia/fairFund_deployment.json';
 import mockFairFundABI from '@/blockchain/out/MockFairFund.sol/MockFairFund.json';
-import mockERC20 from '@/blockchain/deployments/anvil/erc20_deployment.json';
+import fairFundABI from '@/blockchain/out/FairFund.sol/FairFund.json';
+
+import erc20DeploymentDev from '@/blockchain/deployments/anvil/erc20_deployment.json';
+import erc20 from '@/blockchain/out/ERC20.sol/ERC20.json';
+
 import mockFundingVault from '@/blockchain/out/MockFundingVault.sol/MockFundingVault.json';
-import ERC20 from '@/blockchain/out/ERC20.sol/ERC20.json';
 import fundingVault from '@/blockchain/out/FundingVault.sol/FundingVault.json';
 
 export const fairFund: SmartContract = {
     address:
         process.env.NODE_ENV === 'development'
-            ? mockFairFund.mockFairFund
-            : '0x5fc8d32690cc91d4c39d9d3abcbd16989f875707',
-    abi: mockFairFundABI.abi,
+            ? fairFundDeploymentDev.mockFairFund
+            : fairFundDeploymentProd.fairFund,
+    abi:
+        process.env.NODE_ENV === 'development'
+            ? mockFairFundABI.abi
+            : fairFundABI.abi,
 };
 
-export const erc20ABI = ERC20.abi;
+export const erc20ABI = erc20.abi;
 
-export const mockERC20Address = mockERC20.mockERC20;
+export const mockERC20Address = erc20DeploymentDev.mockERC20;
 
 export const fundingVaultABI =
     process.env.NODE_ENV === 'development'
