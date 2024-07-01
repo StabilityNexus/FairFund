@@ -18,7 +18,7 @@ async function tally(vault: FundingVault): Promise<void> {
             address: vault.vaultAddress as `0x${string}`,
             abi: fundingVaultABI,
             functionName: 'calculateFundingToBeReceived',
-            args: [proposal.id],
+            args: [proposal.proposalId],
         });
         const decimals = await readContract(wagmiConfig, {
             address: vault.fundingTokenAddress as `0x${string}`,
@@ -28,6 +28,9 @@ async function tally(vault: FundingVault): Promise<void> {
         const formattedFundsAllocated = formatUnits(
             fundsAllocated as bigint,
             decimals as number
+        );
+        console.log(
+            `Proposal ${proposal.id} has been allocated ${formattedFundsAllocated} tokens`
         );
         await prisma.proposal.update({
             where: {

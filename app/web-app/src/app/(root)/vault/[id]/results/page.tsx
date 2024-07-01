@@ -28,8 +28,8 @@ export default async function VaultResultsPage({
     if (!vault) {
         redirect('/dashboard');
     }
-    const isTallyDatePassed = vault.tallyDate.getTime() < Date.now();
-    if (!isTallyDatePassed) {
+    const isTallyed = vault.isTallied;
+    if (!isTallyed) {
         redirect(`/vault/${id}`);
     }
 
@@ -115,6 +115,7 @@ export default async function VaultResultsPage({
                     <TableWrapper
                         fundingVaultId={Number(id)}
                         vaultBalance={Number(formattedVaultBalance)}
+                        fundingTokenSymbol={vault.fundingTokenSymbol}
                     />
                 </CardContent>
             </Card>
@@ -128,7 +129,9 @@ export default async function VaultResultsPage({
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <BlockchainActionButton
-                            smartContractAddress={'0x1'}
+                            smartContractAddress={
+                                vault.vaultAddress as `0x${string}`
+                            }
                             functionName="distributeFunds"
                             smartContractABI={fundingVaultABI}
                             buttonText="Distribute Funds"
@@ -137,7 +140,9 @@ export default async function VaultResultsPage({
                             className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                         />
                         <BlockchainActionButton
-                            smartContractAddress={'0x1'}
+                            smartContractAddress={
+                                vault.vaultAddress as `0x${string}`
+                            }
                             functionName="releaseVotingTokens"
                             smartContractABI={fundingVaultABI}
                             buttonText="Withdraw Voting Tokens"

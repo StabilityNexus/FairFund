@@ -98,6 +98,7 @@ export default async function VaultDetailsPage({
         redirect('/dashboard');
     }
     const isTallyDatePassed = vault.tallyDate.getTime() < Date.now();
+    const isTallyed = vault.isTallied;
 
     return (
         <div className="container mx-auto p-6 space-y-8">
@@ -155,8 +156,8 @@ export default async function VaultDetailsPage({
                             href={`/vault/${id}/results`}
                             icon={<BarChart2 className="h-4 w-4" />}
                             text="View Results"
-                            disabled={!isTallyDatePassed}
-                            toolTipText="Results will be available after the tally date has passed."
+                            disabled={!isTallyed}
+                            toolTipText="Results will be available shortly after the tally date has passed."
                         />
                         {/* <BlockchainActionButton
                             smartContractAddress={

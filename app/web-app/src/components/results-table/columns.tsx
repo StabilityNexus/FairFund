@@ -12,7 +12,12 @@ import {
 } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 
-export const getColumn = (totalFunds: number): ColumnDef<Proposal>[] => [
+interface UpdatedProposal extends Proposal {
+    percentage: number;
+    fundingTokenSymbol: string;
+}
+
+export const columns: ColumnDef<UpdatedProposal>[] = [
     {
         accessorKey: 'id',
         header: 'ID',
@@ -46,18 +51,21 @@ export const getColumn = (totalFunds: number): ColumnDef<Proposal>[] => [
         accessorKey: 'fundsAllocated',
         header: 'Funds Allocated',
         cell: ({ row }) => {
-            return <div>{row.original.fundAllocated}</div>;
+            return (
+                <div>
+                    {row.original.fundAllocated}{' '}
+                    {row.original.fundingTokenSymbol}
+                </div>
+            );
         },
     },
     {
         accessorKey: 'distribution',
         header: 'Distribution',
         cell: ({ row }) => {
-            const percentage =
-                totalFunds > 0
-                    ? (row.original.fundAllocated / totalFunds) * 100
-                    : 0;
-            return <Progress value={percentage} className="w-full" />;
+            return (
+                <Progress value={row.original.percentage} className="w-full" />
+            );
         },
     },
     {
