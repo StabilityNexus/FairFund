@@ -1,4 +1,3 @@
-import prisma from '@/lib/db';
 import { fundingVaultABI } from '@/blockchain/constants';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BlockchainActionButton } from '@/components/blockchain-action-button';
@@ -6,11 +5,13 @@ import { Share2, Users, Calendar, Coins } from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
 import TableWrapper from '@/components/results-table/table-wrapper';
 
-import { readContract } from '@wagmi/core';
-import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI } from '@/blockchain/constants';
-import { formatUnits } from 'viem';
 import { redirect } from 'next/navigation';
+import {
+    getTallyDate,
+    getTotalVotingTokens,
+    getVault,
+    getVaultBalance,
+} from '@/lib/vault-data';
 
 export default async function VaultResultsPage({
     params,
@@ -20,11 +21,7 @@ export default async function VaultResultsPage({
     };
 }) {
     const id = params.id;
-    const vault = await prisma.fundingVault.findUnique({
-        where: {
-            id: Number(id),
-        },
-    });
+    const vault = await getVault(Number(id));
     if (!vault) {
         redirect('/dashboard');
     }
@@ -33,46 +30,12 @@ export default async function VaultResultsPage({
         redirect(`/vault/${id}`);
     }
 
-    // Vault Balance.
-    const vaultBalance = await readContract(wagmiConfig, {
-        address: vault.vaultAddress as `0x${string}`,
-        abi: fundingVaultABI,
-        functionName: 'getTotalBalanceAvailbleForDistribution',
-    });
-    const decimals = await readContract(wagmiConfig, {
-        address: vault.fundingTokenAddress as `0x${string}`,
-        abi: erc20ABI,
-        functionName: 'decimals',
-    });
-    const formattedVaultBalance = formatUnits(
-        vaultBalance as bigint,
-        decimals as number
-    );
+    const formattedVaultBalance = await getVaultBalance(vault);
 
-    // tally date
-    const tallyDate = new Date(vault.tallyDate).toLocaleDateString();
+    const tallyDate = getTallyDate(vault);
 
-    // Total Voting Tokens Available
-    const totalVotingTokensAvailable = await readContract(wagmiConfig, {
-        address: vault.vaultAddress as `0x${string}`,
-        abi: fundingVaultABI,
-        functionName: 'getTotalVotingPowerTokensMinted',
-    });
-    const formattedTotalVotingTokensAvailable = formatUnits(
-        totalVotingTokensAvailable as bigint,
-        18
-    );
-
-    // Total voting tokens used
-    const totalVotingTokensUsed = await readContract(wagmiConfig, {
-        address: vault.vaultAddress as `0x${string}`,
-        abi: fundingVaultABI,
-        functionName: 'getTotalVotingPowerTokensMinted',
-    });
-    const formattedTotalVotingTokensUsed = formatUnits(
-        totalVotingTokensUsed as bigint,
-        18
-    );
+    const { totalVotingTokensAvailable, totalVotingTokensUsed } =
+        await getTotalVotingTokens(vault);
 
     return (
         <div className="container mx-auto p-6 space-y-8">
@@ -88,13 +51,13 @@ export default async function VaultResultsPage({
                 <StatCard
                     title="Total Voting Available"
                     icon={<Users className="h-6 w-6 text-blue-500" />}
-                    value={formattedTotalVotingTokensAvailable}
+                    value={totalVotingTokensAvailable}
                     description="Total number of voting power tokens minted."
                 />
                 <StatCard
                     title="Total Votes Used"
                     icon={<Share2 className="h-6 w-6 text-purple-500" />}
-                    value={formattedTotalVotingTokensUsed}
+                    value={totalVotingTokensUsed}
                     description="Total number of voting power tokens used."
                 />
                 <StatCard

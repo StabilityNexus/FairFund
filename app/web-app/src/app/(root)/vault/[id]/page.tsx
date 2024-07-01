@@ -159,30 +159,6 @@ export default async function VaultDetailsPage({
                             disabled={!isTallyed}
                             toolTipText="Results will be available shortly after the tally date has passed."
                         />
-                        {/* <BlockchainActionButton
-                            smartContractAddress={
-                                vault.vaultAddress as `0x${string}`
-                            }
-                            functionName="distributeFunds"
-                            smartContractABI={fundingVaultABI}
-                            buttonText="Distrubute Funds"
-                            iconName="distrubuteFunds"
-                            isDisabled={!isTallyDatePassed}
-                            successMessage="Funds distributed successfully."
-                            className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
-                        />
-                        <BlockchainActionButton
-                            smartContractAddress={
-                                vault.vaultAddress as `0x${string}`
-                            }
-                            functionName="releaseVotingTokens"
-                            smartContractABI={fundingVaultABI}
-                            buttonText="Withdraw Voting Tokens"
-                            iconName="creditCard"
-                            isDisabled={!isTallyDatePassed}
-                            successMessage="Voting tokens withdrawn successfully."
-                            className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
-                        /> */}
                     </div>
                 </CardContent>
             </Card>

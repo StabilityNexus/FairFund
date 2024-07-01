@@ -21,10 +21,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { StatCard } from '@/components/stat-card';
 
 import { type FundingVault } from '@prisma/client';
-import { readContract } from '@wagmi/core';
-import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
-import { formatUnits } from 'viem';
+import { getVaultBalance } from '@/lib/vault-data';
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
@@ -33,21 +30,7 @@ interface VaultDetailsCardWrapperProps {
 export default async function VaultDetailsCardWrapper({
     fundingVault: vault,
 }: VaultDetailsCardWrapperProps) {
-    const vaultBalance = await readContract(wagmiConfig, {
-        address: vault.vaultAddress as `0x${string}`,
-        abi: fundingVaultABI,
-        functionName: 'getTotalBalanceAvailbleForDistribution',
-    });
-
-    const decimals = await readContract(wagmiConfig, {
-        address: vault.fundingTokenAddress as `0x${string}`,
-        abi: erc20ABI,
-        functionName: 'decimals',
-    });
-    const formattedVaultBalance = formatUnits(
-        vaultBalance as bigint,
-        decimals as number
-    );
+    const vaultBalance = await getVaultBalance(vault);
     const proposals = await prisma.proposal.count({
         where: {
             fundingVaultId: vault.id,
@@ -66,7 +49,7 @@ export default async function VaultDetailsCardWrapper({
                 <StatCard
                     title="Available Funds"
                     icon={<LockKeyhole className="text-green-500" />}
-                    value={`${formattedVaultBalance} ${vault.fundingTokenSymbol}`}
+                    value={`${vaultBalance} ${vault.fundingTokenSymbol}`}
                     description="Amount of funding tokens locked in this vault"
                 />
                 <StatCard
