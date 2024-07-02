@@ -9,8 +9,7 @@ import {
     waitForTransactionReceipt,
 } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI } from '@/blockchain/constants';
-import axios from 'axios';
+import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -25,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
+import { write } from 'fs';
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -62,17 +62,22 @@ export default function DepositTokensForm({
             const hash = await writeContract(wagmiConfig, {
                 address: fundingTokenAddress as `0x${string}`,
                 abi: erc20ABI,
-                functionName: 'transfer',
+                functionName: 'approve',
                 args: [vaultAddress, amountOfTokens],
             });
             await waitForTransactionReceipt(wagmiConfig, {
                 hash: hash,
             });
-            await axios.post('/api/vault/deposit', {
-                vaultId: vaultId,
-                amountOfTokens: data.amountOfTokens,
+            const depositHash = await writeContract(wagmiConfig, {
+                address: vaultAddress as `0x${string}`,
+                abi: fundingVaultABI,
+                functionName: 'deposit',
+                args: [amountOfTokens],
             });
-            return { hash, message: 'Tokens deposited successfully.' };
+            await waitForTransactionReceipt(wagmiConfig, {
+                hash: depositHash,
+            });
+            return { depositHash, message: 'Tokens deposited successfully.' };
         },
         `/vault/${vaultId}`
     );

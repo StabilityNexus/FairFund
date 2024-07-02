@@ -6,7 +6,7 @@ import {FundingVault} from "../../src/FundingVault.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {MockERC20} from "../mocks/MockERC20.sol";
+import {MockERC20} from "../../src/mocks/MockERC20.sol";
 
 contract FundingVaultTest is Test {
     FundingVault fundingVault;
@@ -337,6 +337,16 @@ contract FundingVaultTest is Test {
         votingToken.approve(address(fundingVault), 10 ether);
         fundingVault.register(10 ether);
         assertEq(fundingVault.getVotingPowerOf(randomUser), 10 ether);
+        vm.stopPrank();
+    }
+
+    function testGetTotalAvailableFunds() public {
+        uint256 amount = 10 ether;
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, amount);
+        fundingToken.approve(address(fundingVault), amount);
+        fundingVault.deposit(amount);
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), amount);
         vm.stopPrank();
     }
 }

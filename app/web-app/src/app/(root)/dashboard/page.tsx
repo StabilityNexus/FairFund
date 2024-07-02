@@ -13,10 +13,7 @@ export default function DashboardPage() {
                     Overview of key metrics and recent activities
                 </p>
             </header>
-
-            <div className="w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <CardWrapper />
-            </div>
+            <CardWrapper />
             <div className="mt-8">
                 <Card>
                     <CardHeader>

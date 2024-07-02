@@ -113,8 +113,6 @@ export default function VaultForm() {
                 description: data.description,
                 creatorAddress: address,
                 vaultAddress: result,
-                amountFundingTokens: 0,
-                amountVotingTokens: 0,
                 fundingTokenAddress: data.fundingTokenAddress,
                 votingTokenAddress: data.votingTokenAddress,
                 tallyDate: data.tallyDate,
@@ -307,8 +305,13 @@ export default function VaultForm() {
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date < new Date()
+                                                    disabled={
+                                                        process.env.NODE_ENV ===
+                                                        'development'
+                                                            ? false
+                                                            : (date) =>
+                                                                  date <
+                                                                  new Date()
                                                     }
                                                     initialFocus
                                                 />

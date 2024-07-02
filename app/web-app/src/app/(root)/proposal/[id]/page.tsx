@@ -12,12 +12,18 @@ export default async function ProposalDetailsPage({
         id: string;
     };
 }) {
-    const id = params.id;
+    const id = Number(params.id);
+    if (!id) {
+        redirect('/dashboard');
+    }
     const proposal = await prisma.proposal.findUnique({
         where: {
             id: Number(id),
         },
     });
+    if (!proposal) {
+        redirect('/dashboard');
+    }
     const vault = await prisma.fundingVault.findUnique({
         where: {
             id: proposal?.fundingVaultId,
@@ -28,7 +34,7 @@ export default async function ProposalDetailsPage({
             vaultAddress: true,
         },
     });
-    if (!proposal || !vault) {
+    if (!vault) {
         redirect('/dashboard');
     }
     return (

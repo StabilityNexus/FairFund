@@ -13,5 +13,7 @@ contract DeployFairFund is Script {
         vm.startBroadcast(deployerKey);
         fairFund = new FairFund();
         vm.stopBroadcast();
+        string memory deploymentInfo = string.concat('{"fairFund":"', vm.toString(address(fairFund)), '"}');
+        vm.writeFile("../web-app/src/blockchain/deployments/sepolia/fairFund_deployment.json", deploymentInfo);
     }
 }

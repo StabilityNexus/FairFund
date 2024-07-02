@@ -57,6 +57,9 @@ contract FundingVault is Ownable, ReentrancyGuard {
     error FundingVault__AlreadyVoted();
     error FundingVault__TallyDateNotPassed();
     error FundingVault__NotEnoughBalance();
+    error FundingVault__NoVotingPowerTokenMinted();
+    error FundingVault__TransferFailed();
+    error FundingVault__AlreadyDistributedFunds();
 
     // Type Declarations //
     struct Proposal {
@@ -74,6 +77,8 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     uint256 private s_minRequestableAmount;
     uint256 private s_maxRequestableAmount;
+    uint256 private s_totalBalanceAvailableForDistribution;
+    bool private s_fundsDistributed;
 
     /**
      * @dev The date in which the tally will be taken as seconds since unix epoch
@@ -91,6 +96,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     event ProposalSubmitted(address indexed proposer, uint256 indexed proposalId);
     event VotedOnProposal(address indexed voter, uint256 indexed proposalId, uint256 indexed amount);
     event ReleasedTokens(address indexed voter, uint256 indexed amount);
+    event FundsDistributed(uint256 indexed proposalId, address indexed recipient, uint256 indexed amount);
 
     modifier tallyDatePassed() {
         if (block.timestamp < i_tallyDate) {
@@ -125,6 +131,8 @@ contract FundingVault is Ownable, ReentrancyGuard {
         i_votingPowerToken = VotingPowerToken(_votingPowerToken);
         s_minRequestableAmount = _minRequestableAmount;
         s_maxRequestableAmount = _maxRequestableAmount;
+        s_totalBalanceAvailableForDistribution = 0;
+        s_fundsDistributed = false;
     }
 
     /**
@@ -143,9 +151,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
      * @notice Only the owner can call this function
      */
     function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
-        if (_maxRequestableAmount <= 0) {
-            revert FundingVault__AmountCannotBeZero();
-        }
         if (_maxRequestableAmount <= s_minRequestableAmount) {
             revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
         }
@@ -160,6 +165,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
+        s_totalBalanceAvailableForDistribution += _amount;
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
         emit FundingTokenDeposited(msg.sender, _amount);
     }
@@ -240,6 +246,16 @@ contract FundingVault is Ownable, ReentrancyGuard {
         if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
             revert FundingVault__ProposalDoesNotExist();
         }
+
+        uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
+        if (totalVotingPowerTokens == 0) {
+            revert FundingVault__NoVotingPowerTokenMinted();
+        }
+        // Floating point adjustment:
+        // 1.totalVotes is multiplied by 1e18 to avoid rounding errors
+        // 2.transferable is divided by 1e18 to get the actual amount
+        uint256 totalVotes = s_votes[_proposalId] * 1e18;
+        Proposal memory proposal = s_proposals[_proposalId];
         /**
          * Let:
          * `V(p)` be the number of votingPowerTokens assigned to proposal `p`
@@ -249,16 +265,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
          * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
          * The funding to be received by a rejected proposal `p` is `0`.
          */
-        uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
-        uint256 totalBalance = i_fundingToken.balanceOf(address(this));
-        // Floating point adjustment:
-        // 1.totalVotes is multiplied by 1e18 to avoid rounding errors
-        // 2.transferable is divided by 1e18 to get the actual amount
-        uint256 totalVotes = s_votes[_proposalId] * 1e18;
-
-        Proposal memory proposal = s_proposals[_proposalId];
-
-        uint256 transferable = (totalBalance * (totalVotes / totalVotingPowerTokens)) / 1e18;
+        uint256 transferable = (s_totalBalanceAvailableForDistribution * (totalVotes / totalVotingPowerTokens)) / 1e18;
 
         bool isProposalAccepted = transferable >= proposal.minimumAmount;
 
@@ -278,11 +285,20 @@ contract FundingVault is Ownable, ReentrancyGuard {
      * @notice Can only be called after the tally date has passed
      */
     function distributeFunds() external nonReentrant tallyDatePassed {
+        if (s_fundsDistributed) {
+            revert FundingVault__AlreadyDistributedFunds();
+        }
+        s_fundsDistributed = true;
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
             Proposal memory proposal = s_proposals[i];
             if (amount > 0) {
-                i_fundingToken.transfer(proposal.recipient, amount);
+                bool success = i_fundingToken.transfer(proposal.recipient, amount);
+                s_totalBalanceAvailableForDistribution -= amount;
+                if (!success) {
+                    revert FundingVault__TransferFailed();
+                }
+                emit FundsDistributed(i, proposal.recipient, amount);
             }
         }
     }
@@ -297,7 +313,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
             revert FundingVault__AmountCannotBeZero();
         }
         s_voterToVotingTokens[msg.sender] = 0;
-        i_votingPowerToken.burn(msg.sender, votingPower);
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
     }
@@ -338,6 +353,18 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     function getVotingPowerToken() public view returns (address) {
         return address(i_votingPowerToken);
+    }
+
+    function getTotalVotingPowerTokensMinted() public view returns (uint256) {
+        return i_votingPowerToken.totalSupply();
+    }
+
+    function getTotalVotingPowerTokensUsed() public view returns (uint256) {
+        return i_votingPowerToken.balanceOf(address(this));
+    }
+
+    function getTotalBalanceAvailbleForDistribution() public view returns (uint256) {
+        return s_totalBalanceAvailableForDistribution;
     }
 
     function getVotingPowerOf(address _voter) public view returns (uint256) {

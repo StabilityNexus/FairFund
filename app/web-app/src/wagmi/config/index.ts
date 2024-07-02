@@ -1,7 +1,6 @@
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
-
 import { cookieStorage, createStorage, http } from 'wagmi';
-import { sepolia } from 'wagmi/chains';
+import { foundry, sepolia } from 'wagmi/chains';
 
 export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
@@ -14,9 +13,8 @@ const metadata = {
     icons: ['https://avatars.githubusercontent.com/u/37784886'],
 };
 
-const chains = [sepolia] as const;
 export const config = defaultWagmiConfig({
-    chains,
+    chains: [process.env.NEXT_PUBLIC_NETWORK === 'sepolia' ? sepolia : foundry],
     projectId,
     metadata,
     ssr: true,
@@ -27,5 +25,6 @@ export const config = defaultWagmiConfig({
         [sepolia.id]: http(
             `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
         ),
+        [foundry.id]: http('http://localhost:8545'),
     },
 });

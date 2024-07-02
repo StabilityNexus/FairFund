@@ -1,6 +1,13 @@
 import React from 'react';
 import prisma from '@/lib/db';
-import { Coins, Dock, File, Fingerprint, TimerIcon, User2 } from 'lucide-react';
+import {
+    Calendar,
+    File,
+    FileText,
+    LockKeyhole,
+    User2,
+    Wallet,
+} from 'lucide-react';
 import {
     Dialog,
     DialogContent,
@@ -11,82 +18,19 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { StatCard } from '@/components/stat-card';
+
 import { type FundingVault } from '@prisma/client';
-import { readContract } from '@wagmi/core';
-import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI } from '@/blockchain/constants';
-import { formatUnits } from 'viem';
+import { getVaultBalance } from '@/lib/vault-data';
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
 }
 
-const iconMap = {
-    id: Fingerprint,
-    locked: Coins,
-    proposals: Dock,
-    tallyDate: TimerIcon,
-    creator: User2,
-    description: File,
-};
-
-const InfoCard = ({
-    title,
-    icon: Icon,
-    body,
-    tooltip,
-}: {
-    title: string;
-    icon: React.ElementType;
-    body: string | number;
-    tooltip: string;
-}) => (
-    <TooltipProvider>
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Card className="hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            {title}
-                        </CardTitle>
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{body}</div>
-                    </CardContent>
-                </Card>
-            </TooltipTrigger>
-            <TooltipContent>
-                <p>{tooltip}</p>
-            </TooltipContent>
-        </Tooltip>
-    </TooltipProvider>
-);
-
 export default async function VaultDetailsCardWrapper({
     fundingVault: vault,
 }: VaultDetailsCardWrapperProps) {
-    const vaultBalance = await readContract(wagmiConfig, {
-        address: vault.fundingTokenAddress as `0x${string}`,
-        abi: erc20ABI,
-        functionName: 'balanceOf',
-        args: [vault.vaultAddress],
-    });
-    const decimals = await readContract(wagmiConfig, {
-        address: vault.fundingTokenAddress as `0x${string}`,
-        abi: erc20ABI,
-        functionName: 'decimals',
-    });
-    const formattedVaultBalance = formatUnits(
-        vaultBalance as bigint,
-        decimals as number
-    );
+    const vaultBalance = await getVaultBalance(vault);
     const proposals = await prisma.proposal.count({
         where: {
             fundingVaultId: vault.id,
@@ -96,29 +40,29 @@ export default async function VaultDetailsCardWrapper({
     return (
         <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <InfoCard
+                <StatCard
                     title="Vault ID"
-                    icon={iconMap['id']}
-                    body={`#${vault.id}`}
-                    tooltip="Unique identifier for this funding vault"
+                    icon={<Wallet className="text-blue-500" />}
+                    value={`#${vault.id}`}
+                    description="Unique identifier for this funding vault"
                 />
-                <InfoCard
-                    title="Locked Tokens"
-                    icon={iconMap['locked']}
-                    body={`${formattedVaultBalance} ${vault.fundingTokenSymbol}`}
-                    tooltip="Amount of funding tokens locked in this vault"
+                <StatCard
+                    title="Available Funds"
+                    icon={<LockKeyhole className="text-green-500" />}
+                    value={`${vaultBalance} ${vault.fundingTokenSymbol}`}
+                    description="Amount of funding tokens locked in this vault"
                 />
-                <InfoCard
+                <StatCard
                     title="Proposals"
-                    icon={iconMap['proposals']}
-                    body={proposals}
-                    tooltip="Number of proposals submitted to this vault"
+                    icon={<FileText className="text-purple-500" />}
+                    value={proposals.toString()}
+                    description="Number of proposals submitted to this vault"
                 />
-                <InfoCard
+                <StatCard
                     title="Tally Date"
-                    icon={iconMap['tallyDate']}
-                    body={vault.tallyDate.toLocaleDateString()}
-                    tooltip="Date when the voting results will be tallied"
+                    icon={<Calendar className="text-red-500" />}
+                    value={vault.tallyDate.toLocaleDateString()}
+                    description="Date when the voting results will be tallied"
                 />
             </div>
 
@@ -126,7 +70,9 @@ export default async function VaultDetailsCardWrapper({
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold flex items-center">
-                            <User2 className="mr-2 h-5 w-5" />
+                            <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                                <User2 className="h-6 w-6" />
+                            </div>
                             Creator
                         </CardTitle>
                     </CardHeader>
@@ -146,7 +92,9 @@ export default async function VaultDetailsCardWrapper({
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold flex items-center">
-                            <File className="mr-2 h-5 w-5" />
+                            <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                                <File className="h-6 w-6" />
+                            </div>
                             Description
                         </CardTitle>
                     </CardHeader>

@@ -9,7 +9,6 @@ import {
 } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
-import axios from 'axios';
 import { parseUnits } from 'viem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -63,7 +62,6 @@ export function RegisterTokenForm({
                 data.amountOfTokens,
                 decimals as number
             );
-
             const approveHash = await writeContract(wagmiConfig, {
                 address: votingTokenAddress as `0x${string}`,
                 abi: erc20ABI,
@@ -81,10 +79,6 @@ export function RegisterTokenForm({
             });
             await waitForTransactionReceipt(wagmiConfig, {
                 hash: hash,
-            });
-            await axios.post('/api/vault/register', {
-                vaultId: vaultId,
-                amountOfTokens: data.amountOfTokens,
             });
             return { hash, message: 'Successfully registered.' };
         },
