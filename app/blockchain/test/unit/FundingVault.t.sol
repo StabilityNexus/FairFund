@@ -235,26 +235,36 @@ contract FundingVaultTest is Test {
     }
 
     function testDistributeFunds() public {
+        uint256 initialDeposit = 10 ether;
+        uint256 registrationAmount = 10 ether;
+        uint256 proposalMinRequestAmount = 1 ether;
+        uint256 proposalMaxRequestAmount = 8 ether;
+        uint256 votingAmount = 8 ether;
+        uint256 tallyDelay = 2 days;
+        uint256 expectedProposalFunding = 8 ether;
+
         // Setup
         vm.startPrank(randomUser);
-        fundingToken.mint(randomUser, 10 ether);
-        fundingToken.approve(address(fundingVault), 10 ether);
-        fundingVault.deposit(10 ether);
-        votingToken.mint(randomUser, 10 ether);
-        votingToken.approve(address(fundingVault), 10 ether);
-        fundingVault.register(10 ether);
-        fundingVault.submitProposal("<Proposal Link>", 1 ether, 8 ether, address(randomUser));
-        votingPowerToken.approve(address(fundingVault), 8 ether);
-        fundingVault.voteOnProposal(1, 8 ether);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        votingToken.mint(randomUser, registrationAmount);
+        votingToken.approve(address(fundingVault), registrationAmount);
+        fundingVault.register(registrationAmount);
+        fundingVault.submitProposal(
+            "<Proposal Link>", proposalMinRequestAmount, proposalMaxRequestAmount, address(randomUser)
+        );
+        votingPowerToken.approve(address(fundingVault), votingAmount);
+        fundingVault.voteOnProposal(1, votingAmount);
         vm.stopPrank();
 
         // Fast forward time to pass the tally date
-        vm.warp(block.timestamp + 2 days);
+        vm.warp(block.timestamp + tallyDelay);
 
         // Distribute funds
         vm.prank(randomUser);
         fundingVault.distributeFunds();
-        assertEq(fundingToken.balanceOf(randomUser), 8 ether); // Proposal should receive 5 ether
+        assertEq(fundingToken.balanceOf(randomUser), expectedProposalFunding);
     }
 
     function testReleaseVotingTokens() public {

@@ -31,7 +31,7 @@ export async function getTotalVotingTokens(vault: any) {
     const totalVotingTokensUsed = await readContract(wagmiConfig, {
         address: vault.vaultAddress as `0x${string}`,
         abi: fundingVaultABI,
-        functionName: 'getTotalVotingPowerTokensMinted',
+        functionName: 'getTotalVotingPowerTokensUsed',
     });
     return {
         totalVotingTokensAvailable: formatUnits(
