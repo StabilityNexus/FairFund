@@ -154,7 +154,7 @@ export default async function VaultDetailsPage({
                         />
                         <ActionButton
                             href={`/vault/${id}/results`}
-                            icon={<BarChart2 className="h-4 w-4" />}
+                            icon={<BarChart2 className="mr-2 h-4 w-4" />}
                             text="View Results"
                             disabled={!isTallyed}
                             toolTipText="Results will be available shortly after the tally date has passed."
