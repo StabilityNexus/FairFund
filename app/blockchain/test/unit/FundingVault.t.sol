@@ -359,4 +359,62 @@ contract FundingVaultTest is Test {
         assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), amount);
         vm.stopPrank();
     }
+
+    function testGetTotalBalanceAvailableForDistribution() public {
+        // Initially, the balance should be 0
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), 0);
+
+        // Deposit some funds
+        uint256 amount = 5 ether;
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, amount);
+        fundingToken.approve(address(fundingVault), amount);
+        fundingVault.deposit(amount);
+        vm.stopPrank();
+
+        // Check if the balance is updated correctly
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), amount);
+
+        // Deposit more funds
+        uint256 additionalAmount = 3 ether;
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, additionalAmount);
+        fundingToken.approve(address(fundingVault), additionalAmount);
+        fundingVault.deposit(additionalAmount);
+        vm.stopPrank();
+
+        // Check if the balance is updated correctly after multiple deposits
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), amount + additionalAmount);
+    }
+
+    function testGetTotalFundsDistributed() public {
+        // Initially, the total funds distributed should be 0
+        assertEq(fundingVault.getTotalFundsDistributed(), 0);
+
+        // Set up the vault with some funds and a proposal
+        uint256 depositAmount = 10 ether;
+        uint256 minAmount = 5 ether;
+        uint256 maxAmount = 7 ether;
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, depositAmount);
+        fundingToken.approve(address(fundingVault), depositAmount);
+        fundingVault.deposit(depositAmount);
+        fundingVault.submitProposal("Test Proposal", minAmount, maxAmount, randomUser);
+
+        // Register a voter and vote
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        fundingVault.voteOnProposal(1, 10 ether);
+
+        // Fast forward to after the tally date
+        vm.warp(fundingVault.getTallyDate() + 1);
+
+        // Tally the votes and distribute funds
+        fundingVault.distributeFunds();
+        vm.stopPrank();
+
+        // Check if the total funds distributed is updated correctly
+        assertEq(fundingVault.getTotalFundsDistributed(), 7 ether);
+    }
 }

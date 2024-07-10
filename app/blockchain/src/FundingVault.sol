@@ -78,6 +78,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     uint256 private s_minRequestableAmount;
     uint256 private s_maxRequestableAmount;
     uint256 private s_totalBalanceAvailableForDistribution;
+    uint256 private s_totalFundsDistributed;
     bool private s_fundsDistributed;
 
     /**
@@ -132,6 +133,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         s_minRequestableAmount = _minRequestableAmount;
         s_maxRequestableAmount = _maxRequestableAmount;
         s_totalBalanceAvailableForDistribution = 0;
+        s_totalFundsDistributed = 0;
         s_fundsDistributed = false;
     }
 
@@ -297,6 +299,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
                 if (!success) {
                     revert FundingVault__TransferFailed();
                 }
+                s_totalFundsDistributed += amount;
                 emit FundsDistributed(i, proposal.recipient, amount);
             }
         }
@@ -364,6 +367,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
 
     function getTotalBalanceAvailbleForDistribution() public view returns (uint256) {
         return s_totalBalanceAvailableForDistribution;
+    }
+
+    function getTotalFundsDistributed() public view returns (uint256) {
+        return s_totalFundsDistributed;
     }
 
     function getVotingPowerOf(address _voter) public view returns (uint256) {
