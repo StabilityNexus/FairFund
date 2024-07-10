@@ -8,6 +8,7 @@ import {
     Coins,
     DollarSign,
     CheckCircle,
+    ArrowRight,
 } from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
 import TableWrapper from '@/components/results-table/table-wrapper';
@@ -107,18 +108,29 @@ export default async function VaultResultsPage({
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-2xl font-bold">
-                        Post-Tally Actions
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="flex flex-col h-full">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-bold flex items-center justify-start">
+                            Post-Tally Actions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex items-center justify-center">
                         <DistributeFundsButtonWrapper
+                            className="w-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                             vault={vault}
                             smartContractABI={fundingVaultABI}
+                            isDisabled={isFundsDistributed}
                         />
+                    </CardContent>
+                </Card>
+                <Card className="flex flex-col h-full">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-bold flex items-center justify-start">
+                            Post-Distribution Actions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex0grow flex flex-col justify-center space-y-4">
                         <BlockchainActionButton
                             smartContractAddress={
                                 vault.vaultAddress as `0x${string}`
@@ -130,9 +142,21 @@ export default async function VaultResultsPage({
                             successMessage="Voting tokens withdrawn successfully."
                             className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
                         />
-                    </div>
-                </CardContent>
-            </Card>
+                        <BlockchainActionButton
+                            smartContractAddress={
+                                vault.vaultAddress as `0x${string}`
+                            }
+                            functionName="withdrawRemaining"
+                            smartContractABI={fundingVaultABI}
+                            buttonText="Withdraw Remaining Funding Tokens"
+                            iconName="dollarIcon"
+                            successMessage="Remaining funding tokens withdrawn successfully."
+                            className="w-full py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
+                            isDisabled={!isFundsDistributed}
+                        />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

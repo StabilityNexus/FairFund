@@ -6,11 +6,15 @@ import axios from 'axios';
 interface DistributeFundsButtonWrapperProps {
     vault: FundingVault;
     smartContractABI: any;
+    isDisabled?: boolean;
+    className?: string;
 }
 
 export default function DistributeFundsButtonWrapper({
     vault,
     smartContractABI,
+    isDisabled = false,
+    className,
 }: DistributeFundsButtonWrapperProps) {
     async function updateVaultIsDistributed() {
         try {
@@ -32,8 +36,9 @@ export default function DistributeFundsButtonWrapper({
             buttonText="Distribute Funds"
             iconName="trendingUp"
             successMessage="Funds distributed successfully."
-            className="w-full h-full flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
+            className={className}
             callback={updateVaultIsDistributed}
+            isDisabled={isDisabled}
         />
     );
 }
