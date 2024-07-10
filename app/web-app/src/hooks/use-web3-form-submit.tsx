@@ -32,6 +32,8 @@ export function useWeb3FormSubmit<T>() {
                 if (redirectPath) {
                     router.push(redirectPath);
                     router.refresh();
+                } else {
+                    router.refresh();
                 }
             } catch (error) {
                 showErrorMessage(error);

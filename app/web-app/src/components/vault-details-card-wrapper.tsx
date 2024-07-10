@@ -71,7 +71,7 @@ export default async function VaultDetailsCardWrapper({
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold flex items-center">
                             <div className="mr-4 bg-gray-100 p-3 rounded-full">
-                                <User2 className="h-6 w-6" />
+                                <User2 className="h-6 w-6 dark:text-black" />
                             </div>
                             Creator
                         </CardTitle>
@@ -93,7 +93,7 @@ export default async function VaultDetailsCardWrapper({
                     <CardHeader>
                         <CardTitle className="text-lg font-semibold flex items-center">
                             <div className="mr-4 bg-gray-100 p-3 rounded-full">
-                                <File className="h-6 w-6" />
+                                <File className="h-6 w-6 dark:text-black" />
                             </div>
                             Description
                         </CardTitle>

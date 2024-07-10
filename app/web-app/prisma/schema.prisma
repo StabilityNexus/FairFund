@@ -23,9 +23,11 @@ model FundingVault {
   votingTokenAddress  String
   votingTokenSymbol   String
   vaultAddress        String
-  isTallied           Boolean
+  isTallied           Boolean @default(false)
   tallyDate           DateTime
+  isDistributed       Boolean @default(false)
   createdAt           DateTime   @default(now())
+
   proposals           Proposal[]
 
   @@index([creatorAddress])

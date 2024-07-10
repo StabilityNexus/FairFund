@@ -31,7 +31,7 @@ export default function ProposalDetailsCardWrapper({
                 <CardHeader>
                     <CardTitle className="text-lg font-semibold flex items-center">
                         <div className="mr-4 bg-gray-100 p-3 rounded-full">
-                            <File className="h-6 w-6" />
+                            <File className="h-6 w-6 dark:text-gray-800" />
                         </div>
                         Description
                     </CardTitle>
@@ -57,7 +57,7 @@ export default function ProposalDetailsCardWrapper({
             <div className="grid gap-6 md:grid-cols-2">
                 <StatCard
                     title="Creator"
-                    icon={<User2 className="h-6 w-6 " />}
+                    icon={<User2 className="h-6 w-6 dark:text-gray-800" />}
                     value={
                         <div className="flex flex-col items-start">
                             <p className="text-xs text-muted-foreground mb-1">
@@ -75,7 +75,7 @@ export default function ProposalDetailsCardWrapper({
                 />
                 <StatCard
                     title="Recipient"
-                    icon={<User2 className="h-6 w-6 " />}
+                    icon={<User2 className="h-6 w-6 dark:text-gray-800" />}
                     value={
                         <div className="flex flex-col items-start">
                             <p className="text-xs text-muted-foreground mb-1">
@@ -93,13 +93,13 @@ export default function ProposalDetailsCardWrapper({
                 />
                 <StatCard
                     title="Min Request Amount"
-                    icon={<Coins className="h-6 w-6" />}
+                    icon={<Coins className="h-6 w-6 dark:text-gray-800" />}
                     value={`${proposal.minRequestAmount} ${vault.fundingTokenSymbol}`}
                     description="Minimum amount that can be requested"
                 />
                 <StatCard
                     title="Max Request Amount"
-                    icon={<Coins className="h-6 w-6 " />}
+                    icon={<Coins className="h-6 w-6 dark:text-gray-800" />}
                     value={`${proposal.maxRequestAmount} ${vault.fundingTokenSymbol}`}
                     description="Maximum amount that can be requested"
                 />
