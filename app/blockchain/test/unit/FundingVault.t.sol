@@ -305,6 +305,256 @@ contract FundingVaultTest is Test {
         fundingVault.releaseVotingTokens();
     }
 
+    function testWithdrawRemaining() public {
+        uint256 initialDeposit = 10 ether;
+        uint256 registrationAmount = 10 ether;
+        uint256 proposalMinRequestAmount = 1 ether;
+        uint256 proposalMaxRequestAmount = 8 ether;
+        uint256 votingAmount = 8 ether;
+        uint256 tallyDelay = 2 days;
+        uint256 expectedProposalFunding = 8 ether;
+
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        votingToken.mint(randomUser, registrationAmount);
+        votingToken.approve(address(fundingVault), registrationAmount);
+        fundingVault.register(registrationAmount);
+        fundingVault.submitProposal(
+            "<Proposal Link>", proposalMinRequestAmount, proposalMaxRequestAmount, address(randomUser)
+        );
+        votingPowerToken.approve(address(fundingVault), votingAmount);
+        fundingVault.voteOnProposal(1, votingAmount);
+        vm.stopPrank();
+
+        // Fast forward time to pass the tally date
+        vm.warp(block.timestamp + tallyDelay);
+
+        // Distribute funds
+        vm.startPrank(randomUser);
+        fundingVault.distributeFunds();
+
+        // Check initial balances
+        assertEq(fundingToken.balanceOf(randomUser), expectedProposalFunding);
+        assertEq(fundingToken.balanceOf(address(fundingVault)), initialDeposit - expectedProposalFunding);
+
+        // Withdraw remaining funds
+        vm.startPrank(randomUser);
+        fundingVault.withdrawRemaining();
+
+        // Check final balances
+        assertEq(fundingToken.balanceOf(randomUser), initialDeposit);
+        assertEq(fundingToken.balanceOf(address(fundingVault)), 0);
+    }
+
+    function testWithdrawRemainingMultipleUsers() public {
+        uint256 initialDeposit = 10 ether;
+        uint256 registrationAmount = 10 ether;
+        uint256 proposalMinRequestAmount = 1 ether;
+        uint256 proposalMaxRequestAmount = 5 ether;
+        uint256 votingAmount = 8 ether;
+        uint256 tallyDelay = 2 days;
+
+        // Setup for randomUser
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        votingToken.mint(randomUser, registrationAmount);
+        votingToken.approve(address(fundingVault), registrationAmount);
+        fundingVault.register(registrationAmount);
+        fundingVault.submitProposal(
+            "<Proposal Link 1>", proposalMinRequestAmount, proposalMaxRequestAmount, address(randomUser)
+        );
+        votingPowerToken.approve(address(fundingVault), votingAmount);
+        fundingVault.voteOnProposal(1, votingAmount);
+        vm.stopPrank();
+
+        // Setup for randomUser1
+        vm.startPrank(randomUser1);
+        fundingToken.mint(randomUser1, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        votingToken.mint(randomUser1, registrationAmount);
+        votingToken.approve(address(fundingVault), registrationAmount);
+        fundingVault.register(registrationAmount);
+        fundingVault.submitProposal(
+            "<Proposal Link 2>", proposalMinRequestAmount, proposalMaxRequestAmount, address(randomUser1)
+        );
+        votingPowerToken.approve(address(fundingVault), votingAmount);
+        fundingVault.voteOnProposal(2, votingAmount);
+        vm.stopPrank();
+
+        // Fast forward time to pass the tally date
+        vm.warp(block.timestamp + tallyDelay);
+
+        // Distribute funds
+        fundingVault.distributeFunds();
+
+        // Withdraw remaining funds for both users
+        vm.startPrank(randomUser);
+        fundingVault.withdrawRemaining();
+        vm.startPrank(randomUser1);
+        fundingVault.withdrawRemaining();
+
+        // Check final balances
+        assertEq(fundingToken.balanceOf(randomUser), initialDeposit);
+        assertEq(fundingToken.balanceOf(randomUser1), initialDeposit);
+        assertEq(fundingToken.balanceOf(address(fundingVault)), 0);
+    }
+
+    function testWithdrawRemainingCorrectRatio() public {
+        uint256 user1Deposit = 8 ether;
+        uint256 user2Deposit = 2 ether;
+        uint256 proposalAmount = 5 ether;
+
+        // Setup for user1
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, user1Deposit);
+        fundingToken.approve(address(fundingVault), user1Deposit);
+        fundingVault.deposit(user1Deposit);
+
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+
+        fundingVault.submitProposal("<Proposal Link>", proposalAmount, proposalAmount, makeAddr("abc"));
+        fundingVault.voteOnProposal(1, 10 ether);
+        vm.stopPrank();
+
+        // Setup for user2
+        vm.startPrank(randomUser1);
+        fundingToken.mint(randomUser1, user2Deposit);
+        fundingToken.approve(address(fundingVault), user2Deposit);
+        fundingVault.deposit(user2Deposit);
+        vm.stopPrank();
+
+        // Fast forward time to pass the tally date
+        vm.warp(block.timestamp + 2 days);
+
+        // Distribute funds
+        fundingVault.distributeFunds();
+
+        // Withdraw remaining funds for both users
+        vm.prank(randomUser);
+        fundingVault.withdrawRemaining();
+
+        vm.prank(randomUser1);
+        fundingVault.withdrawRemaining();
+
+        // Calculate expected withdrawals
+        uint256 totalRemaining = user1Deposit + user2Deposit - proposalAmount;
+        uint256 expectedUser1Withdrawal =
+            (((totalRemaining * user1Deposit) * 1e18) / (user1Deposit + user2Deposit)) / 1e18;
+        uint256 expectedUser2Withdrawal =
+            (((totalRemaining * user2Deposit) * 1e18) / (user1Deposit + user2Deposit)) / 1e18;
+
+        // Check if the correct amounts were withdrawn
+        assertEq(fundingToken.balanceOf(randomUser), expectedUser1Withdrawal);
+        assertEq(fundingToken.balanceOf(randomUser1), expectedUser2Withdrawal);
+    }
+
+    function testWithdrawRemainingBeforeDistribution() public {
+        uint256 initialDeposit = 10 ether;
+        uint256 tallyDelay = 2 days;
+
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        vm.stopPrank();
+
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__TallyDateNotPassed.selector);
+        fundingVault.withdrawRemaining();
+
+        vm.warp(block.timestamp + tallyDelay);
+
+        // Attempt to withdraw before distribution
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__FundsNotDistributedYet.selector);
+        fundingVault.withdrawRemaining();
+    }
+
+    function testWithdrawRemainingWithNoDeposit() public {
+        uint256 initialDeposit = 10 ether;
+
+        // Setup with a different user
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+
+        // Fast forward time and distribute funds
+        vm.warp(block.timestamp + 2 days);
+        fundingVault.distributeFunds();
+
+        // Attempt to withdraw with a user who didn't deposit
+        vm.startPrank(randomUser1);
+        vm.expectRevert(FundingVault.FundingVault__NoFundsToWithdraw.selector);
+        fundingVault.withdrawRemaining();
+    }
+
+    function testWithdrawRemainingTwice() public {
+        uint256 initialDeposit = 10 ether;
+
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        vm.stopPrank();
+
+        // Fast forward time and distribute funds
+        vm.warp(block.timestamp + 2 days);
+        fundingVault.distributeFunds();
+
+        // Withdraw remaining funds
+        vm.startPrank(randomUser);
+        fundingVault.withdrawRemaining();
+
+        // Attempt to withdraw again
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__NoFundsToWithdraw.selector);
+        fundingVault.withdrawRemaining();
+    }
+
+    function testWithdrawRemainingWithNoRemainingFunds() public {
+        uint256 initialDeposit = 10 ether;
+        uint256 registrationAmount = 10 ether;
+        uint256 proposalMinRequestAmount = 1 ether;
+        uint256 proposalMaxRequestAmount = 10 ether;
+        uint256 votingAmount = 10 ether;
+        uint256 tallyDelay = 2 days;
+
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, initialDeposit);
+        fundingToken.approve(address(fundingVault), initialDeposit);
+        fundingVault.deposit(initialDeposit);
+        votingToken.mint(randomUser, registrationAmount);
+        votingToken.approve(address(fundingVault), registrationAmount);
+        fundingVault.register(registrationAmount);
+        fundingVault.submitProposal(
+            "<Proposal Link>", proposalMinRequestAmount, proposalMaxRequestAmount, address(randomUser)
+        );
+        votingPowerToken.approve(address(fundingVault), votingAmount);
+        fundingVault.voteOnProposal(1, votingAmount);
+        vm.stopPrank();
+
+        // Fast forward time and distribute funds
+        vm.warp(block.timestamp + tallyDelay);
+        fundingVault.distributeFunds();
+
+        // Attempt to withdraw when there are no remaining funds
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__NoRemainingFundsToWithdraw.selector);
+        fundingVault.withdrawRemaining();
+    }
+
     function testGetMinRequestableAmount() public {
         assertEq(fundingVault.getMinRequestableAmount(), 1);
 

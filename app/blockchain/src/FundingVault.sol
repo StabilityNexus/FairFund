@@ -60,6 +60,10 @@ contract FundingVault is Ownable, ReentrancyGuard {
     error FundingVault__NoVotingPowerTokenMinted();
     error FundingVault__TransferFailed();
     error FundingVault__AlreadyDistributedFunds();
+    error FundingVault__FundsNotDistributedYet();
+    error FundingVault__NoFundsToWithdraw();
+    error FundingVault__NoRemainingFundsToWithdraw();
+    error FundingVault__WithdrawableAmountTooSmall();
 
     // Type Declarations //
     struct Proposal {
@@ -90,6 +94,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     mapping(uint256 proposalId => Proposal proposal) private s_proposals;
     mapping(uint256 proposalId => uint256 votes) private s_votes;
     mapping(address voter => uint256 amountOfVotingTokens) private s_voterToVotingTokens;
+    mapping(address user => uint256 amountDeposited) private s_userToDistributionAmountDeposited;
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
@@ -98,6 +103,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
     event VotedOnProposal(address indexed voter, uint256 indexed proposalId, uint256 indexed amount);
     event ReleasedTokens(address indexed voter, uint256 indexed amount);
     event FundsDistributed(uint256 indexed proposalId, address indexed recipient, uint256 indexed amount);
+    event RemainingFundsWithdrawn(address indexed user, uint256 amount);
 
     modifier tallyDatePassed() {
         if (block.timestamp < i_tallyDate) {
@@ -169,6 +175,7 @@ contract FundingVault is Ownable, ReentrancyGuard {
         }
         s_totalBalanceAvailableForDistribution += _amount;
         i_fundingToken.transferFrom(msg.sender, address(this), _amount);
+        s_userToDistributionAmountDeposited[msg.sender] = _amount;
         emit FundingTokenDeposited(msg.sender, _amount);
     }
 
@@ -317,6 +324,54 @@ contract FundingVault is Ownable, ReentrancyGuard {
         s_voterToVotingTokens[msg.sender] = 0;
         i_votingToken.transfer(msg.sender, votingPower);
         emit ReleasedTokens(msg.sender, votingPower);
+    }
+
+    /**
+     * @notice Allows users to withdraw their proportional share of remaining funds after distribution
+     * @dev This function can only be called after the tally date has passed and funds have been distributed
+     * @dev The function calculates the user's share based on their initial deposit and the remaining funds
+     * @dev State changes are made before the transfer to prevent reentrancy
+     * @dev Emits a RemainingFundsWithdrawn event upon successful withdrawal
+     * @dev This function does not take any parameters as it uses msg.sender to identify the user
+     * @custom:throws FundingVault__FundsNotDistributedYet if funds haven't been distributed yet
+     * @custom:throws FundingVault__NoFundsToWithdraw if the user has no funds to withdraw
+     * @custom:throws FundingVault__NoRemainingFundsToWithdraw if there are no remaining funds to withdraw
+     * @custom:throws FundingVault__WithdrawableAmountTooSmall if the calculated withdrawable amount is zero
+     * @custom:throws FundingVault__TransferFailed if the token transfer fails
+     */
+    function withdrawRemaining() public nonReentrant tallyDatePassed {
+        if (!s_fundsDistributed) {
+            revert FundingVault__FundsNotDistributedYet();
+        }
+
+        uint256 userDepositedAmount = s_userToDistributionAmountDeposited[msg.sender];
+        if (userDepositedAmount == 0) {
+            revert FundingVault__NoFundsToWithdraw();
+        }
+
+        uint256 totalDistributableFunds = s_totalBalanceAvailableForDistribution;
+        uint256 totalDistributedFunds = s_totalFundsDistributed;
+
+        if (totalDistributableFunds <= totalDistributedFunds) {
+            revert FundingVault__NoRemainingFundsToWithdraw();
+        }
+
+        uint256 remainingFunds = totalDistributableFunds - totalDistributedFunds;
+        uint256 userShareRatio = (userDepositedAmount * 1e18) / totalDistributableFunds;
+        uint256 userWithdrawableAmount = (userShareRatio * remainingFunds) / 1e18;
+
+        if (userWithdrawableAmount == 0) {
+            revert FundingVault__WithdrawableAmountTooSmall();
+        }
+
+        s_userToDistributionAmountDeposited[msg.sender] = 0;
+
+        bool success = i_fundingToken.transfer(msg.sender, userWithdrawableAmount);
+        if (!success) {
+            revert FundingVault__TransferFailed();
+        }
+
+        emit RemainingFundsWithdrawn(msg.sender, userWithdrawableAmount);
     }
 
     // Getters //
