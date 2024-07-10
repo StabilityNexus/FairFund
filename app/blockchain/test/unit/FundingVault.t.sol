@@ -571,19 +571,19 @@ contract FundingVaultTest is Test {
         assertEq(fundingVault.getMaxRequestableAmount(), 20 ether);
     }
 
-    function testGetTallyDate() public {
+    function testGetTallyDate() public view {
         assertEq(fundingVault.getTallyDate(), block.timestamp + 1 days);
     }
 
-    function testGetFundingToken() public {
+    function testGetFundingToken() public view {
         assertEq(fundingVault.getFundingToken(), address(fundingToken));
     }
 
-    function testGetVotingToken() public {
+    function testGetVotingToken() public view {
         assertEq(fundingVault.getVotingToken(), address(votingToken));
     }
 
-    function testGetVotingPowerToken() public {
+    function testGetVotingPowerToken() public view {
         assertEq(fundingVault.getVotingPowerToken(), address(votingPowerToken));
     }
 

@@ -304,6 +304,7 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
                 if (!success) {
                     revert FundingVault__TransferFailed();
                 }
+                s_totalFundsDistributed += amount;
                 emit FundsDistributed(i, proposal.recipient, amount);
             }
         }

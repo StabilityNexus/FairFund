@@ -21,6 +21,7 @@ interface BlockchainActionButtonProps {
     iconName: keyof typeof iconMap;
     isDisabled?: boolean;
     successMessage: string;
+    callback?: () => Promise<void>;
 }
 
 export function BlockchainActionButton({
@@ -33,6 +34,7 @@ export function BlockchainActionButton({
     isDisabled = false,
     successMessage,
     smartContractABI,
+    callback,
 }: BlockchainActionButtonProps) {
     const Icon = iconMap[iconName];
     const { handleSubmit, isLoading } = useWeb3FormSubmit();
@@ -46,6 +48,9 @@ export function BlockchainActionButton({
         await waitForTransactionReceipt(wagmiConfig, {
             hash: hash,
         });
+        if (callback) {
+            await callback();
+        }
         return {
             hash,
             message: successMessage,
