@@ -8,7 +8,6 @@ import {
     Coins,
     DollarSign,
     CheckCircle,
-    ArrowRight,
 } from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
 import TableWrapper from '@/components/results-table/table-wrapper';

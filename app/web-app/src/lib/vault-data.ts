@@ -4,7 +4,6 @@ import { config as wagmiConfig } from '@/wagmi/config';
 import { fundingVaultABI, erc20ABI } from '@/blockchain/constants';
 import { formatUnits } from 'viem';
 import { type FundingVault } from '@prisma/client';
-import axios from 'axios';
 
 export async function getVault(id: number) {
     return await prisma.fundingVault.findUnique({ where: { id } });
@@ -15,11 +14,13 @@ export async function getVaultBalance(vault: FundingVault) {
         address: vault.vaultAddress as `0x${string}`,
         abi: fundingVaultABI,
         functionName: 'getTotalBalanceAvailbleForDistribution',
+        args: [],
     });
     const decimals = await readContract(wagmiConfig, {
         address: vault.fundingTokenAddress as `0x${string}`,
         abi: erc20ABI,
         functionName: 'decimals',
+        args: [],
     });
     return formatUnits(vaultBalance as bigint, decimals as number);
 }
@@ -29,6 +30,7 @@ export async function getTotalDistributedAmount(vault: FundingVault) {
         address: vault.vaultAddress as `0x${string}`,
         abi: fundingVaultABI,
         functionName: 'getTotalFundsDistributed',
+        args: [],
     });
     const decimals = await readContract(wagmiConfig, {
         address: vault.fundingTokenAddress as `0x${string}`,
@@ -43,11 +45,13 @@ export async function getTotalVotingTokens(vault: FundingVault) {
         address: vault.vaultAddress as `0x${string}`,
         abi: fundingVaultABI,
         functionName: 'getTotalVotingPowerTokensMinted',
+        args: [],
     });
     const totalVotingTokensUsed = await readContract(wagmiConfig, {
         address: vault.vaultAddress as `0x${string}`,
         abi: fundingVaultABI,
         functionName: 'getTotalVotingPowerTokensUsed',
+        args: [],
     });
     return {
         totalVotingTokensAvailable: formatUnits(

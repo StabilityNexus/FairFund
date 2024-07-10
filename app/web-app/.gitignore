@@ -40,4 +40,5 @@ next-env.d.ts
 /src/blockchain/out/*
 !/src/blockchain/out/FairFund.sol
 !/src/blockchain/out/FundingVault.sol
+!/src/blockchain/out/ERC20.sol
 

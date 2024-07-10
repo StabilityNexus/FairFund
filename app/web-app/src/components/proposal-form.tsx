@@ -103,6 +103,7 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                 maxRequestAmount: data.maxRequestAmount,
                 recipient: data.recipient,
                 fundingVaultId: fundingVault.id,
+                // @ts-ignore
                 proposalId: parseInt(result),
             });
             return { hash, message: 'Proposal created successfully.' };
