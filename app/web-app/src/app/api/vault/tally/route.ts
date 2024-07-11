@@ -53,6 +53,13 @@ async function tally(vault: FundingVault): Promise<void> {
 }
 
 export async function POST(req: Request) {
+    if (
+        process.env.NODE_ENV !== 'development' &&
+        req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`
+    ) {
+        return new NextResponse('Unauthorized', { status: 401 });
+    }
+
     try {
         // retrive all the vaults whos is tallied is false,
         const vaults = await prisma.fundingVault.findMany({
