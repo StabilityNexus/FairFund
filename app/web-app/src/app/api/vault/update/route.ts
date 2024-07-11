@@ -7,6 +7,13 @@ type UpdateableVaultFields = Partial<
 >;
 
 export async function PATCH(req: Request) {
+    if (
+        process.env.NODE_ENV !== 'development' &&
+        req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`
+    ) {
+        return new NextResponse('Unauthorized', { status: 401 });
+    }
+
     try {
         const data = await req.json();
         const { id, ...updateData } = data as {
