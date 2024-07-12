@@ -27,7 +27,7 @@ help:
 	@echo "  deploy-mock-fair-fund (dmf)  : Deploy FairFund contract"
 	@echo "  deploy-mock-erc20 (dme)      : Deploy MockERC20 contract"
 	@echo "  deploy-fair-fund (df)        : Deploy FairFund contract to sepolie"
-	@echo "  mock-all                     : Deploy both contracts"
+	@echo "  mock-all                     : Deploy both contracts to anvil testnet"
 	@echo "  help                         : Show this help message"
 
 .PHONY: deploy-mock-fair-fund deploy-mock-erc20 deploy-fair-fund dmf dme df all help
