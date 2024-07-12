@@ -44,6 +44,7 @@ model Proposal {
   fundingVaultId   Int
   fundAllocated    Int          @default(0)
   createdAt        DateTime     @default(now())
+  proposalMetadata String
   fundingVault     FundingVault @relation(fields: [fundingVaultId], references: [id])
 
   @@index([proposerAddress])
