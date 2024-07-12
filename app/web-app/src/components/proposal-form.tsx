@@ -115,6 +115,7 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                 fundingVaultId: fundingVault.id,
                 // @ts-ignore
                 proposalId: parseInt(result),
+                metadata: data.metadata,
             });
             return { hash, message: 'Proposal created successfully.' };
         },

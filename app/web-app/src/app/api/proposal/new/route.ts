@@ -11,6 +11,7 @@ export async function POST(req: Request) {
             recipient,
             fundingVaultId,
             proposalId,
+            metadata,
         } = await req.json();
         const min = parseInt(minRequestAmount);
         const max = parseInt(maxRequestAmount);
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
                 recipient,
                 fundingVaultId,
                 proposalId,
+                proposalMetadata: metadata || '',
             },
         });
         return NextResponse.json(proposal);
