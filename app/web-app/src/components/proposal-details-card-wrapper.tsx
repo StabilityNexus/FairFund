@@ -1,5 +1,11 @@
 import type { Proposal } from '@prisma/client';
-import { Coins, File, User2 } from 'lucide-react';
+import {
+    ArrowUpRight,
+    Coins,
+    File,
+    Link as LinkIcon,
+    User2,
+} from 'lucide-react';
 import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -10,7 +16,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface ProposalDetailsCardWrapperProps {
     proposal: Proposal;
@@ -27,33 +41,99 @@ export default function ProposalDetailsCardWrapper({
 }: ProposalDetailsCardWrapperProps) {
     return (
         <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg font-semibold flex items-center">
-                        <div className="mr-4 bg-gray-100 p-3 rounded-full">
-                            <File className="h-6 w-6 dark:text-gray-800" />
-                        </div>
-                        Description
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
-                                {proposal.description}
-                            </p>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[80vh]">
-                            <DialogHeader>
-                                <DialogTitle>Proposal Description</DialogTitle>
-                            </DialogHeader>
-                            <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
-                                {proposal.description}
-                            </DialogDescription>
-                        </DialogContent>
-                    </Dialog>
-                </CardContent>
-            </Card>
+            {proposal.proposalMetadata.length > 0 ? (
+                <div
+                    className={cn(
+                        proposal.proposalMetadata.length > 0 &&
+                            'grid gap-6 md:grid-cols-2'
+                    )}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg font-semibold flex items-center">
+                                <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                                    <File className="h-6 w-6 dark:text-gray-800" />
+                                </div>
+                                Description
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
+                                        {proposal.description}
+                                    </p>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl max-h-[80vh]">
+                                    <DialogHeader>
+                                        <DialogTitle>
+                                            Proposal Description
+                                        </DialogTitle>
+                                    </DialogHeader>
+                                    <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
+                                        {proposal.description}
+                                    </DialogDescription>
+                                </DialogContent>
+                            </Dialog>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg font-semibold flex items-center">
+                                <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                                    <LinkIcon className="h-6 w-6 dark:text-gray-800" />
+                                </div>
+                                Proposal Metadata
+                            </CardTitle>
+                            <CardDescription>
+                                The links provided by the proposers are not
+                                verified by fairfund, please proceed with
+                                caution.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Link
+                                href={proposal.proposalMetadata}
+                                className="cursor-pointer flex items-center text-sm text-blue-600 hover:underline"
+                                target="_blank"
+                            >
+                                {proposal.proposalMetadata}
+                                <ArrowUpRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </CardContent>
+                    </Card>
+                </div>
+            ) : (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold flex items-center">
+                            <div className="mr-4 bg-gray-100 p-3 rounded-full">
+                                <File className="h-6 w-6 dark:text-gray-800" />
+                            </div>
+                            Description
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
+                                    {proposal.description}
+                                </p>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-3xl max-h-[80vh]">
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Proposal Description
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
+                                    {proposal.description}
+                                </DialogDescription>
+                            </DialogContent>
+                        </Dialog>
+                    </CardContent>
+                </Card>
+            )}
             <div className="grid gap-6 md:grid-cols-2">
                 <StatCard
                     title="Creator"

@@ -1,5 +1,4 @@
 'use client';
-
 import axios from 'axios';
 import { type FundingVault } from '@prisma/client';
 import { useAccount } from 'wagmi';
@@ -30,6 +29,7 @@ import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { parseUnits } from 'viem';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
+import { isValidURL } from '@/lib/utils';
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -48,6 +48,12 @@ const proposalFormSchema = z.object({
     recipient: z.string().min(1, {
         message: 'Please enter a valid recipient address.',
     }),
+    metadata: z
+        .string()
+        .optional()
+        .refine((val) => isValidURL(val), {
+            message: 'Please enter a valid URL.',
+        }),
 });
 
 export default function ProposalForm({ fundingVault }: ProposalFormProps) {
@@ -81,12 +87,16 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                 data.maxRequestAmount,
                 decimals as number
             );
+            let metadata = 'NOT_SET';
+            if (data.metadata) {
+                metadata = data.metadata;
+            }
             const { result, request } = await simulateContract(wagmiConfig, {
                 address: fundingVault.vaultAddress as `0x${string}`,
                 abi: fundingVaultABI,
                 functionName: 'submitProposal',
                 args: [
-                    'TODO',
+                    metadata,
                     minRequestAmount,
                     maxRequestAmount,
                     data.recipient,
@@ -105,6 +115,7 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                 fundingVaultId: fundingVault.id,
                 // @ts-ignore
                 proposalId: parseInt(result),
+                metadata: data.metadata,
             });
             return { hash, message: 'Proposal created successfully.' };
         },
@@ -227,6 +238,31 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
                                             The address of the wallet that will
                                             receive the funds, if the proposal
                                             is approved.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+                        <FormField
+                            name="metadata"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem className="col-span-2 md:col-span-1">
+                                        <FormLabel>
+                                            Additional Metadata
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={isLoading}
+                                                placeholder="URL here..."
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Any additional URL with more
+                                            information about your proposal.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
