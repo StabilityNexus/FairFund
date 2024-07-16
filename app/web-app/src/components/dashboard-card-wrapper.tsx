@@ -10,8 +10,12 @@ const iconMap = {
 };
 
 export default async function CardWrapper() {
-    const totalVaults = await prisma.fundingVault.count();
-    const totalProposals = await prisma.proposal.count();
+    const totalVaultsPromise = prisma.fundingVault.count();
+    const totalProposalsPromise = prisma.proposal.count();
+    const [totalVaults, totalProposals] = await Promise.all([
+        totalVaultsPromise,
+        totalProposalsPromise,
+    ]);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
