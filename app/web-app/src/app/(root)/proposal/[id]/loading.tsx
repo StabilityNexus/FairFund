@@ -12,7 +12,7 @@ const CardWrapperSkeleton = () => (
 );
 
 const VoteProposalSkeleton = () => (
-    <div className="w-full max-w-md h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+    <div className="m-6 pt-4 w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
 );
 
 const ProposalDetailsPage = () => {
@@ -33,7 +33,7 @@ const ProposalDetailsPage = () => {
                 </CardContent>
             </Card>
 
-            <Card className="bg-white dark:bg-gray-800">
+            <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold flex items-center">
                         <Vote className="mr-2" />

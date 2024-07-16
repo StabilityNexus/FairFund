@@ -38,6 +38,7 @@ export default async function ProposalDetailsPage({
     if (!vault) {
         redirect('/dashboard');
     }
+
     return (
         <div className="container mx-auto py-8 space-y-8">
             <Card>

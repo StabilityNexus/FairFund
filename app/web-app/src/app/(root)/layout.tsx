@@ -3,7 +3,6 @@ import Web3ModalProvider from '@/wagmi/context';
 import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
 import { Toaster } from '@/components/ui/toaster';
-import dynamic from 'next/dynamic';
 import Navbar from '@/components/navbar';
 
 export default function ApplicationLayout({

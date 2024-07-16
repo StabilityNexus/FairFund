@@ -68,6 +68,7 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
             minRequestAmount: '',
             maxRequestAmount: '',
             recipient: '',
+            metadata: '',
         },
     });
     const formIsLoading = form.formState.isLoading;
