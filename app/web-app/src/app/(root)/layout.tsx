@@ -4,10 +4,7 @@ import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
 import { Toaster } from '@/components/ui/toaster';
 import dynamic from 'next/dynamic';
-
-const Navbar = dynamic(() => import('@/components/navbar'), {
-    ssr: false,
-});
+import Navbar from '@/components/navbar';
 
 export default function ApplicationLayout({
     children,
