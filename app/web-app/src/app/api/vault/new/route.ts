@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import { getTokenName } from '@/lib/utils';
+import { getTokenName } from '@/lib/get-token-name';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {

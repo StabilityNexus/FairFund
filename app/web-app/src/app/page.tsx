@@ -3,7 +3,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { DM_Serif_Display, Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
-import { ArrowRight, ShieldCheck, Users, Lightbulb } from 'lucide-react';
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+import ShieldCheck from 'lucide-react/dist/esm/icons/shield-check';
+import Users from 'lucide-react/dist/esm/icons/users';
+import Lightbulb from 'lucide-react/dist/esm/icons/lightbulb';
 
 const dmSerifDisplay = DM_Serif_Display({
     subsets: ['latin'],

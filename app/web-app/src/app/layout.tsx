@@ -2,11 +2,6 @@ import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import '@/app/globals.css';
 import { cn } from '@/lib/utils';
-import { config } from '@/wagmi/config';
-import Web3ModalProvider from '@/wagmi/context';
-import { cookieToInitialState } from 'wagmi';
-import { headers } from 'next/headers';
-import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 
 const fontSans = FontSans({
@@ -25,8 +20,6 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const initialState = cookieToInitialState(config, headers().get('cookie'));
-
     return (
         <html lang="en">
             <body
@@ -40,11 +33,8 @@ export default function RootLayout({
                     defaultTheme="system"
                     enableSystem
                 >
-                    <Web3ModalProvider initialState={initialState}>
-                        {children}
-                    </Web3ModalProvider>
+                    {children}
                 </ThemeProvider>
-                <Toaster />
             </body>
         </html>
     );
