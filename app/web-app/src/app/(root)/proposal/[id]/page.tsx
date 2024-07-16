@@ -2,7 +2,8 @@ import CardWrapper from '@/components/proposal-details-card-wrapper';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import VoteProposal from '@/components/vote-proposal';
 import prisma from '@/lib/db';
-import { FileText, Vote } from 'lucide-react';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import Vote from 'lucide-react/dist/esm/icons/vote';
 import { redirect } from 'next/navigation';
 
 export default async function ProposalDetailsPage({

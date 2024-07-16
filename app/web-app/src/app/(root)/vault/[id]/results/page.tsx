@@ -1,14 +1,14 @@
 import { fundingVaultABI } from '@/blockchain/constants';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BlockchainActionButton } from '@/components/blockchain-action-button';
-import {
-    Share2,
-    Users,
-    Calendar,
-    Coins,
-    DollarSign,
-    CheckCircle,
-} from 'lucide-react';
+
+import Share2 from 'lucide-react/dist/esm/icons/share-2';
+import Users from 'lucide-react/dist/esm/icons/users';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import Coins from 'lucide-react/dist/esm/icons/coins';
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+
 import { StatCard } from '@/components/stat-card';
 import TableWrapper from '@/components/results-table/table-wrapper';
 

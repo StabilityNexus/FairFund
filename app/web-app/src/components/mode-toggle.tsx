@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { MoonStarIcon, SunIcon } from 'lucide-react';
+
+import MoonStarIcon from 'lucide-react/dist/esm/icons/moon-star';
+import SunIcon from 'lucide-react/dist/esm/icons/sun';
+
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';

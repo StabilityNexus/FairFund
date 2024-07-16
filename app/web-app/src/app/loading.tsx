@@ -1,4 +1,4 @@
-import { LoaderIcon } from 'lucide-react';
+import LoaderIcon from 'lucide-react/dist/esm/icons/loader';
 
 export default function LoadingComponent() {
     return (

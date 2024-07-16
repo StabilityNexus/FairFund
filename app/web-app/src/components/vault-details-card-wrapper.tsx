@@ -1,13 +1,11 @@
 import React from 'react';
 import prisma from '@/lib/db';
-import {
-    Calendar,
-    File,
-    FileText,
-    LockKeyhole,
-    User2,
-    Wallet,
-} from 'lucide-react';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import File from 'lucide-react/dist/esm/icons/file';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import LockKeyhole from 'lucide-react/dist/esm/icons/lock-keyhole';
+import User2 from 'lucide-react/dist/esm/icons/user-2';
+import Wallet from 'lucide-react/dist/esm/icons/wallet';
 import {
     Dialog,
     DialogContent,

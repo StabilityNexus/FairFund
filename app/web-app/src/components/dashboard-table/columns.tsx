@@ -3,7 +3,10 @@ import { type FundingVault } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { Dot, MoveUpRight } from 'lucide-react';
+
+import Dot from 'lucide-react/dist/esm/icons/dot';
+import MoveUpRight from 'lucide-react/dist/esm/icons/move-up-right';
+
 import Link from 'next/link';
 import React from 'react';
 import {

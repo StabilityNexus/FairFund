@@ -1,4 +1,8 @@
-import { Coins, Dock, DollarSignIcon, Wallet2 } from 'lucide-react';
+import Coins from 'lucide-react/dist/esm/icons/coins';
+import Dock from 'lucide-react/dist/esm/icons/dock';
+import Wallet2 from 'lucide-react/dist/esm/icons/wallet-2';
+import DollarSignIcon from 'lucide-react/dist/esm/icons/dollar-sign';
+
 import { StatCard } from '@/components/stat-card';
 import prisma from '@/lib/db';
 

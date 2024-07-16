@@ -12,13 +12,11 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {
-    ArrowRight,
-    PlusCircle,
-    Coins,
-    UserPlus,
-    BarChart2,
-} from 'lucide-react';
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+import PlusCircle from 'lucide-react/dist/esm/icons/plus-circle';
+import Coins from 'lucide-react/dist/esm/icons/coins';
+import UserPlus from 'lucide-react/dist/esm/icons/user-plus';
+import BarChart2 from 'lucide-react/dist/esm/icons/bar-chart-2';
 
 const ActionButton = ({
     href,

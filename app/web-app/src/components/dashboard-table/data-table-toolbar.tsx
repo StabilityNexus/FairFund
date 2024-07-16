@@ -18,7 +18,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
+
+import CheckIcon from 'lucide-react/dist/esm/icons/check';
+import PlusCircleIcon from 'lucide-react/dist/esm/icons/plus-circle';
+import X from 'lucide-react/dist/esm/icons/x';
+
 import { statuses } from '@/components/dashboard-table/constants';
 import { cn } from '@/lib/utils';
 
