@@ -1,8 +1,8 @@
-import CardWrapper from '@/components/dashboard-card-wrapper';
+import StatCardsWrapper from '@/components/dashboard-card-wrapper';
 import TableWrapper from '@/components/dashboard-table/table-wrapper';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <header className="mb-8">
@@ -13,7 +13,7 @@ export default function DashboardPage() {
                     Overview of key metrics and recent activities
                 </p>
             </header>
-            <CardWrapper />
+            <StatCardsWrapper />
             <div className="mt-8">
                 <Card>
                     <CardHeader>

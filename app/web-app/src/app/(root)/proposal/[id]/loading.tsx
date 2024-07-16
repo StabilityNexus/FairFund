@@ -1,47 +1,24 @@
-import CardWrapper from '@/components/proposal-details-card-wrapper';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import VoteProposal from '@/components/vote-proposal';
-import prisma from '@/lib/db';
 import FileText from 'lucide-react/dist/esm/icons/file-text';
 import Vote from 'lucide-react/dist/esm/icons/vote';
-import { redirect } from 'next/navigation';
 
-export default async function ProposalDetailsPage({
-    params,
-}: {
-    params: {
-        id: string;
-    };
-}) {
-    const id = Number(params.id);
-    if (!id) {
-        redirect('/dashboard');
-    }
-    const proposal = await prisma.proposal.findUnique({
-        where: {
-            id: Number(id),
-        },
-    });
-    if (!proposal) {
-        redirect('/dashboard');
-    }
-    const vault = await prisma.fundingVault.findUnique({
-        where: {
-            id: proposal?.fundingVaultId,
-        },
-        select: {
-            fundingTokenSymbol: true,
-            votingTokenAddress: true,
-            vaultAddress: true,
-        },
-    });
-    if (!vault) {
-        redirect('/dashboard');
-    }
+const CardWrapperSkeleton = () => (
+    <div className="space-y-4">
+        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+    </div>
+);
 
+const VoteProposalSkeleton = () => (
+    <div className="m-6 pt-4 w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+);
+
+const ProposalDetailsPage = () => {
     return (
-        <div className="container mx-auto py-8 space-y-8">
-            <Card>
+        <div className="container mx-auto py-8 space-y-8 text-gray-900 dark:text-gray-100">
+            <Card className="bg-white dark:bg-gray-800">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold flex items-center">
                         <FileText className="mr-2" />
@@ -52,7 +29,7 @@ export default async function ProposalDetailsPage({
                     <p className="text-muted-foreground mb-4">
                         View the details of the proposal.
                     </p>
-                    <CardWrapper proposal={proposal} vault={vault} />
+                    <CardWrapperSkeleton />
                 </CardContent>
             </Card>
 
@@ -69,14 +46,12 @@ export default async function ProposalDetailsPage({
                         proposal.
                     </p>
                     <div className="mt-4 flex justify-center">
-                        <VoteProposal
-                            proposal={proposal}
-                            votingTokenAddress={vault.votingTokenAddress}
-                            vaultAddress={vault.vaultAddress}
-                        />
+                        <VoteProposalSkeleton />
                     </div>
                 </CardContent>
             </Card>
         </div>
     );
-}
+};
+
+export default ProposalDetailsPage;

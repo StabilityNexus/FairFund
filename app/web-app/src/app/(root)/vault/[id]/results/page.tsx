@@ -1,14 +1,14 @@
 import { fundingVaultABI } from '@/blockchain/constants';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { BlockchainActionButton } from '@/components/blockchain-action-button';
-import {
-    Share2,
-    Users,
-    Calendar,
-    Coins,
-    DollarSign,
-    CheckCircle,
-} from 'lucide-react';
+
+import Share2 from 'lucide-react/dist/esm/icons/share-2';
+import Users from 'lucide-react/dist/esm/icons/users';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import Coins from 'lucide-react/dist/esm/icons/coins';
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
+import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
+
 import { StatCard } from '@/components/stat-card';
 import TableWrapper from '@/components/results-table/table-wrapper';
 
@@ -39,14 +39,19 @@ export default async function VaultResultsPage({
         redirect(`/vault/${id}`);
     }
 
-    const formattedVaultBalance = await getVaultBalance(vault);
+    const formattedVaultBalancePromise = getVaultBalance(vault);
 
     const tallyDate = getTallyDate(vault);
 
-    const { totalVotingTokensAvailable, totalVotingTokensUsed } =
-        await getTotalVotingTokens(vault);
+    const votingTokenDataPromise = getTotalVotingTokens(vault);
 
-    const tokensDistributed = await getTotalDistributedAmount(vault);
+    const tokensDistributedPromise = getTotalDistributedAmount(vault);
+    const [formattedVaultBalance, votingTokenData, tokensDistributed] =
+        await Promise.all([
+            formattedVaultBalancePromise,
+            votingTokenDataPromise,
+            tokensDistributedPromise,
+        ]);
     const isFundsDistributed = vault.isDistributed;
 
     return (
@@ -63,13 +68,13 @@ export default async function VaultResultsPage({
                 <StatCard
                     title="Total Voting Available"
                     icon={<Users className="h-6 w-6 text-blue-500" />}
-                    value={totalVotingTokensAvailable}
+                    value={votingTokenData?.totalVotingTokensAvailable}
                     description="Total number of voting power tokens minted."
                 />
                 <StatCard
                     title="Total Votes Used"
                     icon={<Share2 className="h-6 w-6 text-purple-500" />}
-                    value={totalVotingTokensUsed}
+                    value={votingTokenData?.totalVotingTokensUsed}
                     description="Total number of voting power tokens used."
                 />
                 <StatCard

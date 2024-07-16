@@ -1,4 +1,5 @@
-import { CirclePlus, LayoutDashboard } from 'lucide-react';
+import CirclePlus from 'lucide-react/dist/esm/icons/circle-plus';
+import LayoutDashboard from 'lucide-react/dist/esm/icons/layout-dashboard';
 
 export const routes: Route[] = [
     {

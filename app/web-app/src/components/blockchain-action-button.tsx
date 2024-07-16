@@ -3,7 +3,11 @@ import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
-import { BarChart3, CreditCard, DollarSign, TrendingUp } from 'lucide-react';
+
+import BarChart3 from 'lucide-react/dist/esm/icons/bar-chart-3';
+import CreditCard from 'lucide-react/dist/esm/icons/credit-card';
+import DollarSign from 'lucide-react/dist/esm/icons/dollar-sign';
+import TrendingUp from 'lucide-react/dist/esm/icons/trending-up';
 
 const iconMap = {
     distrubuteFunds: BarChart3,

@@ -29,7 +29,7 @@ import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 import { parseUnits } from 'viem';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
-import { isValidURL } from '@/lib/utils';
+import { isValidURL } from '@/lib/is-valid-url';
 
 interface ProposalFormProps {
     fundingVault: FundingVault;
@@ -68,6 +68,7 @@ export default function ProposalForm({ fundingVault }: ProposalFormProps) {
             minRequestAmount: '',
             maxRequestAmount: '',
             recipient: '',
+            metadata: '',
         },
     });
     const formIsLoading = form.formState.isLoading;

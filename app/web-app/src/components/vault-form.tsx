@@ -40,7 +40,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
 
-import { CalendarIcon } from 'lucide-react';
+import CalenderIcon from 'lucide-react/dist/esm/icons/calendar';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),
@@ -296,7 +296,7 @@ export default function VaultForm() {
                                                                 Pick a date
                                                             </span>
                                                         )}
-                                                        <CalendarIcon className="opacity-50" />
+                                                        <CalenderIcon className="opacity-50" />
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>

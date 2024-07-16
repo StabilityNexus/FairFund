@@ -12,7 +12,7 @@ export default function Navbar() {
     const pathname = usePathname();
 
     return (
-        <div className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/80">
+        <nav className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/80">
             <Link href={'/'} className="flex items-center group">
                 <VoteIcon className="h-8 w-8 transition-transform group-hover:scale-110" />
                 <h1 className="ml-2 text-2xl font-bold text-primary group-hover:text-primary/80 transition-colors">
@@ -23,7 +23,6 @@ export default function Navbar() {
                 <div className="flex flex-row gap-x-6 mr-4">
                     {routes.map((route) => {
                         const isActive = pathname === route.href;
-
                         return (
                             <Link
                                 href={route.href}
@@ -47,6 +46,6 @@ export default function Navbar() {
                 <ModeToggle />
             </div>
             <MobileNavbar />
-        </div>
+        </nav>
     );
 }

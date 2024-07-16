@@ -1,11 +1,11 @@
 import type { Proposal } from '@prisma/client';
-import {
-    ArrowUpRight,
-    Coins,
-    File,
-    Link as LinkIcon,
-    User2,
-} from 'lucide-react';
+
+import ArrowUpRight from 'lucide-react/dist/esm/icons/arrow-up-right';
+import Coins from 'lucide-react/dist/esm/icons/coins';
+import File from 'lucide-react/dist/esm/icons/file';
+import LinkIcon from 'lucide-react/dist/esm/icons/link';
+import User2 from 'lucide-react/dist/esm/icons/user-2';
+
 import { StatCard } from '@/components/stat-card';
 import { Badge } from '@/components/ui/badge';
 import {

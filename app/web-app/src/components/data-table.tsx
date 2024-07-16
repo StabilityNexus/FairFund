@@ -17,7 +17,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
+import ArrowRight from 'lucide-react/dist/esm/icons/arrow-right';
+
 import { useState } from 'react';
 import DataTableToolbar from './dashboard-table/data-table-toolbar';
 import { cn } from '@/lib/utils';

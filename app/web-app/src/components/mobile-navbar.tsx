@@ -7,7 +7,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { AlignJustify, MoonStarIcon, SunIcon } from 'lucide-react';
+
+import AlignJustify from 'lucide-react/dist/esm/icons/align-justify';
+import MoonStarIcon from 'lucide-react/dist/esm/icons/moon-star';
+import SunIcon from 'lucide-react/dist/esm/icons/sun';
+
 import { routes } from '@/lib/constants';
 import ConnectWalletButton from '@/components/connect-wallet-button';
 import { useTheme } from 'next-themes';

@@ -2,7 +2,9 @@
 import { type Proposal } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
-import { MoveUpRight } from 'lucide-react';
+
+import MoveUpRight from 'lucide-react/dist/esm/icons/move-up-right';
+
 import Link from 'next/link';
 import {
     Tooltip,
