@@ -39,14 +39,19 @@ export default async function VaultResultsPage({
         redirect(`/vault/${id}`);
     }
 
-    const formattedVaultBalance = await getVaultBalance(vault);
+    const formattedVaultBalancePromise = getVaultBalance(vault);
 
     const tallyDate = getTallyDate(vault);
 
-    const { totalVotingTokensAvailable, totalVotingTokensUsed } =
-        await getTotalVotingTokens(vault);
+    const votingTokenDataPromise = getTotalVotingTokens(vault);
 
-    const tokensDistributed = await getTotalDistributedAmount(vault);
+    const tokensDistributedPromise = getTotalDistributedAmount(vault);
+    const [formattedVaultBalance, votingTokenData, tokensDistributed] =
+        await Promise.all([
+            formattedVaultBalancePromise,
+            votingTokenDataPromise,
+            tokensDistributedPromise,
+        ]);
     const isFundsDistributed = vault.isDistributed;
 
     return (
@@ -63,13 +68,13 @@ export default async function VaultResultsPage({
                 <StatCard
                     title="Total Voting Available"
                     icon={<Users className="h-6 w-6 text-blue-500" />}
-                    value={totalVotingTokensAvailable}
+                    value={votingTokenData?.totalVotingTokensAvailable}
                     description="Total number of voting power tokens minted."
                 />
                 <StatCard
                     title="Total Votes Used"
                     icon={<Share2 className="h-6 w-6 text-purple-500" />}
-                    value={totalVotingTokensUsed}
+                    value={votingTokenData?.totalVotingTokensUsed}
                     description="Total number of voting power tokens used."
                 />
                 <StatCard

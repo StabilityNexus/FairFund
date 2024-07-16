@@ -28,12 +28,16 @@ interface VaultDetailsCardWrapperProps {
 export default async function VaultDetailsCardWrapper({
     fundingVault: vault,
 }: VaultDetailsCardWrapperProps) {
-    const vaultBalance = await getVaultBalance(vault);
-    const proposals = await prisma.proposal.count({
+    const vaultBalancePromise = getVaultBalance(vault);
+    const proposalsPromise = prisma.proposal.count({
         where: {
             fundingVaultId: vault.id,
         },
     });
+    const [vaultBalance, proposals] = await Promise.all([
+        vaultBalancePromise,
+        proposalsPromise,
+    ]);
 
     return (
         <div className="space-y-6">
