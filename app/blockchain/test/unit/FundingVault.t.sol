@@ -33,26 +33,6 @@ contract FundingVaultTest is Test {
         votingPowerToken.transferOwnership(address(fundingVault));
     }
 
-    function testSetMinRequestableAmount() public {
-        vm.prank(owner);
-        fundingVault.setMinRequestableAmount(2 ether);
-        assertEq(fundingVault.getMinRequestableAmount(), 2 ether);
-    }
-
-    function testFailSetMinRequestableAmount() public {
-        fundingVault.setMinRequestableAmount(11 ether);
-    }
-
-    function testSetMaxRequestableAmount() public {
-        vm.prank(owner);
-        fundingVault.setMaxRequestableAmount(20 ether);
-        assertEq(fundingVault.getMaxRequestableAmount(), 20 ether);
-    }
-
-    function testFailSetMaxRequestableAmount() public {
-        fundingVault.setMaxRequestableAmount(0);
-    }
-
     function testDeposit() public {
         vm.startPrank(randomUser);
         fundingToken.mint(randomUser, 10 ether);
@@ -553,22 +533,6 @@ contract FundingVaultTest is Test {
         vm.startPrank(randomUser);
         vm.expectRevert(FundingVault.FundingVault__NoRemainingFundsToWithdraw.selector);
         fundingVault.withdrawRemaining();
-    }
-
-    function testGetMinRequestableAmount() public {
-        assertEq(fundingVault.getMinRequestableAmount(), 1);
-
-        vm.prank(owner);
-        fundingVault.setMinRequestableAmount(2 ether);
-        assertEq(fundingVault.getMinRequestableAmount(), 2 ether);
-    }
-
-    function testGetMaxRequestableAmount() public {
-        assertEq(fundingVault.getMaxRequestableAmount(), 10 ether);
-
-        vm.prank(owner);
-        fundingVault.setMaxRequestableAmount(20 ether);
-        assertEq(fundingVault.getMaxRequestableAmount(), 20 ether);
     }
 
     function testGetTallyDate() public view {
