@@ -41,20 +41,6 @@ contract FundingVaultTest is Test {
         votingPowerToken.transferOwnership(address(fundingVault));
     }
 
-    function testFuzzSetMinRequestableAmount(uint96 _minRequestableAmount) public {
-        vm.assume(_minRequestableAmount <= 10 ether);
-        vm.prank(owner);
-        fundingVault.setMinRequestableAmount(_minRequestableAmount);
-        assertEq(fundingVault.getMinRequestableAmount(), _minRequestableAmount);
-    }
-
-    function testFuzzSetMaxRequestableAmount(uint96 _maxRequestableAmount) public {
-        vm.assume(_maxRequestableAmount > 0);
-        vm.prank(owner);
-        fundingVault.setMaxRequestableAmount(_maxRequestableAmount);
-        assertEq(fundingVault.getMaxRequestableAmount(), _maxRequestableAmount);
-    }
-
     function testFuzzDeposit(uint96 _amount) public {
         vm.assume(_amount > 0);
         fundingToken.mint(address(this), _amount);

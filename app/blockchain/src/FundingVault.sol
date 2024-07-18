@@ -144,28 +144,6 @@ contract FundingVault is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @param _minRequestableAmount The minimum amount of token that can be requested in proposal
-     * @notice Only the owner can call this function
-     */
-    function setMinRequestableAmount(uint256 _minRequestableAmount) public onlyOwner {
-        if (_minRequestableAmount > s_maxRequestableAmount) {
-            revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
-        }
-        s_minRequestableAmount = _minRequestableAmount;
-    }
-
-    /**
-     * @param _maxRequestableAmount The maximum amount of token that can be requested in proposal
-     * @notice Only the owner can call this function
-     */
-    function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
-        if (_maxRequestableAmount <= s_minRequestableAmount) {
-            revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
-        }
-        s_maxRequestableAmount = _maxRequestableAmount;
-    }
-
-    /**
      * @dev Allows users to deposit fundingToken into the vault
      * @param _amount The amount of fundingToken to deposit
      */
