@@ -13,10 +13,10 @@ export default function ApplicationLayout({
     const initialState = cookieToInitialState(config, headers().get('cookie'));
 
     return (
-        <div className="h-full">
+        <div className="h-screen">
             <Web3ModalProvider initialState={initialState}>
                 <Navbar />
-                <main className="pt-[70px] h-full">{children}</main>
+                <main className="h-full pt-[70px]">{children}</main>
             </Web3ModalProvider>
             <Toaster />
         </div>

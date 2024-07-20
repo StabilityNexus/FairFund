@@ -32,7 +32,7 @@ export default function Navbar() {
                         return (
                             <>
                                 {route.options.length > 0 ? (
-                                    <DropdownMenu>
+                                    <DropdownMenu key={route.label}>
                                         <DropdownMenuTrigger
                                             className={cn(
                                                 'flex items-center space-x-1 py-2 px-3 rounded-md transition-colors',

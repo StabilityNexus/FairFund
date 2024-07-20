@@ -3,4 +3,6 @@ export const allowedRoutes = [
     '/profile',
     '/proposal/',
     '/vault/',
+    '/create/',
+    '/create/',
 ];
