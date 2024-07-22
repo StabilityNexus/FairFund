@@ -3,185 +3,95 @@ import { useState } from 'react';
 
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
 import Circle from 'lucide-react/dist/esm/icons/circle';
-import Search from 'lucide-react/dist/esm/icons/search';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from './ui/scroll-area';
+import { useDebouncedCallback } from 'use-debounce';
 import { type FundingVault } from '@prisma/client';
-import { cn } from '@/lib/utils';
-import { Badge } from './ui/badge';
-
-const mockVaults = [
-    {
-        id: 1,
-        description: 'Community Development Fund',
-        creator: '0x1234...5678',
-        tokensLocked: '1000 ETH',
-        status: 'active',
-    },
-    {
-        id: 2,
-        description: 'Ecosystem Growth Initiative',
-        creator: '0xabcd...efgh',
-        tokensLocked: '500 ETH',
-        status: 'active',
-    },
-    {
-        id: 3,
-        description: 'Research Grant Pool',
-        creator: '0x9876...5432',
-        tokensLocked: '750 ETH',
-        status: 'inactive',
-    },
-    {
-        id: 4,
-        description: 'Community Development Fund',
-        creator: '0x1234...5678',
-        tokensLocked: '1000 ETH',
-        status: 'active',
-    },
-    {
-        id: 5,
-        description: 'Ecosystem Growth Initiative',
-        creator: '0xabcd...efgh',
-        tokensLocked: '500 ETH',
-        status: 'active',
-    },
-    {
-        id: 6,
-        description: 'Research Grant Pool',
-        creator: '0x9876...5432',
-        tokensLocked: '750 ETH',
-        status: 'inactive',
-    },
-    {
-        id: 7,
-        description: 'Community Development Fund',
-        creator: '0x1234...5678',
-        tokensLocked: '1000 ETH',
-        status: 'active',
-    },
-    {
-        id: 8,
-        description: 'Ecosystem Growth Initiative',
-        creator: '0xabcd...efgh',
-        tokensLocked: '500 ETH',
-        status: 'active',
-    },
-    {
-        id: 9,
-        description: 'Research Grant Pool',
-        creator: '0x9876...5432',
-        tokensLocked: '750 ETH',
-        status: 'inactive',
-    },
-    {
-        id: 10,
-        description: 'Community Development Fund',
-        creator: '0x1234...5678',
-        tokensLocked: '1000 ETH',
-        status: 'active',
-    },
-    {
-        id: 11,
-        description: 'Ecosystem Growth Initiative',
-        creator: '0xabcd...efgh',
-        tokensLocked: '500 ETH',
-        status: 'active',
-    },
-    {
-        id: 12,
-        description: 'Research Grant Pool',
-        creator: '0x9876...5432',
-        tokensLocked: '750 ETH',
-        status: 'inactive',
-    },
-    {
-        id: 13,
-        description: 'Community Development Fund',
-        creator: '0x1234...5678',
-        tokensLocked: '1000 ETH',
-        status: 'active',
-    },
-    {
-        id: 14,
-        description: 'Ecosystem Growth Initiative',
-        creator: '0xabcd...efgh',
-        tokensLocked: '500 ETH',
-        status: 'active',
-    },
-    {
-        id: 15,
-        description: 'Research Grant Pool',
-        creator: '0x9876...5432',
-        tokensLocked: '750 ETH',
-        status: 'inactive',
-    },
-];
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import SelectVault from '@/components/select-vault';
 
 const steps = [
     {
-        title: 'Select from active funding vaults',
-        description: 'Select a funding vaults to make a proposal for',
+        title: 'Select an Active Funding Vault',
+        description:
+            'Choose a funding vault for which you want to create a proposal.',
         subSteps: [],
     },
     {
         title: 'Create a Proposal',
-        description: 'This will create a blockchain transaction',
+        description: 'This action will initiate a blockchain transaction.',
         subSteps: [
             {
                 title: 'Proposal Information',
                 description:
-                    'A clear and consice description for your proposal and additional redirect url (if any)',
+                    'Provide a clear and concise description of your proposal, along with an additional redirect URL (if applicable).',
                 fields: ['description', 'metadata'],
             },
             {
                 title: 'Request Amount',
                 description:
-                    'Minimum and maximum amount required by the proposal',
+                    'Specify the minimum and maximum funding amounts required for your proposal.',
                 fields: ['minRequestAmount', 'maxRequestAmount'],
             },
             {
-                title: 'Recipent wallet address',
+                title: 'Recipient Wallet Address',
                 description:
-                    'If the proposal is accepted for the funding, the funds will be transfered to this address',
+                    'Enter the wallet address where funds will be transferred if the proposal is accepted for funding.',
                 fields: ['recipient'],
             },
             {
                 title: 'Review and Submit',
                 description:
-                    'Carefully review all entered parameters before submitting the proposal',
+                    'Carefully review all entered parameters before submitting your proposal.',
                 fields: [],
             },
         ],
     },
 ];
 
-export default function ProposalFormWrapper() {
+interface ProposalFormInterface {
+    fundingVaults?: FundingVault[];
+}
+
+export default function ProposalFormWrapper({
+    fundingVaults,
+}: ProposalFormInterface) {
     const [currentStep, setCurrentStep] = useState(0);
     const [currentProposalStep, setCurrentProposalStep] = useState(0);
     const [selectedVault, setSelectedVault] = useState<any>(null);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { replace } = useRouter();
 
-    const nextStep = () => {
+    function nextStep() {
         if (currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
         }
-    };
+    }
 
-    const prevStep = () => {
+    function prevStep() {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
         }
-    };
+    }
 
-    const handleClickVault = (vault: any) => {
+    function handleClickVault(vault: any) {
         if (selectedVault && vault.id === selectedVault.id) {
             setSelectedVault(null);
         } else {
             setSelectedVault(vault);
         }
-    };
+    }
+
+    const handleSearch = useDebouncedCallback((term: string) => {
+        console.log(term);
+        const params = new URLSearchParams(searchParams);
+        if (term) {
+            params.set('query', term);
+        } else {
+            params.delete('query');
+        }
+        replace(`${pathname}?${params.toString()}`);
+    }, 300);
 
     return (
         <div className="h-full container mx-auto p-4">
@@ -267,78 +177,14 @@ export default function ProposalFormWrapper() {
                 </div>
                 <div className="w-full md:w-3/4 order-1 md:order-2 flex flex-col items-center">
                     {currentStep === 0 && (
-                        <div className="w-full space-y-4">
-                            <div className="my-6">
-                                <h3 className="text-2xl font-semibold mb-2 ">
-                                    {steps[0].title}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {steps[0].description}
-                                </p>
-                            </div>
-                            <div className="relative">
-                                <Input
-                                    type="text"
-                                    placeholder="Search vaults..."
-                                    className="pl-10 w-full"
-                                />
-                                <Search
-                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                    size={20}
-                                />
-                            </div>
-                            <ScrollArea className="h-[calc(100vh-350px)] pr-4">
-                                <div className="space-y-4">
-                                    {mockVaults.map((vault) => (
-                                        <div
-                                            key={vault.id}
-                                            className={cn(
-                                                'p-6 border rounded-lg cursor-pointer transition-all',
-                                                selectedVault?.id === vault.id
-                                                    ? 'border-primary bg-primary/10'
-                                                    : 'border-border hover:border-primary hover:bg-primary/5'
-                                            )}
-                                            onClick={() =>
-                                                handleClickVault(vault)
-                                            }
-                                        >
-                                            <div className="flex justify-between items-start mb-3">
-                                                <h3 className="font-semibold text-lg">
-                                                    {vault.description}
-                                                </h3>
-                                                <Badge
-                                                    variant={
-                                                        vault.status ===
-                                                        'active'
-                                                            ? 'default'
-                                                            : 'secondary'
-                                                    }
-                                                >
-                                                    {vault.status}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground mb-2">
-                                                Creator: {vault.creator}
-                                            </p>
-                                            <p className="text-sm font-medium">
-                                                Locked: {vault.tokensLocked}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                            {selectedVault && (
-                                <div className="mt-6">
-                                    <Button
-                                        onClick={nextStep}
-                                        disabled={!selectedVault}
-                                        className="w-full"
-                                    >
-                                        Continue
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+                        <SelectVault
+                            nextStep={nextStep}
+                            fundingVaults={fundingVaults}
+                            title={steps[currentStep].title}
+                            description={steps[currentStep].description}
+                            selectedVault={selectedVault}
+                            setSelectedVault={setSelectedVault}
+                        />
                     )}
                 </div>
             </div>
