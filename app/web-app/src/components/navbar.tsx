@@ -29,46 +29,10 @@ export default function Navbar() {
                 <div className="flex flex-row gap-x-6 mr-8">
                     {routes.map((route) => {
                         const isActive = pathname === route.href;
-                        return (
-                            <>
-                                {route.options.length > 0 ? (
-                                    <DropdownMenu key={route.label}>
-                                        <DropdownMenuTrigger
-                                            className={cn(
-                                                'flex items-center space-x-1 py-2 px-3 rounded-md transition-colors',
-                                                isActive
-                                                    ? 'text-primary font-medium'
-                                                    : 'text-primary/70 hover:text-primary hover:bg-primary/5'
-                                            )}
-                                        >
-                                            <route.icon className="h-5 w-5" />
-                                            <h1 className="font-bold text-lg cursor-pointer">
-                                                {route.label}
-                                            </h1>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            {route.options.map((route) => {
-                                                return (
-                                                    <DropdownMenuItem
-                                                        className="py-2"
-                                                        key={route.href}
-                                                    >
-                                                        <Link
-                                                            href={route.href}
-                                                            className="flex flex-row"
-                                                        >
-                                                            <route.icon className="h-5 w-5 mr-3" />
-                                                            {route.label}
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                );
-                                            })}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                ) : (
-                                    <Link
-                                        href={route.href}
-                                        key={route.href}
+                        if (route.options.length > 0) {
+                            return (
+                                <DropdownMenu key={route.label}>
+                                    <DropdownMenuTrigger
                                         className={cn(
                                             'flex items-center space-x-1 py-2 px-3 rounded-md transition-colors',
                                             isActive
@@ -80,10 +44,46 @@ export default function Navbar() {
                                         <h1 className="font-bold text-lg cursor-pointer">
                                             {route.label}
                                         </h1>
-                                    </Link>
-                                )}
-                            </>
-                        );
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        {route.options.map((route) => {
+                                            return (
+                                                <DropdownMenuItem
+                                                    className="py-2"
+                                                    key={route.href}
+                                                >
+                                                    <Link
+                                                        href={route.href}
+                                                        className="flex flex-row"
+                                                    >
+                                                        <route.icon className="h-5 w-5 mr-3" />
+                                                        {route.label}
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            );
+                                        })}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            );
+                        } else {
+                            return (
+                                <Link
+                                    href={route.href}
+                                    key={route.href}
+                                    className={cn(
+                                        'flex items-center space-x-1 py-2 px-3 rounded-md transition-colors',
+                                        isActive
+                                            ? 'text-primary font-medium'
+                                            : 'text-primary/70 hover:text-primary hover:bg-primary/5'
+                                    )}
+                                >
+                                    <route.icon className="h-5 w-5" />
+                                    <h1 className="font-bold text-lg cursor-pointer">
+                                        {route.label}
+                                    </h1>
+                                </Link>
+                            );
+                        }
                     })}
                 </div>
                 <ConnectWalletButton />

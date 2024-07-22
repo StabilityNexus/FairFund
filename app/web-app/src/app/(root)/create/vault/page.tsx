@@ -1,5 +1,5 @@
-import VaultForm from '@/components/vault-form-wrapper';
+import VaultFormWrapper from '@/components/vault-form-wrapper';
 
 export default function NewVaultPage() {
-    return <VaultForm />;
+    return <VaultFormWrapper />;
 }
