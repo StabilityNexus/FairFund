@@ -44,6 +44,7 @@ import CalenderIcon from 'lucide-react/dist/esm/icons/calendar';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { type FundingVault } from '@prisma/client';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),
@@ -76,12 +77,18 @@ interface VaultFormInterface {
     }[];
     currentVaultFormStep: number;
     setCurrentVaultFormStep: (step: number) => void;
+    nextComp: () => void;
+    prevComp: () => void;
+    setFundingVault: (vault: FundingVault) => void;
 }
 
 export default function VaultForm({
     steps,
     currentVaultFormStep,
     setCurrentVaultFormStep,
+    nextComp,
+    prevComp,
+    setFundingVault,
 }: VaultFormInterface) {
     const { address } = useAccount();
     const { handleSubmit, isLoading } =
@@ -131,7 +138,7 @@ export default function VaultForm({
             await waitForTransactionReceipt(wagmiConfig, {
                 hash: hash,
             });
-            await axios.post('/api/vault/new', {
+            const response = await axios.post('/api/vault/new', {
                 description: data.description,
                 creatorAddress: address,
                 vaultAddress: result,
@@ -139,9 +146,11 @@ export default function VaultForm({
                 votingTokenAddress: data.votingTokenAddress,
                 tallyDate: data.tallyDate,
             });
+            console.log(response);
+            setFundingVault(response.data);
+            nextComp();
             return { hash, message: 'Vault created successfully.' };
-        },
-        '/dashboard'
+        }
     );
 
     const nextStep = async () => {
@@ -157,6 +166,8 @@ export default function VaultForm({
     const prevStep = () => {
         if (currentVaultFormStep > 0) {
             setCurrentVaultFormStep(currentVaultFormStep - 1);
+        } else {
+            prevComp();
         }
     };
 
@@ -421,15 +432,13 @@ export default function VaultForm({
 
                 {currentVaultFormStep < 3 && (
                     <div className="flex justify-between">
-                        {currentVaultFormStep > 0 && (
-                            <Button
-                                type="button"
-                                onClick={prevStep}
-                                variant="outline"
-                            >
-                                Previous
-                            </Button>
-                        )}
+                        <Button
+                            type="button"
+                            onClick={prevStep}
+                            variant="outline"
+                        >
+                            Previous
+                        </Button>
                         <Button
                             type="button"
                             onClick={nextStep}

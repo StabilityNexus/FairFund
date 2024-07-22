@@ -24,12 +24,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
-import { write } from 'fs';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
     vaultAddress: string;
     vaultId: number;
+    isCreateVault?: boolean;
 }
 
 const depositTokensForm = z.object({
@@ -40,10 +44,11 @@ export default function DepositTokensForm({
     fundingTokenAddress,
     vaultAddress,
     vaultId,
+    isCreateVault = false,
 }: DepositTokensFormProps) {
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof depositTokensForm>>();
-
+    const router = useRouter();
     const form = useForm<z.infer<typeof depositTokensForm>>({
         resolver: zodResolver(depositTokensForm),
         defaultValues: {
@@ -79,15 +84,19 @@ export default function DepositTokensForm({
             });
             return { depositHash, message: 'Tokens deposited successfully.' };
         },
-        `/vault/${vaultId}`
+        isCreateVault ? '/dashboard' : `/vault/${vaultId}`
     );
 
+    const handleSkip = () => {
+        router.push('/dashboard');
+    };
+
     return (
-        <Card className="m-6">
+        <Card className="w-[90%] mx-auto my-10">
             <CardHeader>
                 <CardTitle>Deposit Tokens</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className={cn(isCreateVault && 'w-full')}>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
@@ -119,6 +128,20 @@ export default function DepositTokensForm({
                         </div>
                     </form>
                 </Form>
+                {isCreateVault && (
+                    <Alert className="mt-4">
+                        <AlertDescription>
+                            You can skip depositing tokens for now.{' '}
+                            <Button
+                                variant="link"
+                                className="p-0 h-auto font-normal"
+                                onClick={handleSkip}
+                            >
+                                Skip and go to dashboard
+                            </Button>
+                        </AlertDescription>
+                    </Alert>
+                )}
             </CardContent>
         </Card>
     );
