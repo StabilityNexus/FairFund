@@ -10,7 +10,7 @@
         "format": "prettier --write .",
         "addMock": "ts-node src/mocks/handleMocks.ts add",
         "cleanDB": "ts-node src/mocks/handleMocks.ts remove",
-        "resetDB": "npm run cleanDB && npx prisma db push --force-reset && npx prisma generate"
+        "resetDB": "npx prisma db push --force-reset && npx prisma generate"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
