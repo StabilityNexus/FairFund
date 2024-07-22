@@ -3,19 +3,18 @@ import Search from 'lucide-react/dist/esm/icons/search';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from './ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDebouncedCallback } from 'use-debounce';
 import { type FundingVault } from '@prisma/client';
-import { cn } from '@/lib/utils';
-import { Badge } from './ui/badge';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import VaultCard from '@/components/vault-card';
 
 interface SelectVaultProps {
     nextStep: () => void;
     fundingVaults?: FundingVault[];
     title: string;
     description: string;
-    selectedVault: FundingVault;
+    selectedVault: FundingVault | null;
     setSelectedVault: (vault: FundingVault | null) => void;
 }
 
@@ -51,7 +50,7 @@ export default function SelectVault({
     }, 300);
 
     return (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-4 mx-auto p-4 max-w-3xl">
             <div className="my-6">
                 <h3 className="text-2xl font-semibold mb-2 ">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
@@ -76,40 +75,12 @@ export default function SelectVault({
                 <ScrollArea className="h-[calc(100vh-350px)] pr-4">
                     <div className="space-y-4">
                         {fundingVaults.map((vault) => (
-                            <div
+                            <VaultCard
                                 key={vault.id}
-                                className={cn(
-                                    'p-6 border rounded-lg cursor-pointer transition-all',
-                                    selectedVault?.id === vault.id
-                                        ? 'border-primary bg-primary/10'
-                                        : 'border-border hover:border-primary hover:bg-primary/5'
-                                )}
-                                onClick={() => handleClickVault(vault)}
-                            >
-                                <div className="flex justify-between items-start mb-3">
-                                    <h3 className="font-semibold text-lg">
-                                        {vault.description}
-                                    </h3>
-                                    <Badge
-                                        variant={
-                                            vault.tallyDate.getTime() >
-                                            Date.now()
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {vault.tallyDate.getTime() > Date.now()
-                                            ? 'active'
-                                            : 'closed'}
-                                    </Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                    Creator: {vault.creatorAddress}
-                                </p>
-                                <p className="text-sm font-medium">
-                                    Locked: TODO
-                                </p>
-                            </div>
+                                vault={vault}
+                                selectedVaultId={selectedVault?.id || null}
+                                handleClickVault={handleClickVault}
+                            />
                         ))}
                     </div>
                 </ScrollArea>

@@ -153,7 +153,7 @@ export default function VaultForm({
         }
     );
 
-    const nextStep = async () => {
+    async function nextStep() {
         const currentStepSchema = steps[currentVaultFormStep];
         const isValid = await form.trigger(currentStepSchema.fields as any);
         if (isValid) {
@@ -161,17 +161,17 @@ export default function VaultForm({
                 setCurrentVaultFormStep(currentVaultFormStep + 1);
             }
         }
-    };
+    }
 
-    const prevStep = () => {
+    function prevStep() {
         if (currentVaultFormStep > 0) {
             setCurrentVaultFormStep(currentVaultFormStep - 1);
         } else {
             prevComp();
         }
-    };
+    }
 
-    const renderReviewStep = () => {
+    function renderReviewStep() {
         const data = form.getValues();
         return (
             <Card className="w-full mx-auto flex flex-col h-[500px]">
@@ -180,7 +180,7 @@ export default function VaultForm({
                         {Object.entries(data).map(([key, value]) => (
                             <div
                                 key={key}
-                                className="flex flex-col sm:flex-row sm:justify-between py-2 border-b last:border-b-0"
+                                className="flex flex-col sm:flex-row sm:justify-between py-2 last:border-b-0"
                             >
                                 <span className="font-medium capitalize mb-1 sm:mb-0">
                                     {key.replace(/([A-Z])/g, ' $1').trim()}:
@@ -211,7 +211,7 @@ export default function VaultForm({
                 </CardFooter>
             </Card>
         );
-    };
+    }
 
     return (
         <Form {...form}>

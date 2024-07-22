@@ -1,13 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
 import Circle from 'lucide-react/dist/esm/icons/circle';
 
-import { useDebouncedCallback } from 'use-debounce';
 import { type FundingVault } from '@prisma/client';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import SelectVault from '@/components/select-vault';
+import ProposalForm from '@/components/proposal-form';
 
 const steps = [
     {
@@ -50,17 +49,27 @@ const steps = [
 
 interface ProposalFormInterface {
     fundingVaults?: FundingVault[];
+    fromVaultPage?: boolean;
+    vault?: FundingVault;
 }
 
 export default function ProposalFormWrapper({
     fundingVaults,
+    fromVaultPage = false,
+    vault,
 }: ProposalFormInterface) {
     const [currentStep, setCurrentStep] = useState(0);
     const [currentProposalStep, setCurrentProposalStep] = useState(0);
-    const [selectedVault, setSelectedVault] = useState<any>(null);
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
+    const [selectedVault, setSelectedVault] = useState<FundingVault | null>(
+        null
+    );
+
+    useEffect(() => {
+        if (fromVaultPage && vault) {
+            setSelectedVault(vault);
+            setCurrentStep(1);
+        }
+    }, []);
 
     function nextStep() {
         if (currentStep < steps.length - 1) {
@@ -73,25 +82,6 @@ export default function ProposalFormWrapper({
             setCurrentStep(currentStep - 1);
         }
     }
-
-    function handleClickVault(vault: any) {
-        if (selectedVault && vault.id === selectedVault.id) {
-            setSelectedVault(null);
-        } else {
-            setSelectedVault(vault);
-        }
-    }
-
-    const handleSearch = useDebouncedCallback((term: string) => {
-        console.log(term);
-        const params = new URLSearchParams(searchParams);
-        if (term) {
-            params.set('query', term);
-        } else {
-            params.delete('query');
-        }
-        replace(`${pathname}?${params.toString()}`);
-    }, 300);
 
     return (
         <div className="h-full container mx-auto p-4">
@@ -184,6 +174,16 @@ export default function ProposalFormWrapper({
                             description={steps[currentStep].description}
                             selectedVault={selectedVault}
                             setSelectedVault={setSelectedVault}
+                        />
+                    )}
+                    {currentStep === 1 && (
+                        <ProposalForm
+                            fromVaultPage={fromVaultPage}
+                            steps={steps[1].subSteps}
+                            currentProposalStep={currentProposalStep}
+                            setCurrentProposalStep={setCurrentProposalStep}
+                            prevComp={prevStep}
+                            fundingVault={selectedVault!}
                         />
                     )}
                 </div>
