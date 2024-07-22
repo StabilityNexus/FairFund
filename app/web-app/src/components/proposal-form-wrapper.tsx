@@ -10,7 +10,7 @@ import ProposalForm from '@/components/proposal-form';
 
 const steps = [
     {
-        title: 'Select an Active Funding Vault',
+        title: 'Select a Active Funding Vault',
         description:
             'Choose a funding vault for which you want to create a proposal.',
         subSteps: [],
@@ -69,7 +69,7 @@ export default function ProposalFormWrapper({
             setSelectedVault(vault);
             setCurrentStep(1);
         }
-    }, []);
+    }, [fromVaultPage, vault]);
 
     function nextStep() {
         if (currentStep < steps.length - 1) {
