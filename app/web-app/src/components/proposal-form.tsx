@@ -165,7 +165,7 @@ export default function ProposalForm({
     function renderReviewStep() {
         const data = form.getValues();
         return (
-            <Card className="w-full flex flex-col h-[400px]">
+            <Card className="w-full mx-auto flex flex-col h-[500px]">
                 <ScrollArea className="flex-grow">
                     <CardContent className="p-6 space-y-4">
                         {Object.entries(data).map(([key, value]) => (
@@ -205,11 +205,11 @@ export default function ProposalForm({
     }
 
     return (
-        <div className="h-full p-4 space-y-3 max-w-4xl mx-auto flex items-center">
+        // <div className="h-full p-4 space-y-3 max-w-4xl mx-auto flex items-center">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8 pb-10"
+                    className="w-full space-y-8 pb-10"
                 >
                     <div className="my-6">
                         <h3 className="text-2xl font-semibold mb-2 ">
@@ -220,7 +220,7 @@ export default function ProposalForm({
                         </p>
                     </div>
                     {currentProposalStep === 0 && (
-                        <div className="space-y-2 flex flex-col w-full">
+                        <div className="space-y-2 flex flex-col">
                             <FormField
                                 name="description"
                                 control={form.control}
@@ -274,7 +274,7 @@ export default function ProposalForm({
                         </div>
                     )}
                     {currentProposalStep === 1 && (
-                        <div className="grid grid-col-1 md:grid-cols-2 gap-4">
+                        <>
                             <FormField
                                 name="minRequestAmount"
                                 control={form.control}
@@ -325,7 +325,7 @@ export default function ProposalForm({
                                     );
                                 }}
                             />
-                        </div>
+                        </>
                     )}
                     {currentProposalStep === 2 && (
                         <FormField
@@ -376,6 +376,6 @@ export default function ProposalForm({
                     )}
                 </form>
             </Form>
-        </div>
+        // </div>
     );
 }

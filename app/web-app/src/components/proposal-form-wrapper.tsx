@@ -165,7 +165,7 @@ export default function ProposalFormWrapper({
                         ))}
                     </div>
                 </div>
-                <div className="w-full md:w-3/4 order-1 md:order-2 flex flex-col items-center">
+                <div className="w-full md:w-3/4 order-1 md:order-2 flex  items-center">
                     {currentStep === 0 && (
                         <SelectVault
                             nextStep={nextStep}

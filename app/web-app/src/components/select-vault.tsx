@@ -50,7 +50,7 @@ export default function SelectVault({
     }, 300);
 
     return (
-        <div className="w-full space-y-4 mx-auto p-4 max-w-3xl">
+        <div className="w-full space-y-4 p-4 mx-auto">
             <div className="my-6">
                 <h3 className="text-2xl font-semibold mb-2 ">{title}</h3>
                 <p className="text-sm text-muted-foreground">{description}</p>
