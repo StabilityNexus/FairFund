@@ -4,7 +4,11 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuPortal,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
@@ -26,17 +30,51 @@ export default function MobileNavbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="md:hidden space-y-2">
                     {routes.map((route) => {
-                        return (
-                            <DropdownMenuItem className="py-4" key={route.href}>
-                                <Link
-                                    href={route.href}
-                                    className="flex flex-row"
+                        if (route.options.length) {
+                            return (
+                                <DropdownMenuSub key={route.label}>
+                                    <DropdownMenuSubTrigger className="py-4">
+                                        <route.icon className="h-5 w-5 mr-3" />
+                                        {route.label}
+                                    </DropdownMenuSubTrigger>
+                                    <DropdownMenuPortal>
+                                        <DropdownMenuSubContent>
+                                            {route.options.map((option) => {
+                                                return (
+                                                    <DropdownMenuItem
+                                                        className="py-4"
+                                                        key={option.href}
+                                                    >
+                                                        <Link
+                                                            href={option.href}
+                                                            className="flex flex-row"
+                                                        >
+                                                            <option.icon className="h-5 w-5 mr-3" />
+                                                            {option.label}
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                );
+                                            })}
+                                        </DropdownMenuSubContent>
+                                    </DropdownMenuPortal>
+                                </DropdownMenuSub>
+                            );
+                        } else {
+                            return (
+                                <DropdownMenuItem
+                                    className="py-4"
+                                    key={route.href}
                                 >
-                                    <route.icon className="h-5 w-5 mr-3" />
-                                    {route.label}
-                                </Link>
-                            </DropdownMenuItem>
-                        );
+                                    <Link
+                                        href={route.href}
+                                        className="flex flex-row"
+                                    >
+                                        <route.icon className="h-5 w-5 mr-3" />
+                                        {route.label}
+                                    </Link>
+                                </DropdownMenuItem>
+                            );
+                        }
                     })}
                     <DropdownMenuItem
                         className="py-4"

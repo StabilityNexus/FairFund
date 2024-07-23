@@ -17,7 +17,6 @@ import { cn } from '@/lib/utils';
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fairFund } from '@/blockchain/constants';
 
-import { Separator } from '@/components/ui/separator';
 import {
     Form,
     FormControl,
@@ -36,11 +35,16 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from '@/components/web3-submit-button';
 
 import CalenderIcon from 'lucide-react/dist/esm/icons/calendar';
+import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
+import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { type FundingVault } from '@prisma/client';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),
@@ -50,16 +54,42 @@ const createVaultFormSchema = z.object({
     votingTokenAddress: z.string().min(1, 'Voting Token Address is required.'),
     minRequestableAmount: z
         .string()
-        .min(1, 'Minimum Requestable Amount is required.'),
+        .min(1, 'Minimum Requestable Amount is required.')
+        .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+            message: 'Must be a positive number',
+        }),
     maxRequestableAmount: z
         .string()
-        .min(1, 'Maximum Requestable Amount is required.'),
+        .min(1, 'Maximum Requestable Amount is required.')
+        .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+            message: 'Must be a positive number',
+        }),
     tallyDate: z.date({
         required_error: 'Tally Date is required.',
     }),
 });
 
-export default function VaultForm() {
+interface VaultFormInterface {
+    steps: {
+        title: string;
+        description: string;
+        fields: string[];
+    }[];
+    currentVaultFormStep: number;
+    setCurrentVaultFormStep: (step: number) => void;
+    nextComp: () => void;
+    prevComp: () => void;
+    setFundingVault: (vault: FundingVault) => void;
+}
+
+export default function VaultForm({
+    steps,
+    currentVaultFormStep,
+    setCurrentVaultFormStep,
+    nextComp,
+    prevComp,
+    setFundingVault,
+}: VaultFormInterface) {
     const { address } = useAccount();
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
@@ -74,7 +104,6 @@ export default function VaultForm() {
         },
     });
     const formIsLoading = form.formState.isLoading;
-
     const onSubmit = handleSubmit(
         async (data: z.infer<typeof createVaultFormSchema>) => {
             const unixTime = getUnixTime(data.tallyDate);
@@ -109,7 +138,7 @@ export default function VaultForm() {
             await waitForTransactionReceipt(wagmiConfig, {
                 hash: hash,
             });
-            await axios.post('/api/vault/new', {
+            const response = await axios.post('/api/vault/new', {
                 description: data.description,
                 creatorAddress: address,
                 vaultAddress: result,
@@ -117,28 +146,89 @@ export default function VaultForm() {
                 votingTokenAddress: data.votingTokenAddress,
                 tallyDate: data.tallyDate,
             });
+            console.log(response);
+            setFundingVault(response.data);
+            nextComp();
             return { hash, message: 'Vault created successfully.' };
-        },
-        '/dashboard'
+        }
     );
 
+    async function nextStep() {
+        const currentStepSchema = steps[currentVaultFormStep];
+        const isValid = await form.trigger(currentStepSchema.fields as any);
+        if (isValid) {
+            if (currentVaultFormStep < steps.length - 1) {
+                setCurrentVaultFormStep(currentVaultFormStep + 1);
+            }
+        }
+    }
+
+    function prevStep() {
+        if (currentVaultFormStep > 0) {
+            setCurrentVaultFormStep(currentVaultFormStep - 1);
+        } else {
+            prevComp();
+        }
+    }
+
+    function renderReviewStep() {
+        const data = form.getValues();
+        return (
+            <Card className="w-full mx-auto flex flex-col h-[500px]">
+                <ScrollArea className="flex-grow">
+                    <CardContent className="p-6 space-y-4">
+                        {Object.entries(data).map(([key, value]) => (
+                            <div
+                                key={key}
+                                className="flex flex-col sm:flex-row sm:justify-between py-2 last:border-b-0"
+                            >
+                                <span className="font-medium capitalize mb-1 sm:mb-0">
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                </span>
+                                <span className="text-sm text-right sm:text-left sm:w-1/2 break-words">
+                                    {value.toString()}
+                                </span>
+                            </div>
+                        ))}
+                    </CardContent>
+                </ScrollArea>
+                <CardFooter className="flex flex-col sm:flex-row justify-between p-6 space-y-4 sm:space-y-0 border-t">
+                    <Button
+                        type="button"
+                        onClick={prevStep}
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                    >
+                        <ChevronLeft className="w-4 h-4 mr-2" /> Previous
+                    </Button>
+                    <Web3SubmitButton
+                        disabled={isLoading || formIsLoading}
+                        isLoading={isLoading}
+                        className="w-full sm:w-auto"
+                    >
+                        Submit
+                    </Web3SubmitButton>
+                </CardFooter>
+            </Card>
+        );
+    }
+
     return (
-        <div className="h-full p-4 space-y-3 max-w-4xl mx-auto">
-            <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8 pb-10"
-                >
-                    <div className="space-y-2 w-full">
-                        <h3 className="text-lg font-medium">
-                            Create a new funding vault
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                            This will deploy a new funding vault smart contract.
-                        </p>
-                    </div>
-                    <Separator className="bg-primary/10" />
-                    <div className="space-y-2 w-full">
+        <Form {...form}>
+            <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="w-full space-y-8 pb-10"
+            >
+                <div className="my-6">
+                    <h3 className="text-2xl font-semibold mb-2 ">
+                        {steps[currentVaultFormStep].title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        {steps[currentVaultFormStep].description}
+                    </p>
+                </div>
+                {currentVaultFormStep === 0 && (
+                    <div className="space-y-2 ">
                         <FormField
                             name="description"
                             control={form.control}
@@ -165,7 +255,9 @@ export default function VaultForm() {
                             }}
                         />
                     </div>
-                    <div className="grid grid-col-1 md:grid-cols-2 gap-4">
+                )}
+                {currentVaultFormStep === 1 && (
+                    <>
                         <FormField
                             name="fundingTokenAddress"
                             control={form.control}
@@ -218,6 +310,10 @@ export default function VaultForm() {
                                 );
                             }}
                         />
+                    </>
+                )}
+                {currentVaultFormStep === 2 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <FormField
                             name="minRequestableAmount"
                             control={form.control}
@@ -273,7 +369,7 @@ export default function VaultForm() {
                             control={form.control}
                             render={({ field }) => {
                                 return (
-                                    <FormItem className="col-span-2 md:col-span-1">
+                                    <FormItem>
                                         <FormLabel>Tally Date</FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -296,11 +392,14 @@ export default function VaultForm() {
                                                                 Pick a date
                                                             </span>
                                                         )}
-                                                        <CalenderIcon className="opacity-50" />
+                                                        <CalenderIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            <PopoverContent>
+                                            <PopoverContent
+                                                className="w-auto p-0"
+                                                align="start"
+                                            >
                                                 <Calendar
                                                     mode="single"
                                                     selected={field.value}
@@ -328,15 +427,28 @@ export default function VaultForm() {
                             }}
                         />
                     </div>
-                    <div className="w-full flex justify-center">
-                        <Web3SubmitButton
-                            isLoading={isLoading || formIsLoading}
+                )}
+                {currentVaultFormStep === 3 && renderReviewStep()}
+
+                {currentVaultFormStep < 3 && (
+                    <div className="flex justify-between">
+                        <Button
+                            type="button"
+                            onClick={prevStep}
+                            variant="outline"
                         >
-                            Submit
-                        </Web3SubmitButton>
+                            Previous
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={nextStep}
+                            className="ml-auto"
+                        >
+                            Next <ChevronRight className="w-4 h-4 ml-2" />
+                        </Button>
                     </div>
-                </form>
-            </Form>
-        </div>
+                )}
+            </form>
+        </Form>
     );
 }

@@ -10,7 +10,7 @@
         "format": "prettier --write .",
         "addMock": "ts-node src/mocks/handleMocks.ts add",
         "cleanDB": "ts-node src/mocks/handleMocks.ts remove",
-        "resetDB": "npm run cleanDB && npx prisma db push --force-reset && npx prisma generate"
+        "resetDB": "npx prisma db push --force-reset && npx prisma generate"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
@@ -21,6 +21,7 @@
         "@radix-ui/react-label": "^2.0.2",
         "@radix-ui/react-popover": "^1.0.7",
         "@radix-ui/react-progress": "^1.1.0",
+        "@radix-ui/react-scroll-area": "^1.1.0",
         "@radix-ui/react-separator": "^1.0.3",
         "@radix-ui/react-slot": "^1.0.2",
         "@radix-ui/react-toast": "^1.1.5",
@@ -42,6 +43,7 @@
         "react-hook-form": "^7.51.5",
         "tailwind-merge": "^2.3.0",
         "tailwindcss-animate": "^1.0.7",
+        "use-debounce": "^10.0.1",
         "viem": "^2.16.0",
         "wagmi": "^2.10.4",
         "zod": "^3.23.8"

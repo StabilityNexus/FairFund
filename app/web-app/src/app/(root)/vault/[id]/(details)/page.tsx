@@ -130,7 +130,7 @@ export default async function VaultDetailsPage({
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <ActionButton
-                            href={`/proposal/new?vaultId=${id}`}
+                            href={`/create/proposal?vaultId=${id}`}
                             icon={<PlusCircle className="mr-2 h-4 w-4" />}
                             text="Create Proposal"
                             disabled={isTallyDatePassed}
