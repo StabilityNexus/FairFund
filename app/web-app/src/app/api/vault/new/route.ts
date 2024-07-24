@@ -11,6 +11,9 @@ export async function POST(req: Request) {
             fundingTokenAddress,
             votingTokenAddress,
             tallyDate,
+            minimumRequestableAmount,
+            maximumRequestableAmount,
+            spaceId,
         } = await req.json();
         const fundingTokenSymbol = await getTokenName(fundingTokenAddress);
         const votingTokenSymbol = await getTokenName(votingTokenAddress);
@@ -25,6 +28,9 @@ export async function POST(req: Request) {
                 votingTokenAddress,
                 tallyDate,
                 isTallied: false,
+                minimumRequestableAmount: parseFloat(minimumRequestableAmount),
+                maximumRequestableAmount: parseFloat(maximumRequestableAmount),
+                spaceId,
             },
         });
         return NextResponse.json(vault);
