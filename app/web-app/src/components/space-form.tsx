@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -12,8 +13,8 @@ import {
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
+    FormDescription,
     FormItem,
     FormLabel,
     FormMessage,
@@ -21,6 +22,11 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import type { Space } from '@prisma/client';
+import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 
 const createSpaceFormSchema = z.object({
     name: z.string().min(1, 'Name is requeired.'),
@@ -28,17 +34,49 @@ const createSpaceFormSchema = z.object({
 });
 
 interface SpaceFormInterface {
+    setSelectedSpace: (space: Space) => void;
     nextComp: () => void;
 }
 
-export default function SpaceForm({ nextComp }: SpaceFormInterface) {
+export default function SpaceForm({
+    nextComp,
+    setSelectedSpace,
+}: SpaceFormInterface) {
+    const [isLoading, setIsLoading] = useState(false);
     const form = useForm<z.infer<typeof createSpaceFormSchema>>({
         resolver: zodResolver(createSpaceFormSchema),
+        defaultValues: {
+            name: '',
+            description: '',
+        },
     });
     const formIsLoading = form.formState.isLoading;
+    const { toast } = useToast();
 
-    function onSubmit(data: z.infer<typeof createSpaceFormSchema>) {
-        alert(JSON.stringify(data));
+    async function onSubmit(data: z.infer<typeof createSpaceFormSchema>) {
+        setIsLoading(true);
+        try {
+            const { name, description } = data;
+            const response = await axios.post('/api/space/new', {
+                name,
+                description,
+            });
+            toast({
+                title: 'Space Created',
+                description: 'Space has been created successfully.',
+            });
+            setSelectedSpace(response.data);
+            nextComp();
+        } catch (err) {
+            console.log('[SPACE_FORM_ERROR]', err);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'An error occured while creating the space.',
+            });
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -94,6 +132,9 @@ export default function SpaceForm({ nextComp }: SpaceFormInterface) {
                                                                 {...field}
                                                             />
                                                         </FormControl>
+                                                        <FormDescription>
+                                                            Name of the space
+                                                        </FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
                                                 );
@@ -119,14 +160,28 @@ export default function SpaceForm({ nextComp }: SpaceFormInterface) {
                                                                 {...field}
                                                             />
                                                         </FormControl>
+                                                        <FormDescription>
+                                                            Description of the
+                                                            space
+                                                        </FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
                                                 );
                                             }}
                                         />
                                     </div>
-                                    <Button type="submit">
-                                        Create a Vault
+                                    <Button
+                                        type="submit"
+                                        disabled={formIsLoading || isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            <>{'Create a Space'}</>
+                                        )}
                                     </Button>
                                 </form>
                             </Form>

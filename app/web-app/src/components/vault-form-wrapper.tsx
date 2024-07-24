@@ -3,7 +3,7 @@ import { useState } from 'react';
 import VaultForm from '@/components/vault-form';
 import SpaceForm from '@/components/space-form';
 import DepositTokensForm from '@/components/desposit-tokens-form';
-import { type FundingVault } from '@prisma/client';
+import type { Space, FundingVault } from '@prisma/client';
 
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
 import Circle from 'lucide-react/dist/esm/icons/circle';
@@ -62,7 +62,8 @@ const steps = [
 export default function VaultFormWrapper() {
     const [currentStep, setCurrentStep] = useState(0);
     const [currentVaultFormStep, setCurrentVaultFormStep] = useState(0);
-    const [fundingVault, setFundingVault] = useState<FundingVault | null>();
+    const [fundingVault, setFundingVault] = useState<FundingVault | null>(null);
+    const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
     const router = useRouter();
 
     const nextStep = () => {
@@ -160,7 +161,12 @@ export default function VaultFormWrapper() {
                     </div>
                 </div>
                 <div className="w-full md:w-3/4 order-1 md:order-2 flex items-center">
-                    {currentStep === 0 && <SpaceForm nextComp={nextStep} />}
+                    {currentStep === 0 && (
+                        <SpaceForm
+                            nextComp={nextStep}
+                            setSelectedSpace={setSelectedSpace}
+                        />
+                    )}
                     {currentStep === 1 && (
                         <VaultForm
                             currentVaultFormStep={currentVaultFormStep}
@@ -169,6 +175,7 @@ export default function VaultFormWrapper() {
                             nextComp={nextStep}
                             prevComp={prevStep}
                             setFundingVault={setFundingVault}
+                            selectedSpace={selectedSpace}
                         />
                     )}
                     {currentStep === 2 && (

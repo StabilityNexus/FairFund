@@ -44,7 +44,8 @@ import CalenderIcon from 'lucide-react/dist/esm/icons/calendar';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { type FundingVault } from '@prisma/client';
+import { Space, type FundingVault } from '@prisma/client';
+import { useEffect } from 'react';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),
@@ -80,6 +81,7 @@ interface VaultFormInterface {
     nextComp: () => void;
     prevComp: () => void;
     setFundingVault: (vault: FundingVault) => void;
+    selectedSpace: Space | null;
 }
 
 export default function VaultForm({
@@ -89,6 +91,7 @@ export default function VaultForm({
     nextComp,
     prevComp,
     setFundingVault,
+    selectedSpace,
 }: VaultFormInterface) {
     const { address } = useAccount();
     const { handleSubmit, isLoading } =
@@ -104,54 +107,68 @@ export default function VaultForm({
         },
     });
     const formIsLoading = form.formState.isLoading;
+
+    useEffect(() => {
+        if (!selectedSpace) {
+            prevComp();
+        }
+    }, [selectedSpace]);
+
     const onSubmit = handleSubmit(
         async (data: z.infer<typeof createVaultFormSchema>) => {
-            const unixTime = getUnixTime(data.tallyDate);
-            const decimals = await readContract(wagmiConfig, {
-                address: data.fundingTokenAddress as `0x${string}`,
-                abi: erc20ABI,
-                functionName: 'decimals',
-            });
-            const minRequestableAmount = parseUnits(
-                data.minRequestableAmount,
-                decimals as number
-            );
-            const maxRequestableAmount = parseUnits(
-                data.maxRequestableAmount,
-                decimals as number
-            );
+            if (selectedSpace) {
+                const unixTime = getUnixTime(data.tallyDate);
+                const decimals = await readContract(wagmiConfig, {
+                    address: data.fundingTokenAddress as `0x${string}`,
+                    abi: erc20ABI,
+                    functionName: 'decimals',
+                });
+                const minRequestableAmount = parseUnits(
+                    data.minRequestableAmount,
+                    decimals as number
+                );
+                const maxRequestableAmount = parseUnits(
+                    data.maxRequestableAmount,
+                    decimals as number
+                );
 
-            const { result, request } = await simulateContract(wagmiConfig, {
-                address: fairFund.address as `0x${string}`,
-                abi: fairFund.abi,
-                functionName: 'deployFundingVault',
-                args: [
-                    data.fundingTokenAddress,
-                    data.votingTokenAddress,
-                    minRequestableAmount,
-                    maxRequestableAmount,
-                    unixTime,
-                    address!,
-                ],
-            });
-            const hash = await writeContract(wagmiConfig, request);
-            await waitForTransactionReceipt(wagmiConfig, {
-                hash: hash,
-            });
-            const response = await axios.post('/api/vault/new', {
-                description: data.description,
-                creatorAddress: address,
-                vaultAddress: result,
-                fundingTokenAddress: data.fundingTokenAddress,
-                votingTokenAddress: data.votingTokenAddress,
-                tallyDate: data.tallyDate,
-                minimumRequestableAmount: data.minRequestableAmount,
-                maximumRequestableAmount: data.maxRequestableAmount,
-            });
-            console.log(response);
-            setFundingVault(response.data);
-            nextComp();
-            return { hash, message: 'Vault created successfully.' };
+                const { result, request } = await simulateContract(
+                    wagmiConfig,
+                    {
+                        address: fairFund.address as `0x${string}`,
+                        abi: fairFund.abi,
+                        functionName: 'deployFundingVault',
+                        args: [
+                            data.fundingTokenAddress,
+                            data.votingTokenAddress,
+                            minRequestableAmount,
+                            maxRequestableAmount,
+                            unixTime,
+                            address!,
+                        ],
+                    }
+                );
+                const hash = await writeContract(wagmiConfig, request);
+                await waitForTransactionReceipt(wagmiConfig, {
+                    hash: hash,
+                });
+                const response = await axios.post('/api/vault/new', {
+                    description: data.description,
+                    creatorAddress: address,
+                    vaultAddress: result,
+                    fundingTokenAddress: data.fundingTokenAddress,
+                    votingTokenAddress: data.votingTokenAddress,
+                    tallyDate: data.tallyDate,
+                    minimumRequestableAmount: data.minRequestableAmount,
+                    maximumRequestableAmount: data.maxRequestableAmount,
+                    spaceId: selectedSpace.id,
+                });
+                setFundingVault(response.data);
+                nextComp();
+                return { hash, message: 'Vault created successfully.' };
+            } else {
+                throw new Error('Space not selected');
+            }
         }
     );
 

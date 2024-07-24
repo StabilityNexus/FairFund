@@ -1,7 +1,7 @@
 import prisma from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-export default async function POST(req: Request) {
+export async function POST(req: Request) {
     try {
         const { name, description } = await req.json();
         const result = await prisma.space.create({
