@@ -19,12 +19,28 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+const createSpaceFormSchema = z.object({
+    name: z.string().min(1, 'Name is requeired.'),
+    description: z.string().min(1, 'Description is required.'),
+});
 
 interface SpaceFormInterface {
     nextComp: () => void;
 }
 
 export default function SpaceForm({ nextComp }: SpaceFormInterface) {
+    const form = useForm<z.infer<typeof createSpaceFormSchema>>({
+        resolver: zodResolver(createSpaceFormSchema),
+    });
+    const formIsLoading = form.formState.isLoading;
+
+    function onSubmit(data: z.infer<typeof createSpaceFormSchema>) {
+        alert(JSON.stringify(data));
+    }
+
     return (
         <div className="w-full mx-auto">
             <div className="my-6">
@@ -53,20 +69,72 @@ export default function SpaceForm({ nextComp }: SpaceFormInterface) {
                                 consice description.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-40">
-                            <div className="space-y-2">
-                                <div>Name</div>
-                                <div>Desc</div>
-                            </div>
-                            <Button>Submit</Button>
+                        <CardContent className="">
+                            <Form {...form}>
+                                <form
+                                    onSubmit={form.handleSubmit(onSubmit)}
+                                    className=" flex flex-col gap-4"
+                                >
+                                    <div className="flex flex-col">
+                                        <FormField
+                                            name="name"
+                                            control={form.control}
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Name
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                disabled={
+                                                                    formIsLoading
+                                                                }
+                                                                placeholder="Name here..."
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+                                        <FormField
+                                            name="description"
+                                            control={form.control}
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Description
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                className="bg-background resize-none"
+                                                                rows={6}
+                                                                disabled={
+                                                                    formIsLoading
+                                                                }
+                                                                placeholder="Description here..."
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                    <Button type="submit">
+                                        Create a Vault
+                                    </Button>
+                                </form>
+                            </Form>
                         </CardContent>
                     </Card>
                 </TabsContent>
                 <TabsContent value="select">Select a space</TabsContent>
             </Tabs>
-            <Button type="button" onClick={nextComp}>
-                Next
-            </Button>
         </div>
     );
 }
