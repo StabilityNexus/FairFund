@@ -145,6 +145,8 @@ export default function VaultForm({
                 fundingTokenAddress: data.fundingTokenAddress,
                 votingTokenAddress: data.votingTokenAddress,
                 tallyDate: data.tallyDate,
+                minimumRequestableAmount: data.minRequestableAmount,
+                maximumRequestableAmount: data.maxRequestableAmount,
             });
             console.log(response);
             setFundingVault(response.data);
