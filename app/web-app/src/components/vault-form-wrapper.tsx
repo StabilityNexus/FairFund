@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import VaultForm from '@/components/vault-form';
 import SpaceForm from '@/components/space-form';
 import DepositTokensForm from '@/components/desposit-tokens-form';
@@ -59,12 +59,29 @@ const steps = [
     },
 ];
 
-export default function VaultFormWrapper() {
+interface VaultFormWrapperProps {
+    spaces?: Space[];
+    fromSpacePage?: boolean;
+    space?: Space;
+}
+
+export default function VaultFormWrapper({
+    spaces,
+    fromSpacePage = false,
+    space,
+}: VaultFormWrapperProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [currentVaultFormStep, setCurrentVaultFormStep] = useState(0);
     const [fundingVault, setFundingVault] = useState<FundingVault | null>(null);
     const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        if (fromSpacePage && space) {
+            setSelectedSpace(space);
+            setCurrentStep(1);
+        }
+    }, [fromSpacePage, space]);
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
@@ -163,7 +180,9 @@ export default function VaultFormWrapper() {
                 <div className="w-full md:w-3/4 order-1 md:order-2 flex items-center">
                     {currentStep === 0 && (
                         <SpaceForm
+                            spaces={spaces}
                             nextComp={nextStep}
+                            selectedSpace={selectedSpace}
                             setSelectedSpace={setSelectedSpace}
                         />
                     )}

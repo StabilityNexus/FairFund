@@ -17,7 +17,7 @@ export default function VaultCard({
     return (
         <div
             className={cn(
-                'p-6 border rounded-lg cursor-pointer transition-all',
+                'mx-2 p-6 border rounded-lg cursor-pointer transition-all',
                 selectedVaultId && selectedVaultId === vault.id
                     ? 'border-primary bg-primary/10'
                     : 'border-border hover:border-primary hover:bg-primary/5'

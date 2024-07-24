@@ -5,7 +5,7 @@ import { fundingVaultABI, erc20ABI } from '@/blockchain/constants';
 import { formatUnits } from 'viem';
 import { type FundingVault } from '@prisma/client';
 
-export async function getVault(id: number) {
+export async function getVault(id: number): Promise<FundingVault | null> {
     try {
         const vault = await prisma.fundingVault.findUnique({ where: { id } });
         return vault;

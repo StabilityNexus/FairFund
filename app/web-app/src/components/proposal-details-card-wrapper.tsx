@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { truncateText } from '@/lib/truncate-text';
+import { Button } from './ui/button';
 
 interface ProposalDetailsCardWrapperProps {
     proposal: Proposal;
@@ -58,23 +60,27 @@ export default function ProposalDetailsCardWrapper({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
-                                        {proposal.description}
-                                    </p>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-3xl max-h-[80vh]">
-                                    <DialogHeader>
-                                        <DialogTitle>
-                                            Proposal Description
-                                        </DialogTitle>
-                                    </DialogHeader>
-                                    <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
-                                        {proposal.description}
-                                    </DialogDescription>
-                                </DialogContent>
-                            </Dialog>
+                            {truncateText(proposal.description, 100)}
+                            {proposal.description.length > 100 && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="link"
+                                            className="p-0 h-auto font-normal"
+                                        >
+                                            Read more
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Proposal Description
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <p>{proposal.description}</p>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
                         </CardContent>
                     </Card>
                     <Card>
