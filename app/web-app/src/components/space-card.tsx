@@ -11,9 +11,10 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { SpaceWithVaultCount } from '@/lib/filter-space';
 
 interface SpaceCardInterface {
-    space: Space;
+    space: SpaceWithVaultCount;
     selectedSpaceId: number | null;
     setSelectedSpace: (space: Space | null) => void;
 }
@@ -66,7 +67,9 @@ export default function SpaceCard({
                         </Dialog>
                     )}
                 </p>
-                <p className="text-sm font-semibold">Vaults: TODO</p>
+                <p className="text-sm font-semibold">
+                    Vaults: {space._count.vaults}
+                </p>
             </CardContent>
         </Card>
     );

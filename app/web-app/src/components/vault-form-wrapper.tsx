@@ -9,6 +9,7 @@ import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
 import Circle from 'lucide-react/dist/esm/icons/circle';
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import { SpaceWithVaultCount } from '@/lib/filter-space';
 
 const steps = [
     {
@@ -60,7 +61,7 @@ const steps = [
 ];
 
 interface VaultFormWrapperProps {
-    spaces?: Space[];
+    spaces?: SpaceWithVaultCount[];
     fromSpacePage?: boolean;
     space?: Space;
 }

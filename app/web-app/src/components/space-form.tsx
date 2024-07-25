@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { Space } from '@prisma/client';
 import CreateSpaceForm from '@/components/create-space-form';
 import SelectSpace from '@/components/select-space';
+import { SpaceWithVaultCount } from '@/lib/filter-space';
 
 const createSpaceFormSchema = z.object({
     name: z.string().min(1, 'Name is requeired.'),
@@ -13,7 +14,7 @@ const createSpaceFormSchema = z.object({
 interface SpaceFormInterface {
     setSelectedSpace: (space: Space | null) => void;
     selectedSpace: Space | null;
-    spaces?: Space[];
+    spaces?: SpaceWithVaultCount[];
     nextComp: () => void;
 }
 
