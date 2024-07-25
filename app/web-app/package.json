@@ -9,8 +9,8 @@
         "lint": "next lint",
         "format": "prettier --write .",
         "addMock": "ts-node src/mocks/handleMocks.ts add",
-        "cleanDB": "ts-node src/mocks/handleMocks.ts remove",
-        "resetDB": "npx prisma db push --force-reset && npx prisma generate"
+        "resetDB": "npx prisma db push --force-reset && npx prisma generate",
+        "cleanDB": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/mocks/remove.ts"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
