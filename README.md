@@ -94,15 +94,21 @@ $$0$$
 3. **Update the environment variables**:
     - Create a `.env` file in the `web-app` directory and update all the values. You can use `.env.example` as a template.
 
-3. **Run the Development Server**:
+3. **To use local instance of postgreSQL database**: (Optional)
+    - Start docker desktop
+    - Run `docker compose up`
+
+4. **Run the Development Server**:
     ```bash
     npm run dev
     ```
 
-4. **Update Smart Contract Address**:
+5. **Update Smart Contract Address**:
     - Change the smart contract address in `web-app/src/blockchain/constants.ts` to match the deployed contract address.
 
-5. **Access the Web App**:
+6. **Access the Web App**:
     - Open your browser and navigate to `http://localhost:3000`.
+
+
 
 
