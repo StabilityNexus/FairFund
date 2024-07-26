@@ -44,3 +44,4 @@ CREATE INDEX "Proposal_fundingVaultId_idx" ON "Proposal"("fundingVaultId");
 
 -- AddForeignKey
 ALTER TABLE "Proposal" ADD CONSTRAINT "Proposal_fundingVaultId_fkey" FOREIGN KEY ("fundingVaultId") REFERENCES "FundingVault"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

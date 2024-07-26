@@ -206,176 +206,176 @@ export default function ProposalForm({
 
     return (
         // <div className="h-full p-4 space-y-3 max-w-4xl mx-auto flex items-center">
-            <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="w-full space-y-8 pb-10"
-                >
-                    <div className="my-6">
-                        <h3 className="text-2xl font-semibold mb-2 ">
-                            {steps[currentProposalStep].title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                            {steps[currentProposalStep].description}
-                        </p>
-                    </div>
-                    {currentProposalStep === 0 && (
-                        <div className="space-y-2 flex flex-col">
-                            <FormField
-                                name="description"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Description</FormLabel>
-                                            <FormControl>
-                                                <Textarea
-                                                    className="bg-background resize-none"
-                                                    rows={6}
-                                                    disabled={isLoading}
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                A short description about the
-                                                proposal (this won&apos;t be
-                                                stored on chain).
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    );
-                                }}
-                            />
-                            <FormField
-                                name="metadata"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem className="col-span-2 md:col-span-1">
-                                            <FormLabel>
-                                                Additional Metadata
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    disabled={isLoading}
-                                                    placeholder="URL here..."
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Any additional URL with more
-                                                information about your proposal.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    );
-                                }}
-                            />
-                        </div>
-                    )}
-                    {currentProposalStep === 1 && (
-                        <>
-                            <FormField
-                                name="minRequestAmount"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem className="col-span-2 md:col-span-1">
-                                            <FormLabel>
-                                                Minimum Request Amount
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    disabled={isLoading}
-                                                    placeholder="Minimum amount (in ETH)"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                The minimum amount that would be
-                                                suffice for recepient.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    );
-                                }}
-                            />
-                            <FormField
-                                name="maxRequestAmount"
-                                control={form.control}
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem className="col-span-2 md:col-span-1">
-                                            <FormLabel>
-                                                Maximum Request Amount
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    disabled={isLoading}
-                                                    placeholder="Maximum amount (in ETH)"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                The maximum amount needed for
-                                                the recepient.
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    );
-                                }}
-                            />
-                        </>
-                    )}
-                    {currentProposalStep === 2 && (
+        <Form {...form}>
+            <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="w-full space-y-8 pb-10"
+            >
+                <div className="my-6">
+                    <h3 className="text-2xl font-semibold mb-2 ">
+                        {steps[currentProposalStep].title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        {steps[currentProposalStep].description}
+                    </p>
+                </div>
+                {currentProposalStep === 0 && (
+                    <div className="space-y-2 flex flex-col">
                         <FormField
-                            name="recipient"
+                            name="description"
                             control={form.control}
                             render={({ field }) => {
                                 return (
-                                    <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
-                                            Recepient Wallet Address
-                                        </FormLabel>
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Input
+                                            <Textarea
+                                                className="bg-background resize-none"
+                                                rows={6}
                                                 disabled={isLoading}
-                                                placeholder="Wallet address here..."
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            The address of the wallet that will
-                                            receive the funds, if the proposal
-                                            is approved.
+                                            A short description about the
+                                            proposal (this won&apos;t be stored
+                                            on chain).
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 );
                             }}
                         />
-                    )}
-                    {currentProposalStep === 3 && renderReviewStep()}
-                    {currentProposalStep < 3 && (
-                        <div className="flex justify-between">
-                            <Button
-                                type="button"
-                                onClick={prevStep}
-                                variant="outline"
-                            >
-                                Previous
-                            </Button>
-                            <Button
-                                type="button"
-                                onClick={nextStep}
-                                className="ml-auto"
-                            >
-                                Next <ChevronRight className="w-4 h-4 ml-2" />
-                            </Button>
-                        </div>
-                    )}
-                </form>
-            </Form>
+                        <FormField
+                            name="metadata"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem className="col-span-2 md:col-span-1">
+                                        <FormLabel>
+                                            Additional Metadata
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={isLoading}
+                                                placeholder="URL here..."
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Any additional URL with more
+                                            information about your proposal.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+                    </div>
+                )}
+                {currentProposalStep === 1 && (
+                    <>
+                        <FormField
+                            name="minRequestAmount"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem className="col-span-2 md:col-span-1">
+                                        <FormLabel>
+                                            Minimum Request Amount
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={isLoading}
+                                                placeholder="Minimum amount (in ETH)"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            The minimum amount that would be
+                                            suffice for recepient.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+                        <FormField
+                            name="maxRequestAmount"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem className="col-span-2 md:col-span-1">
+                                        <FormLabel>
+                                            Maximum Request Amount
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={isLoading}
+                                                placeholder="Maximum amount (in ETH)"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            The maximum amount needed for the
+                                            recepient.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+                    </>
+                )}
+                {currentProposalStep === 2 && (
+                    <FormField
+                        name="recipient"
+                        control={form.control}
+                        render={({ field }) => {
+                            return (
+                                <FormItem className="col-span-2 md:col-span-1">
+                                    <FormLabel>
+                                        Recepient Wallet Address
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            disabled={isLoading}
+                                            placeholder="Wallet address here..."
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        The address of the wallet that will
+                                        receive the funds, if the proposal is
+                                        approved.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            );
+                        }}
+                    />
+                )}
+                {currentProposalStep === 3 && renderReviewStep()}
+                {currentProposalStep < 3 && (
+                    <div className="flex justify-between">
+                        <Button
+                            type="button"
+                            onClick={prevStep}
+                            variant="outline"
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={nextStep}
+                            className="ml-auto"
+                        >
+                            Next <ChevronRight className="w-4 h-4 ml-2" />
+                        </Button>
+                    </div>
+                )}
+            </form>
+        </Form>
         // </div>
     );
 }
