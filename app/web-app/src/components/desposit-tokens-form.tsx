@@ -11,7 +11,13 @@ import {
 import { config as wagmiConfig } from '@/wagmi/config';
 import { erc20ABI, fundingVaultABI } from '@/blockchain/constants';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import {
     Form,
     FormControl,
@@ -92,11 +98,14 @@ export default function DepositTokensForm({
     };
 
     return (
-        <Card className="w-[90%] mx-auto my-10">
+        <Card className="w-[97%] mx-auto my-10 border-none shadow-none">
             <CardHeader>
                 <CardTitle>Deposit Tokens</CardTitle>
+                <CardDescription>
+                    Deposit funding token to the vault.
+                </CardDescription>
             </CardHeader>
-            <CardContent className={cn(isCreateVault && 'w-full')}>
+            <CardContent className={cn('w-full')}>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
@@ -121,8 +130,11 @@ export default function DepositTokensForm({
                                 );
                             }}
                         />
-                        <div className="w-full flex justify-center">
-                            <Web3SubmitButton isLoading={isLoading}>
+                        <div className="w-full flex justify-center mt-5">
+                            <Web3SubmitButton
+                                isLoading={isLoading}
+                                className="w-full"
+                            >
                                 Submit
                             </Web3SubmitButton>
                         </div>
