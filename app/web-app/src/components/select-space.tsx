@@ -8,6 +8,7 @@ import { ScrollArea } from './ui/scroll-area';
 import SpaceCard from './space-card';
 import { Button } from './ui/button';
 import { SpaceWithVaultCount } from '@/lib/filter-space';
+import SearchSpaces from './search-spaces';
 
 interface SelectSpaceProps {
     spaces?: SpaceWithVaultCount[];
@@ -38,20 +39,7 @@ export default function SelectSpace({
 
     return (
         <>
-            <div className="relative">
-                <Input
-                    type="text"
-                    placeholder="Search spaces..."
-                    className="pl-10 w-full"
-                    onChange={(e) => {
-                        handleSearch(e.target.value);
-                    }}
-                />
-                <Search
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                />
-            </div>
+            <SearchSpaces placeholder="Search spaces...." />
             {spaces && spaces.length > 0 ? (
                 <ScrollArea className="h-[calc(100vh-400px)] p-4 border-2 border-secondary rounded-xl ">
                     <div className="space-y-4">

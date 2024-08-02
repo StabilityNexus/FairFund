@@ -112,7 +112,7 @@ export default function VaultForm({
         if (!selectedSpace) {
             prevComp();
         }
-    }, [selectedSpace]);
+    }, [selectedSpace, prevComp]);
 
     const onSubmit = handleSubmit(
         async (data: z.infer<typeof createVaultFormSchema>) => {
