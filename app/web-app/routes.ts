@@ -4,5 +4,5 @@ export const allowedRoutes = [
     '/proposal/',
     '/vault/',
     '/create/',
-    '/create/',
+    '/spaces',
 ];

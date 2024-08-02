@@ -29,7 +29,6 @@ The funding vault contract should have the following functions:
 * `submitProposal` allows the message sender to submit a proposal. (Submitted proposals are stored in a mapping and their key in the mapping is their id.)
 * `voteOnProposal` allows the message sender to vote on a submitted proposal by assigning some of his/her votingPowerTokens to the proposal.
 * `calculateFundingToBeReceived`: can only be called after the tallyDate. Takes a proposal id as an argument and returns whether the proposal is accepted or not.
-* TODO
 
 Let:
 
