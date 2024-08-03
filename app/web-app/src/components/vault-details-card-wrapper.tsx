@@ -9,7 +9,6 @@ import Wallet from 'lucide-react/dist/esm/icons/wallet';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -20,6 +19,8 @@ import { StatCard } from '@/components/stat-card';
 
 import { type FundingVault } from '@prisma/client';
 import { getVaultBalance } from '@/lib/vault-data';
+import { truncateText } from '@/lib/truncate-text';
+import { Button } from '@/components/ui/button';
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
@@ -101,21 +102,29 @@ export default async function VaultDetailsCardWrapper({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <p className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors line-clamp-3">
-                                    {vault.description}
-                                </p>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl max-h-[80vh]">
-                                <DialogHeader>
-                                    <DialogTitle>Vault Description</DialogTitle>
-                                </DialogHeader>
-                                <DialogDescription className="mt-4 max-h-[60vh] overflow-y-auto">
-                                    {vault.description}
-                                </DialogDescription>
-                            </DialogContent>
-                        </Dialog>
+                        <p className="text-sm text-gray-600 mb-2">
+                            {truncateText(vault.description, 100)}
+                            {vault.description.length > 100 && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="link"
+                                            className="p-0 h-auto font-normal"
+                                        >
+                                            Read more
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Vault Description
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <p>{vault.description}</p>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        </p>
                     </CardContent>
                 </Card>
             </div>

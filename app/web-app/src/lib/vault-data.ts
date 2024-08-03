@@ -5,10 +5,34 @@ import { fundingVaultABI, erc20ABI } from '@/blockchain/constants';
 import { formatUnits } from 'viem';
 import { type FundingVault } from '@prisma/client';
 
-export async function getVault(id: number) {
+export async function getVault(id: number): Promise<FundingVault | null> {
     try {
         const vault = await prisma.fundingVault.findUnique({ where: { id } });
         return vault;
+    } catch (error) {
+        console.error('Error fetching vault:', error);
+        throw new Error('[GET_VAULT: Funding vault not found.]');
+    }
+}
+export async function getVaultsForSpaceId(
+    id: number,
+    page: number,
+    pageSize: number
+): Promise<{ vaults: FundingVault[]; totalCount: number }> {
+    try {
+        const vaultsProimse = prisma.fundingVault.findMany({
+            where: {
+                spaceId: id,
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        });
+        const totalVaultsPromise = prisma.fundingVault.count();
+        const [vaults, totalCount] = await Promise.all([
+            vaultsProimse,
+            totalVaultsPromise,
+        ]);
+        return { vaults, totalCount };
     } catch (error) {
         console.error('Error fetching vault:', error);
         throw new Error('[GET_VAULT: Funding vault not found.]');

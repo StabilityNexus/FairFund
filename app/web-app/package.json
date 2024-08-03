@@ -3,14 +3,13 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "npm run resetDB && next dev",
-        "build": "next build",
+        "dev": "npx prisma db push --force-reset && next dev",
+        "build": "npx prisma generate && npx prisma migrate deploy && next build",
         "start": "next start",
         "lint": "next lint",
         "format": "prettier --write .",
-        "addMock": "ts-node src/mocks/handleMocks.ts add",
-        "cleanDB": "ts-node src/mocks/handleMocks.ts remove",
-        "resetDB": "npx prisma db push --force-reset && npx prisma generate"
+        "addMockSpaces": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/mocks/add-spaces.ts",
+        "cleanDB": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/mocks/remove.ts"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
@@ -24,6 +23,7 @@
         "@radix-ui/react-scroll-area": "^1.1.0",
         "@radix-ui/react-separator": "^1.0.3",
         "@radix-ui/react-slot": "^1.0.2",
+        "@radix-ui/react-tabs": "^1.1.0",
         "@radix-ui/react-toast": "^1.1.5",
         "@radix-ui/react-tooltip": "^1.1.1",
         "@tanstack/react-query": "^5.18.1",
@@ -49,6 +49,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@faker-js/faker": "^8.4.1",
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",

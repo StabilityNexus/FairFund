@@ -1,14 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import VaultForm from '@/components/vault-form';
 import SpaceForm from '@/components/space-form';
 import DepositTokensForm from '@/components/desposit-tokens-form';
-import { type FundingVault } from '@prisma/client';
+import type { Space, FundingVault } from '@prisma/client';
 
 import CheckCircle from 'lucide-react/dist/esm/icons/check-circle';
 import Circle from 'lucide-react/dist/esm/icons/circle';
 import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import { SpaceWithVaultCount } from '@/lib/space-data';
 
 const steps = [
     {
@@ -59,11 +60,29 @@ const steps = [
     },
 ];
 
-export default function VaultFormWrapper() {
+interface VaultFormWrapperProps {
+    spaces?: SpaceWithVaultCount[];
+    fromSpacePage?: boolean;
+    space?: Space;
+}
+
+export default function VaultFormWrapper({
+    spaces,
+    fromSpacePage = false,
+    space,
+}: VaultFormWrapperProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [currentVaultFormStep, setCurrentVaultFormStep] = useState(0);
-    const [fundingVault, setFundingVault] = useState<FundingVault | null>();
+    const [fundingVault, setFundingVault] = useState<FundingVault | null>(null);
+    const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        if (fromSpacePage && space) {
+            setSelectedSpace(space);
+            setCurrentStep(1);
+        }
+    }, [fromSpacePage, space]);
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
@@ -160,7 +179,14 @@ export default function VaultFormWrapper() {
                     </div>
                 </div>
                 <div className="w-full md:w-3/4 order-1 md:order-2 flex items-center">
-                    {currentStep === 0 && <SpaceForm nextComp={nextStep} />}
+                    {currentStep === 0 && (
+                        <SpaceForm
+                            spaces={spaces}
+                            nextComp={nextStep}
+                            selectedSpace={selectedSpace}
+                            setSelectedSpace={setSelectedSpace}
+                        />
+                    )}
                     {currentStep === 1 && (
                         <VaultForm
                             currentVaultFormStep={currentVaultFormStep}
@@ -169,6 +195,7 @@ export default function VaultFormWrapper() {
                             nextComp={nextStep}
                             prevComp={prevStep}
                             setFundingVault={setFundingVault}
+                            selectedSpace={selectedSpace}
                         />
                     )}
                     {currentStep === 2 && (

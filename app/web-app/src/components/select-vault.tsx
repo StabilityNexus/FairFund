@@ -39,7 +39,6 @@ export default function SelectVault({
     }
 
     const handleSearch = useDebouncedCallback((term: string) => {
-        console.log(term);
         const params = new URLSearchParams(searchParams);
         if (term) {
             params.set('query', term);
@@ -72,7 +71,7 @@ export default function SelectVault({
             </div>
 
             {fundingVaults && fundingVaults.length > 0 ? (
-                <ScrollArea className="h-[calc(100vh-350px)] pr-4">
+                <ScrollArea className="h-[calc(100vh-350px)] p-4 border-2 border-secondary rounded-xl">
                     <div className="space-y-4">
                         {fundingVaults.map((vault) => (
                             <VaultCard

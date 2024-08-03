@@ -14,21 +14,34 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model FundingVault {
-  id                  Int        @id @default(autoincrement())
-  description         String
-  creatorAddress      String
-  fundingTokenAddress String
-  fundingTokenSymbol  String
-  votingTokenAddress  String
-  votingTokenSymbol   String
-  vaultAddress        String
-  isTallied           Boolean @default(false)
-  tallyDate           DateTime
-  isDistributed       Boolean @default(false)
-  createdAt           DateTime   @default(now())
+model Space {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
 
-  proposals           Proposal[]
+  vaults FundingVault[]
+}
+
+model FundingVault {
+  id                       Int      @id @default(autoincrement())
+  description              String
+  creatorAddress           String
+  fundingTokenAddress      String
+  minimumRequestableAmount Float
+  maximumRequestableAmount Float
+  fundingTokenSymbol       String
+  votingTokenAddress       String
+  votingTokenSymbol        String
+  vaultAddress             String
+  isTallied                Boolean  @default(false)
+  tallyDate                DateTime
+  isDistributed            Boolean  @default(false)
+  createdAt                DateTime @default(now())
+  spaceId                  Int
+  space                    Space    @relation(fields: [spaceId], references: [id])
+
+  proposals Proposal[]
 
   @@index([creatorAddress])
 }
