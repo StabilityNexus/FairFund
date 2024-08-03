@@ -11,7 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { SpaceWithVaultCount } from '@/lib/filter-space';
+import { SpaceWithVaultCount } from '@/lib/space-data';
 
 interface SpaceCardInterface {
     space: SpaceWithVaultCount;

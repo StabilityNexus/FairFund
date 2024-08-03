@@ -14,6 +14,30 @@ export async function getVault(id: number): Promise<FundingVault | null> {
         throw new Error('[GET_VAULT: Funding vault not found.]');
     }
 }
+export async function getVaultsForSpaceId(
+    id: number,
+    page: number,
+    pageSize: number
+): Promise<{ vaults: FundingVault[]; totalCount: number }> {
+    try {
+        const vaultsProimse = prisma.fundingVault.findMany({
+            where: {
+                spaceId: id,
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        });
+        const totalVaultsPromise = prisma.fundingVault.count();
+        const [vaults, totalCount] = await Promise.all([
+            vaultsProimse,
+            totalVaultsPromise,
+        ]);
+        return { vaults, totalCount };
+    } catch (error) {
+        console.error('Error fetching vault:', error);
+        throw new Error('[GET_VAULT: Funding vault not found.]');
+    }
+}
 
 export async function getVaultBalance(vault: FundingVault) {
     try {

@@ -1,12 +1,7 @@
 import prisma from '@/lib/db';
 import { type Space } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
-
-export interface SpaceWithVaultCount extends Space {
-    _count: {
-        vaults: number;
-    };
-}
+import { SpaceWithVaultCount } from '@/lib/space-data';
 
 export async function filterSpaces(
     query: string,

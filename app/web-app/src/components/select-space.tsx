@@ -7,7 +7,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ScrollArea } from './ui/scroll-area';
 import SpaceCard from './space-card';
 import { Button } from './ui/button';
-import { SpaceWithVaultCount } from '@/lib/filter-space';
+import { SpaceWithVaultCount } from '@/lib/space-data';
 import SearchSpaces from './search-spaces';
 
 interface SelectSpaceProps {

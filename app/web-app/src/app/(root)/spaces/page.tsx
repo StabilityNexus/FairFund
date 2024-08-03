@@ -1,5 +1,5 @@
 import SearchSpaces from '@/components/search-spaces';
-import { filterSpaces, SpaceWithVaultCount } from '@/lib/filter-space';
+import { filterSpaces } from '@/lib/filter-space';
 import {
     Card,
     CardHeader,
@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Pagination from '@/components/pagination';
+import Link from 'next/link';
+import { truncateText } from '@/lib/truncate-text';
 
 const PAGE_SIZE = 6;
 
@@ -43,26 +45,34 @@ export default async function SpacesPage({
             </header>
             <SearchSpaces placeholder="Search spaces..." />
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                {spaces.map((space) => (
-                    <Card
-                        key={space.id}
-                        className="hover:shadow-lg transition-shadow duration-300"
-                    >
-                        <CardHeader>
-                            <CardTitle>{space.name}</CardTitle>
-                            <CardDescription>
-                                {space._count.vaults} funding vault
-                                {space._count.vaults !== 1 ? 's' : ''}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-gray-600">
-                                {space.description}
-                            </p>
-                            <Button className="mt-4 w-full">View Space</Button>
-                        </CardContent>
-                    </Card>
-                ))}
+                {spaces.length !== 0 ? (
+                    spaces.map((space) => (
+                        <Card
+                            key={space.id}
+                            className="hover:shadow-lg transition-shadow duration-300"
+                        >
+                            <CardHeader>
+                                <CardTitle>{space.name}</CardTitle>
+                                <CardDescription>
+                                    {space._count.vaults} funding vault
+                                    {space._count.vaults !== 1 ? 's' : ''}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-gray-600">
+                                    {truncateText(space.description, 100)}
+                                </p>
+                                <Link href={`/spaces/${space.id}`}>
+                                    <Button className="mt-4 w-full">
+                                        View Space
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    ))
+                ) : (
+                    <div>No spaces found.</div>
+                )}
             </div>
             {totalPages > 1 && (
                 <div className="flex w-full justify-between items-center">

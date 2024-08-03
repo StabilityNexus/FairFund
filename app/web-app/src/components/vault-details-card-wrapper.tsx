@@ -9,7 +9,6 @@ import Wallet from 'lucide-react/dist/esm/icons/wallet';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
