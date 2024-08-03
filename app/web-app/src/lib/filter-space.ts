@@ -9,26 +9,44 @@ export interface SpaceWithVaultCount extends Space {
 }
 
 export async function filterSpaces(
-    query: string
-): Promise<SpaceWithVaultCount[]> {
+    query: string,
+    page: number,
+    pageSize: number
+): Promise<{ spaces: SpaceWithVaultCount[]; totalCount: number }> {
     noStore();
-    return prisma.space.findMany({
-        where: {
-            OR: [
-                { name: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
-            ],
-        },
-        select: {
-            id: true,
-            name: true,
-            description: true,
-            createdAt: true,
-            _count: {
-                select: {
-                    vaults: true,
+
+    const skip = (page - 1) * pageSize;
+    const [spaces, totalCount] = await Promise.all([
+        prisma.space.findMany({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                ],
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                createdAt: true,
+                _count: {
+                    select: {
+                        vaults: true,
+                    },
                 },
             },
-        },
-    });
+            skip,
+            take: pageSize,
+        }),
+        prisma.space.count({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                ],
+            },
+        }),
+    ]);
+
+    return { spaces, totalCount };
 }

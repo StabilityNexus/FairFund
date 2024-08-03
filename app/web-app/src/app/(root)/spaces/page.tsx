@@ -1,6 +1,18 @@
 import SearchSpaces from '@/components/search-spaces';
+import { filterSpaces, SpaceWithVaultCount } from '@/lib/filter-space';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Pagination from '@/components/pagination';
 
-export default function SpacesPage({
+const PAGE_SIZE = 6;
+
+export default async function SpacesPage({
     searchParams,
 }: {
     searchParams?: {
@@ -10,6 +22,13 @@ export default function SpacesPage({
 }) {
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+
+    const { spaces, totalCount: count } = await filterSpaces(
+        query,
+        currentPage,
+        PAGE_SIZE
+    );
+    const totalPages = Math.floor(count / PAGE_SIZE);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -23,6 +42,33 @@ export default function SpacesPage({
                 </p>
             </header>
             <SearchSpaces placeholder="Search spaces..." />
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                {spaces.map((space) => (
+                    <Card
+                        key={space.id}
+                        className="hover:shadow-lg transition-shadow duration-300"
+                    >
+                        <CardHeader>
+                            <CardTitle>{space.name}</CardTitle>
+                            <CardDescription>
+                                {space._count.vaults} funding vault
+                                {space._count.vaults !== 1 ? 's' : ''}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-gray-600">
+                                {space.description}
+                            </p>
+                            <Button className="mt-4 w-full">View Space</Button>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+            {totalPages > 1 && (
+                <div className="flex w-full justify-between items-center">
+                    <Pagination totalPages={totalPages} />
+                </div>
+            )}
         </div>
     );
 }

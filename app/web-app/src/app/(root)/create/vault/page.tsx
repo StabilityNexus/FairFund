@@ -12,6 +12,8 @@ export default async function NewVaultPage({
 }) {
     const query = searchParams?.query || '';
     const spaceId = searchParams?.spaceId || '';
+    const pageSize = 6;
+    const pageNumber = 1;
 
     if (spaceId) {
         const space = await getSpace(Number(spaceId));
@@ -24,9 +26,7 @@ export default async function NewVaultPage({
             );
         }
     } else {
-        const spaces = await filterSpaces(query);
+        const { spaces } = await filterSpaces(query, pageNumber, pageSize);
         return <VaultFormWrapper spaces={spaces} />;
     }
-
-    return <VaultFormWrapper />;
 }

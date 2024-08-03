@@ -1,7 +1,8 @@
 'use client';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import Search from 'lucide-react/dist/esm/icons/search';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface SearchSpaceProps {
     placeholder: string;
@@ -12,20 +13,20 @@ export default function SearchSpaces({ placeholder }: SearchSpaceProps) {
     const pathname = usePathname();
     const { replace } = useRouter();
 
-    function handleSearch(term: string) {
+    const handleSearch = useDebouncedCallback((term: string) => {
         const params = new URLSearchParams(searchParams);
+        params.set('page', '1');
         if (term) {
             params.set('query', term);
         } else {
             params.delete('query');
         }
         replace(`${pathname}?${params.toString()}`);
-    }
+    }, 300);
 
     return (
         <div className="relative">
             <Input
-                type="text"
                 placeholder={placeholder}
                 className="pl-10 pr-4 w-full"
                 onChange={(e) => {

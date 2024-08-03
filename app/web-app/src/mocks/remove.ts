@@ -13,7 +13,9 @@ async function main() {
                 `TRUNCATE TABLE "${tablename}" CASCADE;`
             );
         }
+        // await db.$executeRaw`ALTER SEQUENCE "Space_id_seq" RESTART WITH 1`;
     }
+
     return { message: 'DB cleared successfully.' };
 }
 
