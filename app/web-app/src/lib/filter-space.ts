@@ -6,7 +6,8 @@ import { SpaceWithVaultCount } from '@/lib/space-data';
 export async function filterSpaces(
     query: string,
     page: number,
-    pageSize: number
+    pageSize: number,
+    creator?: string
 ): Promise<{ spaces: SpaceWithVaultCount[]; totalCount: number }> {
     noStore();
 
@@ -18,12 +19,14 @@ export async function filterSpaces(
                     { name: { contains: query, mode: 'insensitive' } },
                     { description: { contains: query, mode: 'insensitive' } },
                 ],
+                creatorAddress: creator,
             },
             select: {
                 id: true,
                 name: true,
                 description: true,
                 createdAt: true,
+                creatorAddress: true,
                 _count: {
                     select: {
                         vaults: true,

@@ -18,6 +18,7 @@ export default async function getSpace(
                 name: true,
                 description: true,
                 createdAt: true,
+                creatorAddress: true,
                 _count: {
                     select: {
                         vaults: true,

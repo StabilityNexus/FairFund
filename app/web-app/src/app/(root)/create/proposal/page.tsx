@@ -1,6 +1,8 @@
+import { getServerSession } from '@/app/api/auth/options';
 import ProposalFormWrapper from '@/components/proposal-form-wrapper';
 import { filterVaults } from '@/lib/filter-vaults';
 import { getVault } from '@/lib/vault-data';
+import { redirect } from 'next/navigation';
 
 export default async function NewProposalPage({
     searchParams,
@@ -12,6 +14,10 @@ export default async function NewProposalPage({
 }) {
     const query = searchParams?.query || '';
     const vaultId = searchParams?.vaultId || '';
+    const session = await getServerSession();
+    if (!session) {
+        redirect('/dashboard');
+    }
 
     if (vaultId) {
         const vault = await getVault(Number(vaultId));

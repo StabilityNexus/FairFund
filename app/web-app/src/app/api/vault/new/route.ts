@@ -20,6 +20,20 @@ export async function POST(req: Request) {
             maximumRequestableAmount,
             spaceId,
         } = await req.json();
+
+        // If current user is not the creator of the space, return unauthorize
+        const space = await prisma.space.findUnique({
+            where: {
+                id: spaceId,
+            },
+        });
+        if (!space) {
+            return new NextResponse('Space not found', { status: 404 });
+        }
+        if (space.creatorAddress !== session.user.address) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         const fundingTokenSymbol = await getTokenName(fundingTokenAddress);
         const votingTokenSymbol = await getTokenName(votingTokenAddress);
         const vault = await prisma.fundingVault.create({
