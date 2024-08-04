@@ -13,8 +13,7 @@ export const siweConfig = createSIWEConfig({
             version: '1',
             uri: window.location.origin,
             domain: window.location.host,
-            statement:
-                'Sign In With Ethereum to prove you control this wallet.',
+            statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
         }).prepareMessage();
     },
     getNonce: async () => {
@@ -22,7 +21,6 @@ export const siweConfig = createSIWEConfig({
         if (!nonce) {
             throw new Error('Failed to get nonce!');
         }
-
         return nonce;
     },
     getSession: async () => {
@@ -30,7 +28,6 @@ export const siweConfig = createSIWEConfig({
         if (!session) {
             throw new Error('Failed to get session!');
         }
-
         return {
             address: session.user.id,
             chainId: session.user.chainId,
@@ -55,7 +52,6 @@ export const siweConfig = createSIWEConfig({
     signOut: async () => {
         try {
             await signOut();
-
             return true;
         } catch (error) {
             return false;

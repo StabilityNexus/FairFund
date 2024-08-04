@@ -1,10 +1,8 @@
 import NextAuth from 'next-auth';
 
-type Role = 'ADMIN' | 'USER';
-
 declare module 'next-auth' {
     interface User {
-        id: string;
+        address: string;
         chainId: number;
     }
 
@@ -17,7 +15,7 @@ declare module 'next-auth' {
 
 declare module 'next-auth/jwt' {
     interface JWT {
-        id: string;
+        address: string;
         chainId: number;
         iat: number;
         exp: number;

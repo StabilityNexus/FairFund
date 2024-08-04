@@ -5,4 +5,5 @@ export const allowedRoutes = [
     '/vault/',
     '/create/',
     '/spaces',
+    '/profile',
 ];

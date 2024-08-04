@@ -14,8 +14,7 @@ export default async function ApplicationLayout({
 }>) {
     const initialState = cookieToInitialState(config, headers().get('cookie'));
     const session = await getServerSession();
-    console.log(session);
-
+    console.log('This should be fixed: ', session);
     return (
         <div className="h-screen">
             <SessionProvider session={session}>

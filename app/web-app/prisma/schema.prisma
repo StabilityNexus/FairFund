@@ -14,13 +14,25 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model Space {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  createdAt   DateTime @default(now())
+model User {
+  id               String         @id @default(cuid())
+  address          String         @unique
+  chainId          Int
+  joinedSpaces     Space[]        @relation("UserJoinedSpaces")
+  createdSpaces    Space[]        @relation("UserCreatedSpaces")
+  createdVaults    FundingVault[]
+  createdProposals Proposal[]
+}
 
-  vaults FundingVault[]
+model Space {
+  id             Int            @id @default(autoincrement())
+  name           String
+  description    String
+  createdAt      DateTime       @default(now())
+  createdBy      User           @relation("UserCreatedSpaces", fields: [creatorAddress], references: [id])
+  creatorAddress String
+  members        User[]         @relation("UserJoinedSpaces")
+  vaults         FundingVault[]
 }
 
 model FundingVault {
@@ -40,6 +52,7 @@ model FundingVault {
   createdAt                DateTime @default(now())
   spaceId                  Int
   space                    Space    @relation(fields: [spaceId], references: [id])
+  creator                  User     @relation(fields: [creatorAddress], references: [address])
 
   proposals Proposal[]
 
@@ -59,6 +72,7 @@ model Proposal {
   createdAt        DateTime     @default(now())
   proposalMetadata String
   fundingVault     FundingVault @relation(fields: [fundingVaultId], references: [id])
+  proposer         User         @relation(fields: [proposerAddress], references: [address])
 
   @@index([proposerAddress])
   @@index([fundingVaultId])

@@ -57,8 +57,9 @@ export const authOptions: NextAuthOptions = {
                     );
                     if (result.success) {
                         return {
-                            id: siwe.address,
-                            chainId: siwe.chainId,
+                            id: 'TODO',
+                            address: result.data.address,
+                            chainId: result.data.chainId,
                         };
                     } else {
                         return null;
@@ -74,16 +75,18 @@ export const authOptions: NextAuthOptions = {
         jwt: async ({ token, user }) => {
             if (user) {
                 // Persist the data to the token right after authentication
-                token.id = user.id;
+                token.address = user.address;
                 token.chainId = user.chainId;
             } else {
                 //   TODO
             }
-
             return token;
         },
         session({ session, token }) {
-            session.user.id = token.id;
+            delete session.user.image;
+            delete session.user.name;
+            delete session.user.email;
+            session.user.address = token.address;
             session.user.chainId = token.chainId;
             session.iat = token.iat;
             session.exp = token.exp;
