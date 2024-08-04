@@ -26,6 +26,7 @@ import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import type { Space } from '@prisma/client';
 import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
+import { useSession } from 'next-auth/react';
 
 const createSpaceFormSchema = z.object({
     name: z.string().min(1, 'Name is requeired.'),
@@ -42,6 +43,7 @@ export default function CreateSpaceForm({
     nextComp,
 }: CreateSpaceFormProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const { data: session } = useSession();
     const form = useForm<z.infer<typeof createSpaceFormSchema>>({
         resolver: zodResolver(createSpaceFormSchema),
         defaultValues: {
@@ -54,26 +56,35 @@ export default function CreateSpaceForm({
 
     async function onSubmit(data: z.infer<typeof createSpaceFormSchema>) {
         setIsLoading(true);
-        try {
-            const { name, description } = data;
-            const response = await axios.post('/api/space/new', {
-                name,
-                description,
-            });
-            toast({
-                title: 'Space Created',
-                description: 'Space has been created successfully.',
-            });
-            setSelectedSpace(response.data);
-            nextComp();
-        } catch (err) {
-            console.log('[SPACE_FORM_ERROR]', err);
+        if (session) {
+            try {
+                const { name, description } = data;
+                const response = await axios.post('/api/space/new', {
+                    name,
+                    description,
+                });
+                toast({
+                    title: 'Space Created',
+                    description: 'Space has been created successfully.',
+                });
+                setSelectedSpace(response.data);
+                nextComp();
+            } catch (err) {
+                console.log('[SPACE_FORM_ERROR]', err);
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: 'An error occured while creating the space.',
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
             toast({
                 variant: 'destructive',
-                title: 'Error',
-                description: 'An error occured while creating the space.',
+                title: 'Sign in to create a space',
+                description: 'You need to sign in to create a space.',
             });
-        } finally {
             setIsLoading(false);
         }
     }
