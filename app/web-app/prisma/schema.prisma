@@ -33,6 +33,8 @@ model Space {
   creatorAddress String
   members        User[]         @relation("UserJoinedSpaces")
   vaults         FundingVault[]
+
+  @@index([creatorAddress])
 }
 
 model FundingVault {

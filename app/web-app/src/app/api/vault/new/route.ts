@@ -1,13 +1,18 @@
 import prisma from '@/lib/db';
 import { getTokenName } from '@/lib/get-token-name';
 import { NextResponse } from 'next/server';
+import { getServerSession } from '@/app/api/auth/options';
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession();
+        if (!session) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         const {
             vaultAddress,
             description,
-            creatorAddress,
             fundingTokenAddress,
             votingTokenAddress,
             tallyDate,
@@ -20,7 +25,7 @@ export async function POST(req: Request) {
         const vault = await prisma.fundingVault.create({
             data: {
                 description,
-                creatorAddress,
+                creatorAddress: session.user.address,
                 vaultAddress,
                 fundingTokenSymbol,
                 votingTokenSymbol,

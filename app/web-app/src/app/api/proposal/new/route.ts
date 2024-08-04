@@ -1,11 +1,16 @@
 import prisma from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { getServerSession } from '@/app/api/auth/options';
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession();
+        if (!session) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         const {
             description,
-            proposerAddress,
             minRequestAmount,
             maxRequestAmount,
             recipient,
@@ -15,10 +20,11 @@ export async function POST(req: Request) {
         } = await req.json();
         const min = parseInt(minRequestAmount);
         const max = parseInt(maxRequestAmount);
+
         const proposal = await prisma.proposal.create({
             data: {
                 description,
-                proposerAddress,
+                proposerAddress: session.user.address,
                 minRequestAmount: min,
                 maxRequestAmount: max,
                 recipient,
