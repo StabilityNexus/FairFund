@@ -6,6 +6,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { SiweMessage } from 'siwe';
 import { createPublicClient, http } from 'viem';
 import { foundry } from 'viem/chains';
+import prisma from '@/lib/db';
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
@@ -56,10 +57,24 @@ export const authOptions: NextAuthOptions = {
                         }
                     );
                     if (result.success) {
+                        let user = await prisma.user.findFirst({
+                            where: {
+                                address: result.data.address,
+                                chainId: result.data.chainId,
+                            },
+                        });
+                        if (!user) {
+                            user = await prisma.user.create({
+                                data: {
+                                    address: result.data.address,
+                                    chainId: result.data.chainId,
+                                },
+                            });
+                        }
                         return {
-                            id: 'TODO',
-                            address: result.data.address,
-                            chainId: result.data.chainId,
+                            id: user.id,
+                            address: user.address,
+                            chainId: user.chainId,
                         };
                     } else {
                         return null;
@@ -74,11 +89,20 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         jwt: async ({ token, user }) => {
             if (user) {
-                // Persist the data to the token right after authentication
+                token.id = user.id;
                 token.address = user.address;
                 token.chainId = user.chainId;
             } else {
-                //   TODO
+                const user = await prisma.user.findFirst({
+                    where: {
+                        address: token.address,
+                    },
+                });
+                if (user) {
+                    token.id = user.id;
+                    token.address = user.address;
+                    token.chainId = user.chainId;
+                }
             }
             return token;
         },
@@ -86,6 +110,7 @@ export const authOptions: NextAuthOptions = {
             delete session.user.image;
             delete session.user.name;
             delete session.user.email;
+            session.user.id = token.id;
             session.user.address = token.address;
             session.user.chainId = token.chainId;
             session.iat = token.iat;
