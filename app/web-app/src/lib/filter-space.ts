@@ -1,14 +1,13 @@
 import prisma from '@/lib/db';
-import { type Space } from '@prisma/client';
 import { unstable_noStore as noStore } from 'next/cache';
-import { SpaceWithVaultCount } from '@/lib/space-data';
+import { SpaceWithCount } from '@/lib/space-data';
 
 export async function filterSpaces(
     query: string,
     page: number,
     pageSize: number,
     creator?: string
-): Promise<{ spaces: SpaceWithVaultCount[]; totalCount: number }> {
+): Promise<{ spaces: SpaceWithCount[]; totalCount: number }> {
     noStore();
 
     const skip = (page - 1) * pageSize;
@@ -30,6 +29,7 @@ export async function filterSpaces(
                 _count: {
                     select: {
                         vaults: true,
+                        members: true,
                     },
                 },
             },

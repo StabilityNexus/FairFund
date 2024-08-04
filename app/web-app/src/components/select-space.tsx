@@ -7,11 +7,11 @@ import { useDebouncedCallback } from 'use-debounce';
 import { ScrollArea } from './ui/scroll-area';
 import SpaceCard from './space-card';
 import { Button } from './ui/button';
-import { SpaceWithVaultCount } from '@/lib/space-data';
+import { SpaceWithCount } from '@/lib/space-data';
 import SearchSpaces from './search-spaces';
 
 interface SelectSpaceProps {
-    spaces?: SpaceWithVaultCount[];
+    spaces?: SpaceWithCount[];
     selectedSpace: Space | null;
     setSelectedSpace: (space: Space | null) => void;
     nextComp: () => void;

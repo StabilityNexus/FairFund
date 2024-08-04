@@ -1,7 +1,8 @@
 'use client';
 
+import { signOut } from '@/actions/sign-out';
 import { createSIWEConfig, type SIWEConfig } from '@web3modal/siwe';
-import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
+import { getCsrfToken, getSession, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 
 export const siweConfig = createSIWEConfig({
