@@ -15,7 +15,6 @@ export default function Pagination({ totalPages }: PaginationProps) {
     const { replace } = useRouter();
 
     function handleNextPage() {
-        console.log(currentPage + 1);
         createPageURL(currentPage + 1);
     }
 
