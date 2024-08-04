@@ -7,6 +7,7 @@ declare interface Route {
         href: string;
         label: string;
     }[];
+    protected: boolean;
 }
 
 declare interface SmartContract {

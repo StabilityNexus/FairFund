@@ -2,7 +2,8 @@ import Vault from 'lucide-react/dist/esm/icons/vault';
 import CirclePlus from 'lucide-react/dist/esm/icons/circle-plus';
 import LayoutDashboard from 'lucide-react/dist/esm/icons/layout-dashboard';
 import WalletCards from 'lucide-react/dist/esm/icons/wallet-cards';
-import { Dice5Icon, DiscIcon } from 'lucide-react';
+import LayersIcon from 'lucide-react/dist/esm/icons/layers';
+import ActivityIcon from 'lucide-react/dist/esm/icons/activity';
 
 export const routes: Route[] = [
     {
@@ -10,6 +11,7 @@ export const routes: Route[] = [
         href: '/dashboard',
         label: 'Dashboard',
         options: [],
+        protected: false,
     },
     {
         icon: CirclePlus,
@@ -27,11 +29,20 @@ export const routes: Route[] = [
                 href: '/create/proposal',
             },
         ],
+        protected: true,
     },
     {
-        icon: Dice5Icon,
+        icon: LayersIcon,
         href: '/spaces',
         label: 'Spaces',
         options: [],
+        protected: false,
+    },
+    {
+        icon: ActivityIcon,
+        href: '/profile',
+        label: 'My Activity',
+        options: [],
+        protected: true,
     },
 ];
