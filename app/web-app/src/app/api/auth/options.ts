@@ -5,10 +5,8 @@ import {
 import Credentials from 'next-auth/providers/credentials';
 import { SiweMessage } from 'siwe';
 import { createPublicClient, http } from 'viem';
-import { foundry } from 'viem/chains';
+import { foundry, sepolia } from 'viem/chains';
 import prisma from '@/lib/db';
-
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
 export const authOptions: NextAuthOptions = {
     session: {
@@ -43,8 +41,16 @@ export const authOptions: NextAuthOptions = {
 
                     const siwe = new SiweMessage(credentials.message);
                     const provider = createPublicClient({
-                        chain: foundry,
-                        transport: http('http://localhost:8545'),
+                        chain:
+                            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
+                                ? foundry
+                                : sepolia,
+                        transport:
+                            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
+                                ? http('http://localhost:8545')
+                                : http(
+                                      `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+                                  ),
                     });
                     const result = await siwe.verify(
                         {
