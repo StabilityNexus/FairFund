@@ -11,6 +11,7 @@ async function main() {
             data: {
                 name: faker.company.name(),
                 description: faker.company.catchPhraseDescriptor(),
+                creatorAddress: '0x0',
             },
         });
     }
