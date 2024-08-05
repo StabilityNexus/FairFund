@@ -7,85 +7,73 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Layers, Users, FileText, Vault } from 'lucide-react';
-
-const dummyUserData = {
-    id: 'user123',
-    address: '0x1234...5678',
-    chainId: 1,
-    joinedSpaces: [
-        {
-            id: 1,
-            name: 'Ethereum Developers',
-            createdAt: '2023-05-15T10:30:00Z',
-        },
-        { id: 2, name: 'DeFi Enthusiasts', createdAt: '2023-06-20T14:45:00Z' },
-        { id: 3, name: 'NFT Collectors', createdAt: '2023-07-10T09:15:00Z' },
-    ],
-    createdSpaces: [
-        { id: 4, name: 'Web3 Innovators', createdAt: '2023-08-05T11:00:00Z' },
-        { id: 5, name: 'Blockchain Gamers', createdAt: '2023-09-12T16:30:00Z' },
-    ],
-    createdVaults: [
-        {
-            id: 1,
-            description: 'ETH2.0 Development Fund',
-            createdAt: '2023-10-01T13:20:00Z',
-        },
-        {
-            id: 2,
-            description: 'DApp Security Audit Vault',
-            createdAt: '2023-11-15T10:45:00Z',
-        },
-        {
-            id: 3,
-            description: 'Cross-chain Bridge Project',
-            createdAt: '2023-12-20T09:30:00Z',
-        },
-    ],
-    createdProposals: [
-        {
-            id: 1,
-            description: 'Implement Layer 2 Scaling Solution',
-            createdAt: '2024-01-05T14:00:00Z',
-        },
-        {
-            id: 2,
-            description: 'Community Education Program',
-            createdAt: '2024-02-10T11:30:00Z',
-        },
-        {
-            id: 3,
-            description: 'Decentralized Identity Framework',
-            createdAt: '2024-03-15T16:15:00Z',
-        },
-        {
-            id: 4,
-            description: 'Eco-friendly Mining Initiative',
-            createdAt: '2024-04-20T10:00:00Z',
-        },
-    ],
-};
+import Layers from 'lucide-react/dist/esm/icons/layers';
+import Users from 'lucide-react/dist/esm/icons/users';
+import Vault from 'lucide-react/dist/esm/icons/vault';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import ArrowUpRight from 'lucide-react/dist/esm/icons/arrow-up-right';
+import { getServerSession } from '@/app/api/auth/options';
+import { redirect } from 'next/navigation';
+import { truncateText } from '@/lib/truncate-text';
+import { getProfileData } from '@/lib/get-profile-data';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 const ActivityItem = ({
     icon,
     title,
     description,
+    type,
+    id,
 }: {
     title: string;
     description: string;
     icon: any;
-}) => (
-    <div className="flex items-start space-x-4 mb-4 p-3 hover:bg-gray-100 rounded-lg transition duration-150 ease-in-out">
-        <div className="bg-primary/10 p-2 rounded-full">{icon}</div>
-        <div>
-            <h4 className="font-semibold">{title}</h4>
-            <p className="text-sm text-gray-500">{description}</p>
+    id?: number;
+    type: 'space' | 'vault' | 'proposal' | 'overview';
+}) => {
+    const href =
+        type === 'space' && id
+            ? `/spaces/${id}`
+            : type === 'vault'
+              ? `/vault/${id}`
+              : type === 'proposal'
+                ? `/proposal/${id}`
+                : '';
+    return (
+        <div
+            className={cn(
+                'flex  space-x-4 mb-4 p-3 hover:bg-gray-100 rounded-lg transition duration-150 ease-in-out',
+                type === 'overview'
+                    ? 'justify-start'
+                    : 'items-center justify-between'
+            )}
+        >
+            <div className={'flex gap-4 justify-center'}>
+                <div className="bg-primary/10 p-4 rounded-full ">{icon}</div>
+                <div>
+                    <h4 className="font-semibold">{title}</h4>
+                    <p className="text-sm text-gray-500">{description}</p>
+                </div>
+            </div>
+            {type !== 'overview' && (
+                <Link className="flex cursor-pointer" href={href}>
+                    <span className="text-sm text-gray-500">View</span>
+                    <ArrowUpRight className="w-4 h-4 ml-1" />
+                </Link>
+            )}
         </div>
-    </div>
-);
+    );
+};
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+    const session = await getServerSession();
+    if (!session) {
+        redirect('/dashboard');
+    }
+    const [joinedSpaces, createdSpaces, createdVaults, createdProposals] =
+        await getProfileData(session.user.address);
+
     return (
         <div className="container mx-auto px-4 py-8">
             <header className="mb-8">
@@ -118,29 +106,33 @@ export default function ProfilePage() {
                                     icon={
                                         <Users className="h-5 w-5 text-blue-500" />
                                     }
-                                    title={`Joined 1 spaces`}
+                                    title={`Joined ${joinedSpaces.length} spaces`}
                                     description="Spaces that you are a member of"
+                                    type="overview"
                                 />
                                 <ActivityItem
                                     icon={
                                         <Layers className="h-5 w-5 text-green-500" />
                                     }
-                                    title={`Created 2 spaces`}
+                                    title={`Created ${createdSpaces.length} spaces`}
                                     description="Spaces that you started"
+                                    type="overview"
                                 />
                                 <ActivityItem
                                     icon={
                                         <Vault className="h-5 w-5 text-purple-500" />
                                     }
-                                    title={`Created 3 funding vaults`}
+                                    title={`Created ${createdVaults.length} funding vaults`}
                                     description="Your created funding vaults"
+                                    type="overview"
                                 />
                                 <ActivityItem
                                     icon={
                                         <FileText className="h-5 w-5 text-orange-500" />
                                     }
-                                    title={`Submitted 4 proposals`}
+                                    title={`Submitted ${createdProposals.length} proposals`}
                                     description="Your submitted proposals"
+                                    type="overview"
                                 />
                             </ScrollArea>
                         </CardContent>
@@ -156,24 +148,36 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <ScrollArea className="h-[350px] pr-4">
-                                {dummyUserData.joinedSpaces.map((space) => (
+                                <h3>Joined Spaces ({joinedSpaces.length})</h3>
+                                {joinedSpaces.map((space) => (
                                     <ActivityItem
                                         key={space.id}
                                         icon={
                                             <Users className="h-5 w-5 text-blue-500" />
                                         }
                                         title={space.name}
-                                        description={`Joined on ${new Date(space.createdAt).toLocaleDateString()}`}
+                                        description={truncateText(
+                                            space.description,
+                                            50
+                                        )}
+                                        type="space"
+                                        id={space.id}
                                     />
                                 ))}
-                                {dummyUserData.createdSpaces.map((space) => (
+                                <h3>Created Spaces ({createdSpaces.length})</h3>
+                                {createdSpaces.map((space) => (
                                     <ActivityItem
                                         key={space.id}
                                         icon={
                                             <Layers className="h-5 w-5 text-green-500" />
                                         }
                                         title={space.name}
-                                        description={`Created on ${new Date(space.createdAt).toLocaleDateString()}`}
+                                        description={truncateText(
+                                            space.description,
+                                            50
+                                        )}
+                                        type="space"
+                                        id={space.id}
                                     />
                                 ))}
                             </ScrollArea>
@@ -190,14 +194,19 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <ScrollArea className="h-[350px] pr-4">
-                                {dummyUserData.createdVaults.map((vault) => (
+                                {createdVaults.map((vault) => (
                                     <ActivityItem
                                         key={vault.id}
                                         icon={
                                             <Vault className="h-5 w-5 text-purple-500" />
                                         }
-                                        title={vault.description}
+                                        title={truncateText(
+                                            vault.description,
+                                            50
+                                        )}
                                         description={`Created on ${new Date(vault.createdAt).toLocaleDateString()}`}
+                                        type="vault"
+                                        id={vault.id}
                                     />
                                 ))}
                             </ScrollArea>
@@ -214,18 +223,21 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent>
                             <ScrollArea className="h-[350px] pr-4">
-                                {dummyUserData.createdProposals.map(
-                                    (proposal) => (
-                                        <ActivityItem
-                                            key={proposal.id}
-                                            icon={
-                                                <FileText className="h-5 w-5 text-orange-500" />
-                                            }
-                                            title={proposal.description}
-                                            description={`Submitted on ${new Date(proposal.createdAt).toLocaleDateString()}`}
-                                        />
-                                    )
-                                )}
+                                {createdProposals.map((proposal) => (
+                                    <ActivityItem
+                                        key={proposal.id}
+                                        icon={
+                                            <FileText className="h-5 w-5 text-orange-500" />
+                                        }
+                                        title={truncateText(
+                                            proposal.description,
+                                            50
+                                        )}
+                                        description={`Submitted on ${new Date(proposal.createdAt).toLocaleDateString()}`}
+                                        type="proposal"
+                                        id={proposal.id}
+                                    />
+                                ))}
                             </ScrollArea>
                         </CardContent>
                     </Card>
