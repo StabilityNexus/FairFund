@@ -147,40 +147,63 @@ export default async function ProfilePage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ScrollArea className="h-[350px] pr-4">
-                                <h3>Joined Spaces ({joinedSpaces.length})</h3>
-                                {joinedSpaces.map((space) => (
-                                    <ActivityItem
-                                        key={space.id}
-                                        icon={
-                                            <Users className="h-5 w-5 text-blue-500" />
-                                        }
-                                        title={space.name}
-                                        description={truncateText(
-                                            space.description,
-                                            50
-                                        )}
-                                        type="space"
-                                        id={space.id}
-                                    />
-                                ))}
-                                <h3>Created Spaces ({createdSpaces.length})</h3>
-                                {createdSpaces.map((space) => (
-                                    <ActivityItem
-                                        key={space.id}
-                                        icon={
-                                            <Layers className="h-5 w-5 text-green-500" />
-                                        }
-                                        title={space.name}
-                                        description={truncateText(
-                                            space.description,
-                                            50
-                                        )}
-                                        type="space"
-                                        id={space.id}
-                                    />
-                                ))}
-                            </ScrollArea>
+                            {joinedSpaces.length > 0 ||
+                            createdSpaces.length > 0 ? (
+                                <ScrollArea className="h-[350px] pr-4">
+                                    {joinedSpaces.length > 0 ? (
+                                        <>
+                                            <h3>
+                                                Joined Spaces (
+                                                {joinedSpaces.length})
+                                            </h3>
+                                            {joinedSpaces.map((space) => (
+                                                <ActivityItem
+                                                    key={space.id}
+                                                    icon={
+                                                        <Users className="h-5 w-5 text-blue-500" />
+                                                    }
+                                                    title={space.name}
+                                                    description={truncateText(
+                                                        space.description,
+                                                        50
+                                                    )}
+                                                    type="space"
+                                                    id={space.id}
+                                                />
+                                            ))}
+                                        </>
+                                    ) : (
+                                        <div>No joined spaces found.</div>
+                                    )}
+                                    {createdSpaces.length > 0 ? (
+                                        <>
+                                            <h3>
+                                                Created Spaces (
+                                                {createdSpaces.length})
+                                            </h3>
+                                            {createdSpaces.map((space) => (
+                                                <ActivityItem
+                                                    key={space.id}
+                                                    icon={
+                                                        <Layers className="h-5 w-5 text-green-500" />
+                                                    }
+                                                    title={space.name}
+                                                    description={truncateText(
+                                                        space.description,
+                                                        50
+                                                    )}
+                                                    type="space"
+                                                    id={space.id}
+                                                />
+                                            ))}
+                                        </>
+                                    ) : (
+                                        <div>No created spaces found.</div>
+                                    )}
+                                </ScrollArea>
+                            ) : (
+                                <div>No spaces found.</div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -193,23 +216,27 @@ export default async function ProfilePage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ScrollArea className="h-[350px] pr-4">
-                                {createdVaults.map((vault) => (
-                                    <ActivityItem
-                                        key={vault.id}
-                                        icon={
-                                            <Vault className="h-5 w-5 text-purple-500" />
-                                        }
-                                        title={truncateText(
-                                            vault.description,
-                                            50
-                                        )}
-                                        description={`Created on ${new Date(vault.createdAt).toLocaleDateString()}`}
-                                        type="vault"
-                                        id={vault.id}
-                                    />
-                                ))}
-                            </ScrollArea>
+                            {createdVaults.length > 0 ? (
+                                <ScrollArea className="h-[350px] pr-4">
+                                    {createdVaults.map((vault) => (
+                                        <ActivityItem
+                                            key={vault.id}
+                                            icon={
+                                                <Vault className="h-5 w-5 text-purple-500" />
+                                            }
+                                            title={truncateText(
+                                                vault.description,
+                                                50
+                                            )}
+                                            description={`Created on ${new Date(vault.createdAt).toLocaleDateString()}`}
+                                            type="vault"
+                                            id={vault.id}
+                                        />
+                                    ))}
+                                </ScrollArea>
+                            ) : (
+                                <div>No vaults found.</div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -222,23 +249,27 @@ export default async function ProfilePage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ScrollArea className="h-[350px] pr-4">
-                                {createdProposals.map((proposal) => (
-                                    <ActivityItem
-                                        key={proposal.id}
-                                        icon={
-                                            <FileText className="h-5 w-5 text-orange-500" />
-                                        }
-                                        title={truncateText(
-                                            proposal.description,
-                                            50
-                                        )}
-                                        description={`Submitted on ${new Date(proposal.createdAt).toLocaleDateString()}`}
-                                        type="proposal"
-                                        id={proposal.id}
-                                    />
-                                ))}
-                            </ScrollArea>
+                            {createdProposals.length > 0 ? (
+                                <ScrollArea className="h-[350px] pr-4">
+                                    {createdProposals.map((proposal) => (
+                                        <ActivityItem
+                                            key={proposal.id}
+                                            icon={
+                                                <FileText className="h-5 w-5 text-orange-500" />
+                                            }
+                                            title={truncateText(
+                                                proposal.description,
+                                                50
+                                            )}
+                                            description={`Submitted on ${new Date(proposal.createdAt).toLocaleDateString()}`}
+                                            type="proposal"
+                                            id={proposal.id}
+                                        />
+                                    ))}
+                                </ScrollArea>
+                            ) : (
+                                <div>No proposals found.</div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
