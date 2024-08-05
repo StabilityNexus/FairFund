@@ -4,6 +4,7 @@ import { config, projectId } from '@/wagmi/config';
 import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { State, WagmiProvider } from 'wagmi';
+import { siweConfig } from '@/wagmi/siwe';
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,7 @@ createWeb3Modal({
     themeMode: 'light',
     allWallets: 'HIDE',
     enableOnramp: false,
+    siweConfig: siweConfig,
 });
 
 export default function Web3ModalProvider({

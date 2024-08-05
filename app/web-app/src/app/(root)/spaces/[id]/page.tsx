@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { truncateText } from '@/lib/truncate-text';
 import Pagination from '@/components/pagination';
 import { getVaultsForSpaceId } from '@/lib/vault-data';
+import JoinSpaceButton from '@/components/join-space-button';
+import { getServerSession } from '@/app/api/auth/options';
 
 const VAULTS_PER_PAGE = 6;
 
@@ -37,6 +39,25 @@ export default async function SpaceDetailsPage({
         VAULTS_PER_PAGE
     );
     const totalVaultPages = Math.floor(totalCount / VAULTS_PER_PAGE);
+    const session = await getServerSession();
+    let user = null;
+    if (session) {
+        user = await prisma.user.findUnique({
+            where: {
+                address: session.user.address,
+            },
+            include: {
+                joinedSpaces: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+        });
+    }
+    const isJoined = user
+        ? user.joinedSpaces.some((s) => s.id === spaceId)
+        : false;
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -52,7 +73,7 @@ export default async function SpaceDetailsPage({
                 <div className="flex gap-4">
                     <div className="flex items-center">
                         <Users className="mr-2 text-blue-500" size={20} />
-                        <span>128 Members</span>
+                        <span>{space._count.members} Members</span>
                     </div>
                     <div className="flex items-center">
                         <Vault className="mr-2 text-green-500" size={20} />
@@ -66,7 +87,9 @@ export default async function SpaceDetailsPage({
                         </span>
                     </div>
                 </div>
-                <Button variant={'secondary'}>Join Space</Button>
+                {user && (
+                    <JoinSpaceButton isJoined={isJoined} spaceId={spaceId} />
+                )}
             </div>
             <div className="mt-4">
                 <h2 className="text-xl font-semibold mb-6">

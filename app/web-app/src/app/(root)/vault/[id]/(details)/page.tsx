@@ -17,6 +17,7 @@ import PlusCircle from 'lucide-react/dist/esm/icons/plus-circle';
 import Coins from 'lucide-react/dist/esm/icons/coins';
 import UserPlus from 'lucide-react/dist/esm/icons/user-plus';
 import BarChart2 from 'lucide-react/dist/esm/icons/bar-chart-2';
+import { getServerSession } from '@/app/api/auth/options';
 
 const ActionButton = ({
     href,
@@ -97,6 +98,7 @@ export default async function VaultDetailsPage({
     }
     const isTallyDatePassed = vault.tallyDate.getTime() < Date.now();
     const isTallyed = vault.isTallied;
+    const session = await getServerSession();
 
     return (
         <div className="container mx-auto p-6 space-y-8">
@@ -129,13 +131,15 @@ export default async function VaultDetailsPage({
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <ActionButton
-                            href={`/create/proposal?vaultId=${id}`}
-                            icon={<PlusCircle className="mr-2 h-4 w-4" />}
-                            text="Create Proposal"
-                            disabled={isTallyDatePassed}
-                            toolTipText="Proposals can't be created after the tally date has passed."
-                        />
+                        {session && (
+                            <ActionButton
+                                href={`/create/proposal?vaultId=${id}`}
+                                icon={<PlusCircle className="mr-2 h-4 w-4" />}
+                                text="Create Proposal"
+                                disabled={isTallyDatePassed}
+                                toolTipText="Proposals can't be created after the tally date has passed."
+                            />
+                        )}
                         <ActionButton
                             href={`/vault/deposit?vaultId=${id}`}
                             icon={<Coins className="mr-2 h-4 w-4" />}

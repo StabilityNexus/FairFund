@@ -1,15 +1,16 @@
 import prisma from '@/lib/db';
 import { type Space } from '@prisma/client';
 
-export interface SpaceWithVaultCount extends Space {
+export interface SpaceWithCount extends Space {
     _count: {
         vaults: number;
+        members: number;
     };
 }
 
 export default async function getSpace(
     id: number
-): Promise<SpaceWithVaultCount | null> {
+): Promise<SpaceWithCount | null> {
     try {
         const space = await prisma.space.findUnique({
             where: { id },
@@ -18,9 +19,11 @@ export default async function getSpace(
                 name: true,
                 description: true,
                 createdAt: true,
+                creatorAddress: true,
                 _count: {
                     select: {
                         vaults: true,
+                        members: true,
                     },
                 },
             },

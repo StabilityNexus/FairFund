@@ -11,10 +11,10 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { SpaceWithVaultCount } from '@/lib/space-data';
+import { SpaceWithCount } from '@/lib/space-data';
 
 interface SpaceCardInterface {
-    space: SpaceWithVaultCount;
+    space: SpaceWithCount;
     selectedSpaceId: number | null;
     setSelectedSpace: (space: Space | null) => void;
 }

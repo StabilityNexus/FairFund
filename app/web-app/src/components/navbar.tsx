@@ -13,9 +13,11 @@ import {
     DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Navbar() {
     const pathname = usePathname();
+    const { data: session } = useSession();
 
     return (
         <nav className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/80">
@@ -29,6 +31,9 @@ export default function Navbar() {
                 <div className="flex flex-row gap-x-6 mr-8">
                     {routes.map((route) => {
                         const isActive = pathname === route.href;
+                        if (route.protected && !session) {
+                            return null;
+                        }
                         if (route.options.length > 0) {
                             return (
                                 <DropdownMenu key={route.label}>
@@ -89,7 +94,7 @@ export default function Navbar() {
                 <ConnectWalletButton />
                 <ModeToggle />
             </div>
-            <MobileNavbar />
+            <MobileNavbar session={session} />
         </nav>
     );
 }

@@ -19,8 +19,13 @@ import SunIcon from 'lucide-react/dist/esm/icons/sun';
 import { routes } from '@/lib/constants';
 import ConnectWalletButton from '@/components/connect-wallet-button';
 import { useTheme } from 'next-themes';
+import { Session } from 'next-auth';
 
-export default function MobileNavbar() {
+interface MobileNavbarProps {
+    session: Session | null;
+}
+
+export default function MobileNavbar({ session }: MobileNavbarProps) {
     const { theme, setTheme } = useTheme();
     return (
         <div className="md:hidden">
@@ -30,6 +35,9 @@ export default function MobileNavbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="md:hidden space-y-2">
                     {routes.map((route) => {
+                        if (route.protected && !session) {
+                            return null;
+                        }
                         if (route.options.length) {
                             return (
                                 <DropdownMenuSub key={route.label}>

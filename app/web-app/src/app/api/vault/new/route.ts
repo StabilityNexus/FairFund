@@ -1,13 +1,18 @@
 import prisma from '@/lib/db';
 import { getTokenName } from '@/lib/get-token-name';
 import { NextResponse } from 'next/server';
+import { getServerSession } from '@/app/api/auth/options';
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession();
+        if (!session) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         const {
             vaultAddress,
             description,
-            creatorAddress,
             fundingTokenAddress,
             votingTokenAddress,
             tallyDate,
@@ -15,12 +20,26 @@ export async function POST(req: Request) {
             maximumRequestableAmount,
             spaceId,
         } = await req.json();
+
+        // If current user is not the creator of the space, return unauthorize
+        const space = await prisma.space.findUnique({
+            where: {
+                id: spaceId,
+            },
+        });
+        if (!space) {
+            return new NextResponse('Space not found', { status: 404 });
+        }
+        if (space.creatorAddress !== session.user.address) {
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         const fundingTokenSymbol = await getTokenName(fundingTokenAddress);
         const votingTokenSymbol = await getTokenName(votingTokenAddress);
         const vault = await prisma.fundingVault.create({
             data: {
                 description,
-                creatorAddress,
+                creatorAddress: session.user.address,
                 vaultAddress,
                 fundingTokenSymbol,
                 votingTokenSymbol,
