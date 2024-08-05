@@ -5,7 +5,7 @@ import { createSIWEConfig, type SIWEConfig } from '@web3modal/siwe';
 import { getCsrfToken, getSession, signIn } from 'next-auth/react';
 import { SiweMessage } from 'siwe';
 
-export const siweConfig = createSIWEConfig({
+export const siweConfig: SIWEConfig = createSIWEConfig({
     createMessage: ({ nonce, address, chainId }) => {
         return new SiweMessage({
             nonce,
@@ -35,15 +35,12 @@ export const siweConfig = createSIWEConfig({
         };
     },
     verifyMessage: async ({ message, signature }) => {
-        const path = window.location.pathname;
-        const searchParams = new URLSearchParams(window.location.search);
-        const callbackUrl =
-            searchParams.get('callbackUrl') || `${path}?${searchParams}`;
         try {
             await signIn('siwe', {
                 message,
                 signature,
-                callbackUrl,
+                callbackUrl: '/profile',
+                redirect: true,
             });
             return true;
         } catch (error) {
