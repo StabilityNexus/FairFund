@@ -42,7 +42,7 @@ $$0$$
 
 ## Deployed Instances
 
-#### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
+#### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x345a143558a286c861ce5b7367bafaa5f62b14d6)
 #### Frontend: https://fair-fund.vercel.app/
 
 ## Running the Project Locally
