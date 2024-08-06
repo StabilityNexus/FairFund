@@ -16,7 +16,7 @@ contract FairFundTest is Test {
 
     function setUp() external {
         DeployFairFund deployFairFund = new DeployFairFund();
-        (fairFund, helperConfig) = deployFairFund.run(1);
+        (fairFund, helperConfig) = deployFairFund.run();
     }
 
     function testDeployFairFund() public view {

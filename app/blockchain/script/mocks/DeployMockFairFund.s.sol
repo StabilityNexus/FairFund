@@ -11,7 +11,8 @@ contract DeployMockFairFund is Script {
         (uint256 deployerKey) = helperConfig.activeNetworkConfig();
 
         vm.startBroadcast(deployerKey);
-        mockFairFund = new MockFairFund();
+        uint256 platformFee = 1;
+        mockFairFund = new MockFairFund(platformFee);
         vm.stopBroadcast();
         string memory deploymentInfo = string.concat('{"mockFairFund":"', vm.toString(address(mockFairFund)), '"}');
         vm.writeFile("../web-app/src/blockchain/deployments/anvil/fairFund_deployment.json", deploymentInfo);

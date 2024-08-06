@@ -22,7 +22,7 @@ contract FundingVaultTest is Test {
 
     function setUp() external {
         DeployFairFund deployFairFund = new DeployFairFund();
-        (fairFund,) = deployFairFund.run(5); //platform fee
+        (fairFund,) = deployFairFund.run();
         fundingToken = new MockERC20("FundingToken", "FTK");
         votingToken = new MockERC20("VotingToken", "VTK");
         votingPowerToken = new VotingPowerToken("VotingPowerToken", "VOTE");
