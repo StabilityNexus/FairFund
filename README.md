@@ -103,10 +103,17 @@ $$0$$
     npm run dev
     ```
 
-5. **Update Smart Contract Address**:
-    - Change the smart contract address in `web-app/src/blockchain/constants.ts` to match the deployed contract address.
+5. **Run the anvil blockchain locally in another shell**:
+    ```bash
+    anvil
+    ```
 
-6. **Access the Web App**:
+6. **Deploy the mock smart contracts**:
+    ```bash
+    make mock-all
+    ```
+
+7. **Access the Web App**:
     - Open your browser and navigate to `http://localhost:3000`.
 
 
