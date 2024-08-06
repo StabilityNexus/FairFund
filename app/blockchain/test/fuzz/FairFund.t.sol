@@ -14,7 +14,7 @@ contract FairFundTest is Test {
 
     function setUp() external {
         DeployFairFund deployFairFund = new DeployFairFund();
-        (fairFund, helperConfig) = deployFairFund.run();
+        (fairFund, helperConfig) = deployFairFund.run(1); // platform fee 1%
     }
 
     function testFuzzDeployFundingVault(
@@ -33,7 +33,7 @@ contract FairFundTest is Test {
         vm.assume(_minRequestableAmount <= _maxRequestableAmount);
 
         fairFund.deployFundingVault(
-            _fundingToken, _votingToken, _minRequestableAmount, _maxRequestableAmount, _tallyDate, _owner
+            _fundingToken, _votingToken, _minRequestableAmount, _maxRequestableAmount, _tallyDate
         );
 
         uint256 totalVaults = fairFund.getTotalNumberOfFundingVaults();

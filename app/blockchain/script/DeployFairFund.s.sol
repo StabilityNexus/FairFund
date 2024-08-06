@@ -6,12 +6,12 @@ import {FairFund} from "../src/FairFund.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 
 contract DeployFairFund is Script {
-    function run() external returns (FairFund fairFund, HelperConfig helperConfig) {
+    function run(uint256 platformFee) external returns (FairFund fairFund, HelperConfig helperConfig) {
         helperConfig = new HelperConfig();
         (uint256 deployerKey) = helperConfig.activeNetworkConfig();
 
         vm.startBroadcast(deployerKey);
-        fairFund = new FairFund();
+        fairFund = new FairFund(platformFee);
         vm.stopBroadcast();
         string memory deploymentInfo = string.concat('{"fairFund":"', vm.toString(address(fairFund)), '"}');
         vm.writeFile("../web-app/src/blockchain/deployments/sepolia/fairFund_deployment.json", deploymentInfo);
