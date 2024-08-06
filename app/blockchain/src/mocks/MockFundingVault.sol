@@ -29,6 +29,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {MockVotingPowerToken} from "./MockVotingPowerToken.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {MockFairFund} from "./MockFairFund.sol";
 
 /**
  * @title FundingVault
@@ -45,7 +46,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
  * The funding to be received by a rejected proposal `p` is `0`.
  */
-contract MockFundingVault is Ownable, ReentrancyGuard {
+contract MockFundingVault is ReentrancyGuard {
     // Errors //
     error FundingVault__AmountCannotBeZero();
     error FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
@@ -78,6 +79,7 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
     IERC20 private immutable i_fundingToken;
     IERC20 private immutable i_votingToken;
     MockVotingPowerToken private immutable i_votingPowerToken;
+    MockFairFund private immutable i_deployer;
 
     uint256 private s_minRequestableAmount;
     uint256 private s_maxRequestableAmount;
@@ -104,6 +106,7 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
     event ReleasedTokens(address indexed voter, uint256 indexed amount);
     event FundsDistributed(uint256 indexed proposalId, address indexed recipient, uint256 indexed amount);
     event RemainingFundsWithdrawn(address indexed user, uint256 amount);
+    event PlatformFeeSubmitted(address indexed platform, uint256 amount);
 
     modifier tallyDatePassed() {
         // Will always be true
@@ -119,7 +122,7 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
      * @param _minRequestableAmount The minimum amount of token that can be requested in proposal
      * @param _maxRequestableAmount The maximum amount of token that can be requested in proposal
      * @param _tallyDate The date in which the tally will be taken as seconds since unix epoch
-     * @param _owner The owner of the contract
+     * @param _deployer The address of the main fairfund smart contract
      */
     constructor(
         address _fundingToken,
@@ -128,8 +131,8 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
         uint256 _minRequestableAmount,
         uint256 _maxRequestableAmount,
         uint256 _tallyDate,
-        address _owner
-    ) Ownable(_owner) {
+        address _deployer
+    ) {
         i_tallyDate = _tallyDate;
         i_fundingToken = IERC20(_fundingToken);
         i_votingToken = IERC20(_votingToken);
@@ -139,28 +142,7 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
         s_totalBalanceAvailableForDistribution = 0;
         s_totalFundsDistributed = 0;
         s_fundsDistributed = false;
-    }
-
-    /**
-     * @param _minRequestableAmount The minimum amount of token that can be requested in proposal
-     * @notice Only the owner can call this function
-     */
-    function setMinRequestableAmount(uint256 _minRequestableAmount) public onlyOwner {
-        if (_minRequestableAmount > s_maxRequestableAmount) {
-            revert FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
-        }
-        s_minRequestableAmount = _minRequestableAmount;
-    }
-
-    /**
-     * @param _maxRequestableAmount The maximum amount of token that can be requested in proposal
-     * @notice Only the owner can call this function
-     */
-    function setMaxRequestableAmount(uint256 _maxRequestableAmount) public onlyOwner {
-        if (_maxRequestableAmount <= s_minRequestableAmount) {
-            revert FundingVault__MaxRequestableAmountCannotBeLessThanMinRequestableAmount();
-        }
-        s_maxRequestableAmount = _maxRequestableAmount;
+        i_deployer = MockFairFund(_deployer);
     }
 
     /**
@@ -296,17 +278,30 @@ contract MockFundingVault is Ownable, ReentrancyGuard {
             revert FundingVault__AlreadyDistributedFunds();
         }
         s_fundsDistributed = true;
+        uint256 platformFeePercentage = i_deployer.getPlatformFee();
+        uint256 feeAmount = 0;
+
         for (uint256 i = 1; i <= s_proposalIdCounter; i++) {
             uint256 amount = calculateFundingToBeReceived(i);
-            Proposal memory proposal = s_proposals[i];
             if (amount > 0) {
+                Proposal memory proposal = s_proposals[i];
+                uint256 fee = (amount * platformFeePercentage) / 100;
+                amount -= fee;
+                feeAmount += fee;
                 bool success = i_fundingToken.transfer(proposal.recipient, amount);
                 if (!success) {
                     revert FundingVault__TransferFailed();
                 }
-                s_totalFundsDistributed += amount;
+                s_totalFundsDistributed += amount + fee;
                 emit FundsDistributed(i, proposal.recipient, amount);
             }
+        }
+        if (feeAmount > 0) {
+            bool success = i_fundingToken.transfer(address(i_deployer), feeAmount);
+            if (!success) {
+                revert FundingVault__TransferFailed();
+            }
+            emit PlatformFeeSubmitted(address(i_deployer), feeAmount);
         }
     }
 

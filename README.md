@@ -42,7 +42,7 @@ $$0$$
 
 ## Deployed Instances
 
-#### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x66b04c2d28042dc8efa9e512de8145374b930f37)
+#### Smart Contract: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x345a143558a286c861ce5b7367bafaa5f62b14d6)
 #### Frontend: https://fair-fund.vercel.app/
 
 ## Running the Project Locally
@@ -103,10 +103,17 @@ $$0$$
     npm run dev
     ```
 
-5. **Update Smart Contract Address**:
-    - Change the smart contract address in `web-app/src/blockchain/constants.ts` to match the deployed contract address.
+5. **Run the anvil blockchain locally in another shell**:
+    ```bash
+    anvil
+    ```
 
-6. **Access the Web App**:
+6. **Deploy the mock smart contracts**:
+    ```bash
+    make mock-all
+    ```
+
+7. **Access the Web App**:
     - Open your browser and navigate to `http://localhost:3000`.
 
 

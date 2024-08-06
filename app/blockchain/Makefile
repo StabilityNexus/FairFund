@@ -4,7 +4,7 @@ BROADCAST := --broadcast
 LEGACY := --legacy
 
 FORGE_SCRIPT := forge script
-
+-include .env
 
 deploy-mock-fair-fund:
 	$(FORGE_SCRIPT) script/mocks/DeployMockFairFund.s.sol:DeployMockFairFund --rpc-url $(RPC_URL) $(VERBOSITY) $(BROADCAST) $(LEGACY)
@@ -16,7 +16,12 @@ deploy-mock-erc20:
 dmf: deploy-mock-fair-fund
 dme: deploy-mock-erc20
 
+deploy-sepolia:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
+
+
 
 help:
 	@echo "Available targets:"

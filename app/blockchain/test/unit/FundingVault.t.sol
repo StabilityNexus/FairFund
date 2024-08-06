@@ -7,9 +7,12 @@ import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {MockERC20} from "../../src/mocks/MockERC20.sol";
+import {FairFund} from "../../src/FairFund.sol";
+import {DeployFairFund} from "../../script/DeployFairFund.s.sol";
 
 contract FundingVaultTest is Test {
     FundingVault fundingVault;
+    FairFund fairFund;
     MockERC20 fundingToken;
     MockERC20 votingToken;
     VotingPowerToken votingPowerToken;
@@ -18,6 +21,8 @@ contract FundingVaultTest is Test {
     address randomUser1 = makeAddr("randomUser1");
 
     function setUp() external {
+        DeployFairFund deployFairFund = new DeployFairFund();
+        (fairFund,) = deployFairFund.run();
         fundingToken = new MockERC20("FundingToken", "FTK");
         votingToken = new MockERC20("VotingToken", "VTK");
         votingPowerToken = new VotingPowerToken("VotingPowerToken", "VOTE");
@@ -28,7 +33,7 @@ contract FundingVaultTest is Test {
             1,
             10 ether,
             block.timestamp + 1 days,
-            owner
+            address(fairFund)
         );
         votingPowerToken.transferOwnership(address(fundingVault));
     }
@@ -221,7 +226,7 @@ contract FundingVaultTest is Test {
         uint256 proposalMaxRequestAmount = 8 ether;
         uint256 votingAmount = 8 ether;
         uint256 tallyDelay = 2 days;
-        uint256 expectedProposalFunding = 8 ether;
+        uint256 expectedProposalFunding = 7.6 ether; // 8 ether - 5% fee
 
         // Setup
         vm.startPrank(randomUser);
@@ -245,6 +250,7 @@ contract FundingVaultTest is Test {
         vm.prank(randomUser);
         fundingVault.distributeFunds();
         assertEq(fundingToken.balanceOf(randomUser), expectedProposalFunding);
+        assertEq(fundingToken.balanceOf(address(fundingVault.getDeployer())), 0.4 ether); // Platform fee
     }
 
     function testReleaseVotingTokens() public {
@@ -292,7 +298,7 @@ contract FundingVaultTest is Test {
         uint256 proposalMaxRequestAmount = 8 ether;
         uint256 votingAmount = 8 ether;
         uint256 tallyDelay = 2 days;
-        uint256 expectedProposalFunding = 8 ether;
+        uint256 expectedProposalFunding = 7.6 ether; // 8 ether - 5% fee
 
         // Setup
         vm.startPrank(randomUser);
@@ -318,14 +324,14 @@ contract FundingVaultTest is Test {
 
         // Check initial balances
         assertEq(fundingToken.balanceOf(randomUser), expectedProposalFunding);
-        assertEq(fundingToken.balanceOf(address(fundingVault)), initialDeposit - expectedProposalFunding);
+        assertEq(fundingToken.balanceOf(address(fundingVault)), initialDeposit - (expectedProposalFunding + 0.4 ether)); // 0.4 ether is the platform fee
 
         // Withdraw remaining funds
         vm.startPrank(randomUser);
         fundingVault.withdrawRemaining();
 
         // Check final balances
-        assertEq(fundingToken.balanceOf(randomUser), initialDeposit);
+        assertEq(fundingToken.balanceOf(randomUser), initialDeposit - 0.4 ether); // 0.4 ether is the platform fee
         assertEq(fundingToken.balanceOf(address(fundingVault)), 0);
     }
 
@@ -380,8 +386,8 @@ contract FundingVaultTest is Test {
         fundingVault.withdrawRemaining();
 
         // Check final balances
-        assertEq(fundingToken.balanceOf(randomUser), initialDeposit);
-        assertEq(fundingToken.balanceOf(randomUser1), initialDeposit);
+        assertEq(fundingToken.balanceOf(randomUser), initialDeposit - 0.25 ether); // 0.4 ether is the platform fee
+        assertEq(fundingToken.balanceOf(randomUser1), initialDeposit - 0.25 ether); // 0.4 ether is the platform fee
         assertEq(fundingToken.balanceOf(address(fundingVault)), 0);
     }
 

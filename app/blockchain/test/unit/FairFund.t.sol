@@ -26,27 +26,27 @@ contract FairFundTest is Test {
 
     function testDeployFundingVaultZeroAddress() public {
         vm.expectRevert(FairFund.FairFund__CannotBeAZeroAddress.selector);
-        fairFund.deployFundingVault(address(0), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(0), address(1), 1, 10, block.timestamp + 1 days);
     }
 
     function testDeployFundingVaultTallyDateInPast() public {
         vm.warp(100 days);
         vm.expectRevert(FairFund.FairFund__TallyDateCannotBeInThePast.selector);
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp - 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp - 1 days);
     }
 
     function testDeployFundingVaultMinGreaterThanMax() public {
         vm.expectRevert(FairFund.FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount.selector);
-        fairFund.deployFundingVault(address(1), address(1), 10, 1, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 10, 1, block.timestamp + 1 days);
     }
 
     function testDeployFundingVaultSuccess() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         assertEq(fairFund.getTotalNumberOfFundingVaults(), 1);
     }
 
     function testVotingTokenNameAndSymbol() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
         VotingPowerToken votingToken = VotingPowerToken(fundingVault.getVotingPowerToken());
         assertEq(votingToken.name(), "Voting Power Token 1");
@@ -54,31 +54,31 @@ contract FairFundTest is Test {
     }
 
     function testVotingPowerTokenOwnership() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
         VotingPowerToken votingToken = VotingPowerToken(fundingVault.getVotingPowerToken());
         assertEq(votingToken.owner(), address(fundingVault));
     }
 
     function testFundingVaultOwnership() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
-        assertEq(fundingVault.owner(), address(1));
+        assertEq(fundingVault.getDeployer(), address(fairFund));
     }
 
     function testSuccessfullDeploymentEmitEvent() public {
         vm.expectEmit(false, false, false, false);
         emit FundingVaultDeployed(address(0));
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
     }
 
     function testGetFundingVault() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         assertEq(fairFund.getFundingVault(1), fairFund.getFundingVault(1));
     }
 
     function testGetTotalNumberOfFundingVaults() public {
-        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days, address(1));
+        fairFund.deployFundingVault(address(1), address(1), 1, 10, block.timestamp + 1 days);
         assertEq(fairFund.getTotalNumberOfFundingVaults(), 1);
     }
 }

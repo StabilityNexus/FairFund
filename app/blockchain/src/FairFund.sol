@@ -28,25 +28,37 @@ pragma solidity ^0.8.20;
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {FundingVault} from "./FundingVault.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title FairFund
  * @author Aditya Bhattad
  * @notice This is the main FairFund contract that will be used for deployment and keeping track of all the funding vaults.
  */
-contract FairFund {
+contract FairFund is Ownable {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
     error FairFund__TallyDateCannotBeInThePast();
     error FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
     error FairFund__MaxRequestableAmountCannotBeZero();
+    error FairFund__TransferFailed(address token, address recepient, uint256 amount);
 
     // State Variables //
     uint256 private s_fundingVaultIdCounter;
     mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
+    uint256 private s_platformFee;
 
     // Events //
     event FundingVaultDeployed(address indexed fundingVault);
+    event TransferTokens(address indexed token, address indexed recepient, uint256 amount);
+
+    /**
+     * @param _platformFee The fee that will be charged by the platform for using the FairFund platform
+     */
+    constructor(uint256 _platformFee) Ownable(msg.sender) {
+        s_platformFee = _platformFee;
+    }
 
     // Functions //
 
@@ -56,17 +68,15 @@ contract FairFund {
      * @param _minRequestableAmount The minimum amount that can be requested by a single proposal from the funding vault
      * @param _maxRequestableAmount The maximum amount that can be requested by a single proposal from the funding vault
      * @param _tallyDate The date when the voting will end and the proposals will be tallied
-     * @param _owner The address of the owner of the funding vault, this address will be able to modify minimum and maximum requestable amounts
      */
     function deployFundingVault(
         address _fundingToken,
         address _votingToken,
         uint256 _minRequestableAmount,
         uint256 _maxRequestableAmount,
-        uint256 _tallyDate,
-        address _owner
+        uint256 _tallyDate
     ) external returns (address) {
-        if (_fundingToken == address(0) || _votingToken == address(0) || _owner == address(0)) {
+        if (_fundingToken == address(0) || _votingToken == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
         if (_tallyDate < block.timestamp) {
@@ -92,12 +102,30 @@ contract FairFund {
             _minRequestableAmount,
             _maxRequestableAmount,
             _tallyDate,
-            _owner
+            address(this)
         );
         votingPowerToken.transferOwnership(address(fundingVault));
         s_fundingVaults[fundingVaultId] = address(fundingVault);
         emit FundingVaultDeployed(address(fundingVault));
         return address(fundingVault);
+    }
+
+    function modityPlatformFee(uint256 _platformFee) external onlyOwner {
+        s_platformFee = _platformFee;
+    }
+
+    function withdrawPlatformFee(address recepient, address token) external onlyOwner {
+        if (recepient == address(0) || token == address(0)) {
+            revert FairFund__CannotBeAZeroAddress();
+        }
+        uint256 platformBalance = IERC20(token).balanceOf(address(this));
+        if (platformBalance != 0) {
+            bool success = IERC20(token).transfer(recepient, platformBalance);
+            if (!success) {
+                revert FairFund__TransferFailed(token, recepient, platformBalance);
+            }
+            emit TransferTokens(token, recepient, platformBalance);
+        }
     }
 
     // Getters //
@@ -107,5 +135,9 @@ contract FairFund {
 
     function getTotalNumberOfFundingVaults() external view returns (uint256) {
         return s_fundingVaultIdCounter;
+    }
+
+    function getPlatformFee() external view returns (uint256) {
+        return s_platformFee;
     }
 }

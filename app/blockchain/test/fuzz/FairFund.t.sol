@@ -33,7 +33,7 @@ contract FairFundTest is Test {
         vm.assume(_minRequestableAmount <= _maxRequestableAmount);
 
         fairFund.deployFundingVault(
-            _fundingToken, _votingToken, _minRequestableAmount, _maxRequestableAmount, _tallyDate, _owner
+            _fundingToken, _votingToken, _minRequestableAmount, _maxRequestableAmount, _tallyDate
         );
 
         uint256 totalVaults = fairFund.getTotalNumberOfFundingVaults();
