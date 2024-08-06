@@ -110,7 +110,7 @@ $$0$$
 
 6. **Deploy the mock smart contracts**:
     ```bash
-    make mock-all
+    cd FairFund/app/blockchain make mock-all
     ```
 
 7. **Access the Web App**:
