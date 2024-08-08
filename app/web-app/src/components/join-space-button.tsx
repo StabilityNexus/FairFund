@@ -28,7 +28,11 @@ export default function JoinSpaceButton({
     }
 
     return (
-        <Button variant={'secondary'} disabled={isJoined} onClick={handleJoin}>
+        <Button
+            variant={'secondary'}
+            disabled={optimisticJoin}
+            onClick={handleJoin}
+        >
             {optimisticJoin ? 'Joined' : 'Join Space'}
         </Button>
     );
