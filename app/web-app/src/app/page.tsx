@@ -25,7 +25,7 @@ const FeatureCard = ({
     title: string;
     description: string;
 }) => (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transform transition-all duration-300">
         <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full">
             {icon}
         </div>
@@ -38,7 +38,7 @@ export default function Home() {
     return (
         <main
             className={cn(
-                'bg-gradient-to-r min-h-screen from-rose-100 to-teal-100 dark:from-black dark:to-slate-800 flex justify-center items-center',
+                'bg-gradient-to-r min-h-screen  from-[#8baaaa] to-[#ae8b9c] dark:from-[#243949] dark:to-[#517fa4] flex justify-center items-center',
                 inter.className
             )}
         >
