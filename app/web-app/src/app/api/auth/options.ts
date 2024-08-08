@@ -63,20 +63,18 @@ export const authOptions: NextAuthOptions = {
                         }
                     );
                     if (result.success) {
-                        let user = await prisma.user.findFirst({
+                        let user = await prisma.user.upsert({
                             where: {
+                                address: result.data.address,
+                            },
+                            update: {
+                                chainId: result.data.chainId,
+                            },
+                            create: {
                                 address: result.data.address,
                                 chainId: result.data.chainId,
                             },
                         });
-                        if (!user) {
-                            user = await prisma.user.create({
-                                data: {
-                                    address: result.data.address,
-                                    chainId: result.data.chainId,
-                                },
-                            });
-                        }
                         return {
                             id: user.id,
                             address: user.address,
