@@ -56,4 +56,5 @@ export const siweConfig = createSIWEConfig({
             return false;
         }
     },
+    signOutOnNetworkChange: false,
 });
