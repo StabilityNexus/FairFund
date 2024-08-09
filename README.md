@@ -23,7 +23,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 - Other tools and libraries:  Wagmi, Viem, React Hook Form
 
 ## Architecture
-FairFund 1
+![fairfund 1](https://github.com/user-attachments/assets/ce0e7792-2e29-4a8a-8102-880d3974fab0)
 
 ## Run Locally
 
@@ -105,6 +105,8 @@ Our platform supports three types of users: Vault Creators, Proposal Creators, a
 
 ### Vault Creators
 
+https://github.com/user-attachments/assets/16922ace-8cf9-4558-9efe-3829d166e34a
+
 1. **Getting Started**
    - On the landing page, click "Get Started" to access the dashboard
    - Connect your wallet and sign in with Ethereum
@@ -123,6 +125,8 @@ Our platform supports three types of users: Vault Creators, Proposal Creators, a
 
 ### Proposal Creators
 
+https://github.com/user-attachments/assets/d0ce617f-1ef3-493f-bd53-d1d238027ae6
+
 1. **Getting Started**
    - On the landing page, click "Get Started" to access the dashboard
    - Connect your wallet and sign in with Ethereum
@@ -137,6 +141,8 @@ Our platform supports three types of users: Vault Creators, Proposal Creators, a
    - View your created proposals in the "My Activity" page or on the vault details page
 
 ### Voters/Community Members
+
+https://github.com/user-attachments/assets/39f4fc81-ac3a-4ec2-9aa3-21594a1eb1e5
 
 1. **Accessing Vaults**
    - On the landing page, click "Get Started" to access the dashboard
@@ -169,7 +175,7 @@ Smart contract documentation can be found [here](/app/blockchain/README.md).
 - Add support for multiple blockchains
 - Audit smart contracts
 - Refactor smart contracts for better readability and extensibility. [detailed issue](https://github.com/StabilityNexus/FairFund/issues/35)
-- Implement functionality to sponser voting and proposal creation
+- Implement functionality to sponser gas for voting and proposal creation
 - Optimize smart contracts further
 - Add comments functionality on proposals page
 - Enable editing of space, proposal, and vault descriptions
