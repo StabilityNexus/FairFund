@@ -110,10 +110,19 @@ contract FairFund is Ownable {
         return address(fundingVault);
     }
 
+    /**
+     * @notice Modifies the platform fee (only callable by the owner)
+     * @param _platformFee The new platform fee percentage to be set (i.e. 1 for 1% of amount every proposal will get.)
+     */
     function modityPlatformFee(uint256 _platformFee) external onlyOwner {
         s_platformFee = _platformFee;
     }
 
+    /**
+     * @notice Withdraws the accumulated platform fees to a specified recipient (only callable by the owner)
+     * @param recepient The address to receive the withdrawn fees
+     * @param token The address of the token to withdraw
+     */
     function withdrawPlatformFee(address recepient, address token) external onlyOwner {
         if (recepient == address(0) || token == address(0)) {
             revert FairFund__CannotBeAZeroAddress();

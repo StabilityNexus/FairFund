@@ -40,3 +40,9 @@ A proposal `p` is accepted iff `R * V(p)/S >= p.minimumAmount`.
 
 The funding to be received by an accepted proposal `p` is `min(p.maximumAmount, R * V(p)/S)`.
 The funding to be received by a rejected proposal `p` is `0`.
+
+
+## Smart Contract Documentation
+  - [FairFund](docs/src/src/FairFund.sol/contract.FairFund.md)
+  - [FundingVault](docs/src/src/FundingVault.sol/contract.FundingVault.md)
+  - [VotingPowerToken](docs/src/src/VotingPowerToken.sol/contract.VotingPowerToken.md)

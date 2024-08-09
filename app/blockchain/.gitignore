@@ -6,7 +6,11 @@ out/
 broadcast/
 
 # Docs
-docs/
+/docs/*
+!/docs/src/
+/docs/src/*
+!/docs/src/src/
+
 
 # Dotenv file
 .env
