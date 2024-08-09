@@ -1,20 +1,27 @@
 'use client';
-import { createSIWEConfig } from '@web3modal/siwe';
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { SiweMessage } from 'siwe';
+import { createSIWEConfig, formatMessage } from '@web3modal/siwe';
+import type {
+    SIWEVerifyMessageArgs,
+    SIWECreateMessageArgs,
+    SIWESession,
+} from '@web3modal/siwe';
+import { foundry, sepolia } from 'viem/chains';
+import { type Session } from 'next-auth';
 
 export const siweConfig = createSIWEConfig({
-    createMessage: ({ nonce, address, chainId }) => {
-        return new SiweMessage({
-            nonce,
-            chainId,
-            address,
-            version: '1',
-            uri: window.location.origin,
-            domain: window.location.host,
-            statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
-        }).prepareMessage();
-    },
+    getMessageParams: async () => ({
+        domain: typeof window !== 'undefined' ? window.location.host : '',
+        uri: typeof window !== 'undefined' ? window.location.origin : '',
+        chains: [
+            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
+                ? foundry.id
+                : sepolia.id,
+        ],
+        statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
+    }),
+    createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>
+        formatMessage(args, address),
     getNonce: async () => {
         const nonce = await getCsrfToken();
         if (!nonce) {
@@ -23,7 +30,7 @@ export const siweConfig = createSIWEConfig({
         return nonce;
     },
     getSession: async () => {
-        const session = await getSession();
+        const session: Session | null = await getSession();
         if (!session) {
             throw new Error('Failed to get session!');
         }
@@ -32,7 +39,7 @@ export const siweConfig = createSIWEConfig({
             chainId: session.user.chainId,
         };
     },
-    verifyMessage: async ({ message, signature }) => {
+    verifyMessage: async ({ message, signature }: SIWEVerifyMessageArgs) => {
         try {
             await signIn('siwe', {
                 message,

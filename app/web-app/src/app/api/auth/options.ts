@@ -3,16 +3,30 @@ import {
     getServerSession as getServerSessionInternal,
 } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { SiweMessage } from 'siwe';
-import { createPublicClient, http } from 'viem';
-import { foundry, sepolia } from 'viem/chains';
 import prisma from '@/lib/db';
+import {
+    type SIWESession,
+    verifySignature,
+    getChainIdFromMessage,
+    getAddressFromMessage,
+} from '@web3modal/siwe';
+
+const nextAuthSecret = process.env.NEXTAUTH_SECRET;
+if (!nextAuthSecret) {
+    throw new Error('NEXTAUTH_SECRET is not set');
+}
+
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+if (!projectId) {
+    throw new Error('NEXT_PUBLIC_PROJECT_ID is not set');
+}
 
 export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt',
         maxAge: 30 * 60,
     },
+    secret: nextAuthSecret,
     providers: [
         Credentials({
             id: 'siwe',
@@ -38,41 +52,31 @@ export const authOptions: NextAuthOptions = {
                 try {
                     if (!credentials) throw new Error('No credentials');
                     if (!req.headers) throw new Error('No headers');
-
-                    const siwe = new SiweMessage(credentials.message);
-                    const provider = createPublicClient({
-                        chain:
-                            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
-                                ? foundry
-                                : sepolia,
-                        transport:
-                            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
-                                ? http('http://localhost:8545')
-                                : http(
-                                      `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
-                                  ),
+                    if (!credentials?.message) {
+                        throw new Error('SiweMessage is undefined');
+                    }
+                    const { message, signature } = credentials;
+                    const address = getAddressFromMessage(message);
+                    const chainId =
+                        getChainIdFromMessage(message).split(':')[1];
+                    const isValid = await verifySignature({
+                        address,
+                        message,
+                        signature,
+                        chainId,
+                        projectId,
                     });
-                    const result = await siwe.verify(
-                        {
-                            signature: credentials.signature,
-                            domain: req.headers.host,
-                            nonce: credentials.csrfToken,
-                        },
-                        {
-                            provider,
-                        }
-                    );
-                    if (result.success) {
+                    if (isValid) {
                         let user = await prisma.user.upsert({
                             where: {
-                                address: result.data.address,
+                                address: address,
                             },
                             update: {
-                                chainId: result.data.chainId,
+                                chainId: Number(chainId),
                             },
                             create: {
-                                address: result.data.address,
-                                chainId: result.data.chainId,
+                                address: address,
+                                chainId: Number(chainId),
                             },
                         });
                         return {
