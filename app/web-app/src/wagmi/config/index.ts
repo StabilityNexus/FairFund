@@ -1,4 +1,3 @@
-'use client';
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
 import { cookieStorage, createStorage, http } from 'wagmi';
 import { foundry, sepolia } from 'wagmi/chains';
