@@ -8,6 +8,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { type FundingVault } from '@prisma/client';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import VaultCard from '@/components/vault-card';
+import { useToast } from './ui/use-toast';
 
 interface SelectVaultProps {
     nextStep: () => void;
@@ -29,12 +30,21 @@ export default function SelectVault({
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
+    const { toast } = useToast();
 
-    function handleClickVault(vault: any) {
+    function handleClickVault(vault: FundingVault) {
         if (selectedVault && vault.id === selectedVault.id) {
             setSelectedVault(null);
         } else {
-            setSelectedVault(vault);
+            if (vault.tallyDate.getTime() > Date.now()) {
+                setSelectedVault(vault);
+            } else {
+                toast({
+                    title: 'Cannot select',
+                    description:
+                        'Cannot select a vault for which tally date is already passed.',
+                });
+            }
         }
     }
 
