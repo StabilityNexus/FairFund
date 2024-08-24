@@ -69,7 +69,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
     ```
     - Deploy the contract:
     ```bash
-    deploy-sepolia
+    make deploy-sepolia
     ```
 
 ### Frontend
