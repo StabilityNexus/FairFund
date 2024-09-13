@@ -2,15 +2,19 @@
     "name": "web-app",
     "version": "0.1.0",
     "private": true,
+    "type": "module",
+    
+    
     "scripts": {
         "dev": "npx prisma db push --force-reset && next dev",
         "build": "npx prisma generate && npx prisma migrate deploy && next build",
-        "start": "next start",
+        "start": "node index.js",
         "lint": "next lint",
         "format": "prettier --write .",
         "addMockSpaces": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/mocks/add-spaces.ts",
         "cleanDB": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/mocks/remove.ts"
     },
+    
     "dependencies": {
         "@hookform/resolvers": "^3.6.0",
         "@next/bundle-analyzer": "^14.2.5",
@@ -48,7 +52,8 @@
         "use-debounce": "^10.0.1",
         "viem": "^2.16.0",
         "wagmi": "^2.10.4",
-        "zod": "^3.23.8"
+        "zod": "^3.23.8",
+        "express": "^4.17.1"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.4.1",
@@ -70,4 +75,5 @@
         "react": "18.3.1",
         "react-dom": "18.3.1"
     }
+   
 }
