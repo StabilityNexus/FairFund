@@ -33,6 +33,8 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 
 2. **Node.js**: Ensure you have Node.js Installed. You can follow the instructions here: [Nodejs Docs](https://nodejs.org/en/learn/getting-started/introduction-to-nodejs)
 
+3. **Docker**: Docker allows you to build, test, and deploy applications quickly by packaging software into standardized units called containers. These containers include everything the software needs to run, such as libraries, system tools, code, and runtime. To get started with Docker, follow the [official guide](https://docs.docker.com/get-started/introduction/).
+
 ### Smart Contracts
 
 1. **Navigate to the Blockchain Directory**:
