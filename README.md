@@ -1,6 +1,7 @@
 # FairFund - Blockchain-based Community Funding Platform
 
 ## Table of Contents
+
 1. [Introduction](#introduction)
 2. [Technology Stack](#technology-stack)
 3. [Architecture](#architecture)
@@ -13,16 +14,19 @@
 10. [Community](#community)
 
 ## Introduction
+
 FairFund is a blockchain based platform for community-driven funding. Users can deploy funding vaults, deposit funds, and submit proposals for funding. The platform uses a voting mechanism to decide which proposals receive how much funding.
 
 ## Technology Stack
+
 - Frontend: Next.js, TailwindCSS, ShadCN UI
 - Backend: Next.js API Routes, Prisma ORM, NextAuth, SIWE, Web3Modal
 - Blockchain: Foundry, Solidity
 - Database: PostgreSQL
-- Other tools and libraries:  Wagmi, Viem, React Hook Form
+- Other tools and libraries: Wagmi, Viem, React Hook Form
 
 ## Architecture
+
 ![fairfund 1](https://github.com/user-attachments/assets/ce0e7792-2e29-4a8a-8102-880d3974fab0)
 
 ## Run Locally
@@ -38,71 +42,93 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 ### Smart Contracts
 
 1. **Navigate to the Blockchain Directory**:
-    ```bash
-    cd app/blockchain
-    ```
+
+   ```bash
+   cd app/blockchain
+   ```
 
 2. **Install Dependencies**:
-    ```bash
-    forge install
-    ```
+
+   ```bash
+   forge install
+   ```
 
 3. **Run Tests**:
-    ```bash
-    forge test
-    ```
+
+   ```bash
+   forge test
+   ```
 
 4. **Run Local Anvil Chain**:
-    ```bash
-    anvil
-    ```
+
+   ```bash
+   anvil
+   ```
 
 5. **Deploy Mock Smart Contracts**:
-    ```bash
-    make mock-all
-    ```
-    Note: This will automatically update relevant contract addresses and ABIs for smart contract in web-app folder.
+
+   ```bash
+   make mock-all
+   ```
+
+   Note: This will automatically update relevant contract addresses and ABIs for smart contract in web-app folder.
 
 6. **Deploy to the Testnet**:
-    - Ensure you have a `.env` file set up. You can use `.env.example` as a template.
-    - Load the environment variables:
-    ```bash
-    source .env
-    ```
-    - Deploy the contract:
-    ```bash
-    make deploy-sepolia
-    ```
+   - Ensure you have a `.env` file set up. You can use `.env.example` as a template.
+   - Load the environment variables:
+   ```bash
+   source .env
+   ```
+   - Deploy the contract:
+   ```bash
+   make deploy-sepolia
+   ```
 
 ### Frontend
 
 1. **Navigate to the Web App Directory**:
-    ```bash
-    cd app/web-app
-    ```
+
+   ```bash
+   cd app/web-app
+   ```
 
 2. **Install Dependencies**:
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 3. **Update the environment variables**:
-Create a `.env` file in the `web-app` directory and add all the values. You can use `.env.example` as a template.
+   Create a `.env` file in the `web-app` directory and add all the values. You can use `.env.example` as a template.
 
-3. **To use local instance of postgreSQL database**: 
-    1. Start docker desktop
-    2. Run `docker compose up`
+   PostgreSQL:
+   - If using Docker (with the provided docker-compose.yml), the defaults provided for `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` provided in .env.example will work.
+   - If using a local instance of PostgreSQL, update the `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` with the correct connection url for the local postgreSQL.
 
-4. **Run the Development Server**:
-    ```bash
-    npm run dev
-    ```
+   NextAuth:
+   - Generate a secure `NEXTAUTH_SECRET` by running the following command in the terminal
 
-5. **Access the Web App**:
-    - Open your browser and navigate to `http://localhost:3000`.
+   ```bash
+   openssl rand -base64 32
+   ```
+   - For local development `NEXTAUTH_URL` will be `http://localhost:3000`
 
+5. **To start local instance of postgreSQL database (with docker)**:
+
+   1. Start docker desktop
+   2. Run `docker compose up`
+
+6. **Run the Development Server**:
+
+   ```bash
+   npm run dev
+   ```
+
+7. **Access the Web App**:
+   - Open your browser and navigate to `http://localhost:3000`.
 
 ## Usage Guide
+
 Our platform supports three types of users: Vault Creators, Proposal Creators, and Voters/Community Members. Here's how each user type can navigate and use the application:
 
 ### Vault Creators
@@ -110,16 +136,19 @@ Our platform supports three types of users: Vault Creators, Proposal Creators, a
 https://github.com/user-attachments/assets/16922ace-8cf9-4558-9efe-3829d166e34a
 
 1. **Getting Started**
+
    - On the landing page, click "Get Started" to access the dashboard
    - Connect your wallet and sign in with Ethereum
 
 2. **Creating a Vault**
+
    - Click the "Create" button and select "Vault" from the dropdown
    - Choose a space for your vault (multiple vaults can exist in one space)
    - Enter the vault description, token configurations, and funding parameters
    - Review and submit the proposal (requires a wallet transaction)
 
 3. **Optional: Add Funds**
+
    - After creation, you can immediately add funds to your vault
 
 4. **Vault Management**
@@ -130,10 +159,12 @@ https://github.com/user-attachments/assets/16922ace-8cf9-4558-9efe-3829d166e34a
 https://github.com/user-attachments/assets/d0ce617f-1ef3-493f-bd53-d1d238027ae6
 
 1. **Getting Started**
+
    - On the landing page, click "Get Started" to access the dashboard
    - Connect your wallet and sign in with Ethereum
 
 2. **Creating a Proposal**
+
    - Click the "Create" button and select "Proposal" from the dropdown
    - Search and select the vault you want to create a proposal for
    - Enter the proposal description, minimum and maximum request amounts, and recipient address
@@ -147,11 +178,13 @@ https://github.com/user-attachments/assets/d0ce617f-1ef3-493f-bd53-d1d238027ae6
 https://github.com/user-attachments/assets/39f4fc81-ac3a-4ec2-9aa3-21594a1eb1e5
 
 1. **Accessing Vaults**
+
    - On the landing page, click "Get Started" to access the dashboard
    - Click "Spaces" in the navbar to view available spaces
    - Select a space and then choose a vault within that space
 
 2. **Participating in a Vault**
+
    - On the vault page, register to vote
    - Deposit tokens for distribution
    - Create new proposals (if desired)
@@ -159,7 +192,6 @@ https://github.com/user-attachments/assets/39f4fc81-ac3a-4ec2-9aa3-21594a1eb1e5
 
 3. **Viewing Results**
    - After the tally date, results page will be accessible to view the distribution statistics and other vault-related information
-
 
 ## Smart Contract Documentation
 
@@ -204,5 +236,6 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 11. Provide a detailed description of your changes in the PR, including videos and images if applicable
 
 ## Community
+
 - [Stability Nexus](https://docs.stability.nexus/)
 - [AOSSIE](https://aossie.org/about)
