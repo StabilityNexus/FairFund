@@ -5,6 +5,7 @@ import DollarSignIcon from 'lucide-react/dist/esm/icons/dollar-sign';
 
 import { StatCard } from '@/components/stat-card';
 import prisma from '@/lib/db';
+import PlaceholderContent from './placeholder-component';
 
 const iconMap = {
     vaults: Wallet2,
@@ -14,19 +15,19 @@ const iconMap = {
 };
 
 export default async function CardWrapper() {
-    const totalVaultsPromise = prisma.fundingVault.count();
-    const totalProposalsPromise = prisma.proposal.count();
-    const [totalVaults, totalProposals] = await Promise.all([
-        totalVaultsPromise,
-        totalProposalsPromise,
-    ]);
+    const totalVaults = await prisma.fundingVault.count();
+    const totalProposals = await prisma.proposal.count();
+
+    if (totalVaults === 0 && totalProposals === 0) {
+        return <PlaceholderContent section="statCards" />;
+    }
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             <StatCard
                 title="Vaults"
                 icon={<Wallet2 className="h-6 w-6 text-green-500" />}
-                value={totalVaults.toString()}
+                value={totalProposals.toString()}
                 description="Total number of vaults"
                 className=" h-32 flex items-center"
             />

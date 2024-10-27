@@ -30,7 +30,7 @@ export default async function SpacesPage({
         currentPage,
         PAGE_SIZE
     );
-    const totalPages = Math.floor(count / PAGE_SIZE);
+    const totalPages = Math.ceil(count / PAGE_SIZE);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -43,37 +43,59 @@ export default async function SpacesPage({
                     you can find and contribute to various funding projects.
                 </p>
             </header>
+
             <SearchSpaces placeholder="Search spaces..." />
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                {spaces.length !== 0 ? (
-                    spaces.map((space) => (
-                        <Card
-                            key={space.id}
-                            className="hover:shadow-lg transition-shadow duration-300"
-                        >
-                            <CardHeader>
-                                <CardTitle>{space.name}</CardTitle>
-                                <CardDescription>
-                                    {space._count.vaults} funding vault
-                                    {space._count.vaults !== 1 ? 's' : ''}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-gray-600">
-                                    {truncateText(space.description, 100)}
-                                </p>
-                                <Link href={`/spaces/${space.id}`}>
-                                    <Button className="mt-4 w-full">
-                                        View Space
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    ))
+
+            <div className="mt-6 mb-6">
+                {spaces.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {spaces.map((space) => (
+                            <Card
+                                key={space.id}
+                                className="hover:shadow-lg transition-shadow duration-300"
+                            >
+                                <CardHeader>
+                                    <CardTitle>{space.name}</CardTitle>
+                                    <CardDescription>
+                                        {space._count.vaults} funding vault
+                                        {space._count.vaults !== 1 ? 's' : ''}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-gray-600">
+                                        {truncateText(space.description, 100)}
+                                    </p>
+                                    <Link href={`/spaces/${space.id}`}>
+                                        <Button className="mt-4 w-full">
+                                            View Space
+                                        </Button>
+                                    </Link>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
                 ) : (
-                    <div>No spaces found.</div>
+                    <div className="flex flex-col items-center justify-center text-center py-12">
+                        <img
+                            src="nodata.svg"
+                            alt="No spaces found"
+                            className="w-32 h-32 mb-4"
+                        />
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                            No Spaces Available
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            It looks like there are no active spaces yet. Explore
+                            the possibilities of starting your own funding space
+                            and be a pioneer in the community.
+                        </p>
+                        <Link href="/spaces/create">
+                            <Button>Start a New Space</Button>
+                        </Link>
+                    </div>
                 )}
             </div>
+
             {totalPages > 1 && (
                 <div className="flex w-full justify-between items-center">
                     <Pagination totalPages={totalPages} />
