@@ -39,16 +39,13 @@ export default async function DashboardPage() {
     );
 }
 
-async function checkActivityThreshold(): Promise<boolean> {
-   
+async function checkActivityThreshold(): Promise<boolean> {  
     if (!prisma) return false;
     const [totalVaults, totalProposals] = await Promise.all([
         prisma.fundingVault.count(),
         prisma.proposal.count(),
     ]);
-
     const vaultThreshold = 1;
     const proposalThreshold = 1;
-
     return totalVaults >= vaultThreshold || totalProposals >= proposalThreshold;
 }

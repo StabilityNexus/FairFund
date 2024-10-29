@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import Pagination from '@/components/pagination';
 import Link from 'next/link';
 import { truncateText } from '@/lib/truncate-text';
+import NoSpacesPlaceholder from '@/components/no-spaces-placeholder';
 
 const PAGE_SIZE = 6;
 
@@ -75,24 +76,7 @@ export default async function SpacesPage({
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center text-center py-12">
-                        <img
-                            src="nodata.svg"
-                            alt="No spaces found"
-                            className="w-32 h-32 mb-4"
-                        />
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                            No Spaces Available
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                            It looks like there are no active spaces yet. Explore
-                            the possibilities of starting your own funding space
-                            and be a pioneer in the community.
-                        </p>
-                        <Link href="/spaces/create">
-                            <Button>Start a New Space</Button>
-                        </Link>
-                    </div>
+                   <NoSpacesPlaceholder targetRoute="/create/vault" />
                 )}
             </div>
 

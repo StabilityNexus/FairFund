@@ -1,7 +1,11 @@
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Users, Vault, ThumbsUp, DollarSign } from 'lucide-react';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAccount } from 'wagmi';
+import { useRouter } from 'next/navigation';
 
 interface Step {
     title: string;
@@ -10,12 +14,25 @@ interface Step {
 }
 
 export default function FeatureHighlights() {
+    const {open}=useWeb3Modal();
+    const {isConnected}=useAccount();
+    const router=useRouter();
+
     const steps:Step[] = [
         { title: 'Create a Vault', icon: <Vault size={32} className="text-green-500" />, description: 'Start by creating a vault to manage funds for community projects.' },
         { title: 'Submit a Proposal', icon: <ThumbsUp size={32} className="text-blue-500" />, description: 'Propose new projects for funding and community support.' },
         { title: 'Vote on Proposals', icon: <Users size={32} className="text-purple-500" />, description: 'Engage the community to vote on proposed projects.' },
         { title: 'Fund Distribution', icon: <DollarSign size={32} className="text-yellow-500" />, description: 'Allocate funds to approved projects and see their impact.' },
     ];
+
+    const handleButtonClick=(route:string)=>{
+        if(!isConnected){
+            router.push(route);
+        }else{
+            open();
+        }
+    }
+
     return (
         <div className='flex flex-col'>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -27,8 +44,9 @@ export default function FeatureHighlights() {
                     <p className="text-gray-600 dark:text-gray-400">
                         Securely manage funds for community projects by creating your own vault.
                     </p>
-                    <Link href="/create-vault">
-                        <Button className="mt-4 w-full">Create Vault</Button>
+                    <Link href="/create/vault">
+                        <Button className="mt-4 w-full"
+                        onClick={()=> handleButtonClick('/create/vault')}>Create Vault</Button>
                     </Link>
                 </CardContent>
             </Card>
@@ -42,7 +60,8 @@ export default function FeatureHighlights() {
                         Have a project idea? Submit a proposal to gain community support and funding.
                     </p>
                     <Link href="/create-proposal">
-                        <Button className="mt-4 w-full">Submit Proposal</Button>
+                        <Button className="mt-4 w-full"
+                          onClick={() => handleButtonClick('/create/proposal')}>Submit Proposal</Button>
                     </Link>
                 </CardContent>
             </Card>
@@ -56,7 +75,8 @@ export default function FeatureHighlights() {
                         Discover impactful projects and get involved in community-driven decisions.
                     </p>
                     <Link href="/explore-projects">
-                        <Button className="mt-4 w-full">Explore Projects</Button>
+                        <Button className="mt-4 w-full"
+                         onClick={() => handleButtonClick('/spaces')}>Explore Projects</Button>
                     </Link>
                 </CardContent>
             </Card>          
