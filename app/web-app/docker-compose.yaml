@@ -2,6 +2,6 @@ services:
     db:
         image: postgres:15-alpine
         environment:
-            POSTGRES_PASSWORD: Guru7795@
+            POSTGRES_PASSWORD: development
         ports:
             - '5432:5432'
