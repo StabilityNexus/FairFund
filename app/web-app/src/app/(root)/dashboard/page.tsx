@@ -1,12 +1,9 @@
 import StatCardsWrapper from '@/components/dashboard-card-wrapper';
 import TableWrapper from '@/components/dashboard-table/table-wrapper';
-import PlaceholderContent from '@/components/placeholder-component';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import FeatureHighlights from '@/components/feature-highlights';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 export default async function DashboardPage() {
-    const hasVaults = await checkActivityThreshold('vaults');
-    const hasProposals = await checkActivityThreshold('proposals');
-    const hasRecentActivities = await checkActivityThreshold('recentActivities'); // Placeholder for recent activities check
+    const isLowActivity = !(await checkActivityThreshold());
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -15,52 +12,43 @@ export default async function DashboardPage() {
                     Dashboard
                 </h1>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">
-                    Overview of key metrics and recent activities
+                    {isLowActivity
+                        ? "Explore the potential of FairFund. Start by creating a vault or submitting a proposal."
+                        : "Overview of key metrics and recent activities"}
                 </p>
             </header>
 
-            {hasVaults || hasProposals ? (
-                <StatCardsWrapper />
+            {isLowActivity ? (
+                <FeatureHighlights />
             ) : (
-                <PlaceholderContent section="statCards" />
+                <>
+                    <StatCardsWrapper />
+                    <div className="mt-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Recent Activities</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <TableWrapper />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </>
             )}
-
-            <div className="mt-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Recent Activities</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {hasRecentActivities ? (
-                            <TableWrapper />
-                        ) : (
-                            <PlaceholderContent section="recentActivities" />
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
         </div>
     );
 }
 
-// Helper function to check activity thresholds (mock implementation)
-async function checkActivityThreshold(type: 'vaults' | 'proposals' | 'recentActivities'): Promise<boolean> {
+async function checkActivityThreshold(): Promise<boolean> {
+   
     if (!prisma) return false;
+    const [totalVaults, totalProposals] = await Promise.all([
+        prisma.fundingVault.count(),
+        prisma.proposal.count(),
+    ]);
 
-    switch (type) {
-        case 'vaults':
-            const totalVaults = await prisma.fundingVault.count();
-            return totalVaults > 0;
-        case 'proposals':
-            const totalProposals = await prisma.proposal.count();
-            return totalProposals > 0;
-        case 'recentActivities':
-            const recentVaults = await prisma.fundingVault.count();
-            const recentProposals = await prisma.proposal.count();
-            return recentVaults > 0 || recentProposals > 0;
-        default:
-            return false;
-    }
+    const vaultThreshold = 1;
+    const proposalThreshold = 1;
+
+    return totalVaults >= vaultThreshold || totalProposals >= proposalThreshold;
 }
-    
-
