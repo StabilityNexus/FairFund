@@ -102,6 +102,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
    Create a `.env` file in the `web-app` directory and add all the values. You can use `.env.example` as a template.
 
    PostgreSQL:
+
    - If using Docker (with the provided docker-compose.yml), the defaults provided for `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` provided in .env.example will work.
    - If using a local instance of PostgreSQL, update the `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` with the correct connection url for the local postgreSQL.
 
@@ -111,20 +112,26 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
    ```bash
    openssl rand -base64 32
    ```
+
    - For local development `NEXTAUTH_URL` will be `http://localhost:3000`
 
 5. **To start local instance of postgreSQL database (with docker)**:
 
+
    1. Start docker desktop
    2. Run `docker compose up`
 
+
 6. **Run the Development Server**:
+
 
    ```bash
    npm run dev
    ```
 
+
 7. **Access the Web App**:
+
    - Open your browser and navigate to `http://localhost:3000`.
 
 ## Usage Guide
