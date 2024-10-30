@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Users, Vault, ThumbsUp, DollarSign } from 'lucide-react';
+import { Users, Vault, ThumbsUp, DollarSign, CheckCircle } from 'lucide-react';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
@@ -18,15 +18,37 @@ export default function FeatureHighlights() {
     const {isConnected}=useAccount();
     const router=useRouter();
 
-    const steps:Step[] = [
-        { title: 'Create a Vault', icon: <Vault size={32} className="text-green-500" />, description: 'Start by creating a vault to manage funds for community projects.' },
-        { title: 'Submit a Proposal', icon: <ThumbsUp size={32} className="text-blue-500" />, description: 'Propose new projects for funding and community support.' },
-        { title: 'Vote on Proposals', icon: <Users size={32} className="text-purple-500" />, description: 'Engage the community to vote on proposed projects.' },
-        { title: 'Fund Distribution', icon: <DollarSign size={32} className="text-yellow-500" />, description: 'Allocate funds to approved projects and see their impact.' },
+    const steps: Step[] = [
+        { 
+            title: 'Create a Space', 
+            icon: <Users size={32} className="text-purple-500" />, 
+            description: 'Establish a dedicated space for community engagement and project management.' 
+        },
+        { 
+            title: 'Create a Vault', 
+            icon: <Vault size={32} className="text-green-500" />, 
+            description: 'Start by creating a vault to manage funds for community projects.' 
+        },
+        { 
+            title: 'Submit a Proposal', 
+            icon: <ThumbsUp size={32} className="text-blue-500" />, 
+            description: 'Propose new projects for funding and community support.' 
+        },
+        { 
+            title: 'Vote on Proposal', 
+            icon: <CheckCircle size={32} className="text-yellow-500" />, 
+            description: 'Engage the community to vote on proposed projects.' 
+        },
+        { 
+            title: 'Distribute Funds', 
+            icon: <DollarSign size={32} className="text-yellow-500" />, 
+            description: 'Allocate funds to approved projects and see their impact.' 
+        },
     ];
+    
 
     const handleButtonClick=(route:string)=>{
-        if(!isConnected){
+        if(isConnected){
             router.push(route);
         }else{
             open();
