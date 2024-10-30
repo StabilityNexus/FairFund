@@ -80,11 +80,9 @@ export default function FeatureHighlights() {
                 <CardContent>
                     <p className="text-gray-600 dark:text-gray-400">
                         Have a project idea? Submit a proposal to gain community support and funding.
-                    </p>
-                    <Link href="/create-proposal">
+                    </p>                  
                         <Button className="mt-4 w-full"
                           onClick={() => handleButtonClick('/create/proposal')}>Submit Proposal</Button>
-                    </Link>
                 </CardContent>
             </Card>
 
@@ -96,10 +94,8 @@ export default function FeatureHighlights() {
                     <p className="text-gray-600 dark:text-gray-400">
                         Discover impactful projects and get involved in community-driven decisions.
                     </p>
-                    <Link href="/explore-projects">
                         <Button className="mt-4 w-full"
                          onClick={() => handleButtonClick('/spaces')}>Explore Projects</Button>
-                    </Link>
                 </CardContent>
             </Card>          
         </div>

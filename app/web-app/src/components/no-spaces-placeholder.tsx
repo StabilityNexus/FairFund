@@ -13,7 +13,6 @@ export default function NoSpacesPlaceholder({targetRoute}:NoSpacesPlaceholderPro
     const { open } = useWeb3Modal();
     const { isConnected } = useAccount();
     const router = useRouter();
-
     const handleCreateSpaceClick=()=>{
         if(isConnected){
             router.push(targetRoute);
