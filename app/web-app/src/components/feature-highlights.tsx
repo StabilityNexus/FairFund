@@ -57,7 +57,7 @@ export default function FeatureHighlights() {
 
     return (
         <div className='flex flex-col'>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-6">
             <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader>
                     <CardTitle>Start a Vault</CardTitle>
@@ -108,7 +108,7 @@ export default function FeatureHighlights() {
             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                 How FairFund Works
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:grid-cols-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:grid-cols-4 xl:grid-cols-5">
                 {steps.map((step, index) => (
                     <Card key={index} className="text-center w-64 shadow-lg transition-shadow duration-300">
                         <CardHeader className="flex flex-col items-center">
