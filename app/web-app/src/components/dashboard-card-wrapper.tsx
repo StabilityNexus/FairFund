@@ -24,7 +24,7 @@ export default async function CardWrapper() {
             <StatCard
                 title="Vaults"
                 icon={<Wallet2 className="h-6 w-6 text-green-500" />}
-                value={totalProposals.toString()}
+                value={totalVaults.toString()}
                 description="Total number of vaults"
                 className=" h-32 flex items-center"
             />
