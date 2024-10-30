@@ -2,6 +2,8 @@ import StatCardsWrapper from '@/components/dashboard-card-wrapper';
 import TableWrapper from '@/components/dashboard-table/table-wrapper';
 import FeatureHighlights from '@/components/feature-highlights';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import prisma from '@/lib/db';
+
 export default async function DashboardPage() {
     const isLowActivity = !(await checkActivityThreshold());
 
@@ -45,7 +47,7 @@ async function checkActivityThreshold(): Promise<boolean> {
         prisma.fundingVault.count(),
         prisma.proposal.count(),
     ]);
-    const vaultThreshold = 1;
-    const proposalThreshold = 1;
+    const vaultThreshold = 10;
+    const proposalThreshold = 10;
     return totalVaults >= vaultThreshold || totalProposals >= proposalThreshold;
 }

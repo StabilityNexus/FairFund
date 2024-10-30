@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface NoSpacesPlaceholderProps {
     targetRoute: string;
@@ -24,7 +25,7 @@ export default function NoSpacesPlaceholder({
     };
     return (
         <div className="flex flex-col items-center justify-center text-center py-12">
-            <img
+            <Image
                 src="nodata.svg"
                 alt="No spaces found"
                 className="w-32 h-32 mb-4"
