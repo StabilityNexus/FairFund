@@ -1,42 +1,24 @@
-import StatCardsWrapper from '@/components/dashboard-card-wrapper';
-import TableWrapper from '@/components/dashboard-table/table-wrapper';
-import FeatureHighlights from '@/components/feature-highlights';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import LowActivityDashboard from '@/components/low-activity-dashboard';
+import ActiveDashboard from '@/components/active-dashboard';
 import prisma from '@/lib/db';
 
 export default async function DashboardPage() {
     const isLowActivity = !(await checkActivityThreshold());
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-6">
             <header className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    Dashboard
+                    {isLowActivity ? 'Welcome to FairFund' : 'Dashboard'}
                 </h1>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">
                     {isLowActivity
-                        ? 'Explore the potential of FairFund. Start by creating a vault or submitting a proposal.'
-                        : 'Overview of key metrics and recent activities'}
+                        ? "Let's get you started with community funding"
+                        : 'Overview of your community activities and impact'}
                 </p>
             </header>
 
-            {isLowActivity ? (
-                <FeatureHighlights />
-            ) : (
-                <>
-                    <StatCardsWrapper />
-                    <div className="mt-8">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Recent Activities</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <TableWrapper />
-                            </CardContent>
-                        </Card>
-                    </div>
-                </>
-            )}
+            {isLowActivity ? <LowActivityDashboard /> : <ActiveDashboard />}
         </div>
     );
 }

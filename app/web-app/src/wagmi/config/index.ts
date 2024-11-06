@@ -1,6 +1,6 @@
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
 import { cookieStorage, createStorage, http } from 'wagmi';
-import { foundry, sepolia } from 'wagmi/chains';
+import { foundry, sepolia, classic } from 'wagmi/chains';
 
 export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
@@ -14,7 +14,10 @@ const metadata = {
 };
 
 export const config = defaultWagmiConfig({
-    chains: [process.env.NEXT_PUBLIC_NETWORK === 'sepolia' ? sepolia : foundry],
+    chains:
+        process.env.NEXT_PUBLIC_NETWORK === 'foundry'
+            ? [foundry]
+            : [sepolia, classic],
     projectId,
     metadata,
     ssr: true,
@@ -25,6 +28,7 @@ export const config = defaultWagmiConfig({
         [sepolia.id]: http(
             `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
         ),
+        [classic.id]: http(' https://etc.rivet.link'),
         [foundry.id]: http('http://localhost:8545'),
     },
 });

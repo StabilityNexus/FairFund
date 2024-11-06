@@ -29,6 +29,8 @@ export default function NoSpacesPlaceholder({
                 src="nodata.svg"
                 alt="No spaces found"
                 className="w-32 h-32 mb-4"
+                width={32}
+                height={32}
             />
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 No Spaces Available

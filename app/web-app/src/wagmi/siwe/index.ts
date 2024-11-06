@@ -6,18 +6,17 @@ import type {
     SIWECreateMessageArgs,
     SIWESession,
 } from '@web3modal/siwe';
-import { foundry, sepolia } from 'viem/chains';
+import { foundry, sepolia, classic } from 'viem/chains';
 import { type Session } from 'next-auth';
 
 export const siweConfig = createSIWEConfig({
     getMessageParams: async () => ({
         domain: typeof window !== 'undefined' ? window.location.host : '',
         uri: typeof window !== 'undefined' ? window.location.origin : '',
-        chains: [
+        chains:
             process.env.NEXT_PUBLIC_NETWORK === 'foundry'
-                ? foundry.id
-                : sepolia.id,
-        ],
+                ? [foundry.id]
+                : [sepolia.id, classic.id],
         statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
     }),
     createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>
