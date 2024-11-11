@@ -24,7 +24,7 @@ export default function Navbar() {
             <Link href={'/'} className="flex items-center group">
                 <VoteIcon className="h-8 w-8 transition-transform group-hover:scale-110" />
                 <h1 className="ml-2 text-2xl font-bold text-primary group-hover:text-primary/80 transition-colors">
-                    fairfund
+                    FairFund
                 </h1>
             </Link>
             <div className="hidden md:flex items-center gap-2">
