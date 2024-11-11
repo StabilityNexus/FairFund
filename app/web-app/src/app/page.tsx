@@ -62,19 +62,19 @@ export default function Home() {
                         icon={
                             <ShieldCheck className="w-12 h-12 text-teal-500" />
                         }
-                        title="Secure Funding Vaults"
+                        title="Distribute Funding Securily"
                         description="Deploy and manage funding vaults with on-chain governance."
                     />
                     <FeatureCard
                         icon={<Users className="w-12 h-12 text-rose-500" />}
-                        title="Community-Driven"
+                        title="Grow your Community"
                         description="Submit and vote on proposals, ensuring fair and transparent fund allocation."
                     />
                     <FeatureCard
                         icon={
                             <Lightbulb className="w-12 h-12 text-yellow-500" />
                         }
-                        title="Innovative Projects"
+                        title="Foster Innovation"
                         description="Support and fund groundbreaking ideas within your community."
                     />
                 </div>
