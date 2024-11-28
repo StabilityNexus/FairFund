@@ -16,8 +16,8 @@ deploy-mock-erc20:
 dmf: deploy-mock-fair-fund
 dme: deploy-mock-erc20
 
-deploy-sepolia:
-	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+deploy-polygon-testnet:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_AMOY_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
 
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
 

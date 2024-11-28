@@ -21,7 +21,7 @@ export async function POST(req: Request) {
             spaceId,
         } = await req.json();
 
-        // If current user is not the creator of the space, return unauthorize
+        // If current user is not the creator of the space, return unauthorized
         const space = await prisma.space.findUnique({
             where: {
                 id: spaceId,

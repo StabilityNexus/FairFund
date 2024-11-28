@@ -1,5 +1,5 @@
 import fairFundDeploymentDev from '@/blockchain/deployments/anvil/fairFund_deployment.json';
-import fairFundDeploymentProd from '@/blockchain/deployments/sepolia/fairFund_deployment.json';
+import fairFundDeploymentProd from '@/blockchain/deployments/production/fairFund_deployment.json';
 // import mockFairFundABI from '@/blockchain/out/MockFairFund.sol/MockFairFund.json';
 import fairFundABI from '@/blockchain/out/FairFund.sol/FairFund.json';
 
