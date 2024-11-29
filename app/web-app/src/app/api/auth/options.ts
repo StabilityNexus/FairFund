@@ -9,7 +9,7 @@ import {
     verifySignature,
     getChainIdFromMessage,
     getAddressFromMessage,
-} from '@web3modal/siwe';
+} from '@reown/appkit-siwe';
 
 const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 if (!nextAuthSecret) {
@@ -57,8 +57,7 @@ export const authOptions: NextAuthOptions = {
                     }
                     const { message, signature } = credentials;
                     const address = getAddressFromMessage(message);
-                    const chainId =
-                        getChainIdFromMessage(message).split(':')[1];
+                    const chainId = getChainIdFromMessage(message);
                     const isValid = await verifySignature({
                         address,
                         message,

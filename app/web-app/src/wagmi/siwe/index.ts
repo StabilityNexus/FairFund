@@ -1,11 +1,12 @@
 'use client';
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { createSIWEConfig, formatMessage } from '@web3modal/siwe';
+import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
 import type {
     SIWEVerifyMessageArgs,
     SIWECreateMessageArgs,
-} from '@web3modal/siwe';
-import { foundry, polygon, polygonAmoy } from 'viem/chains';
+    SIWESession,
+} from '@reown/appkit-siwe';
+import { foundry, polygonAmoy } from 'viem/chains';
 import { type Session } from 'next-auth';
 
 export const siweConfig = createSIWEConfig({
@@ -15,7 +16,7 @@ export const siweConfig = createSIWEConfig({
         chains:
             process.env.NEXT_PUBLIC_NETWORK === 'foundry'
                 ? [foundry.id]
-                : [polygon.id, polygonAmoy.id],
+                : [polygonAmoy.id],
         statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
     }),
     createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>

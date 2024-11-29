@@ -12,13 +12,13 @@ export default async function ApplicationLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const initialState = cookieToInitialState(config, headers().get('cookie'));
+    const cookies = headers().get('cookie');
     const session = await getServerSession();
 
     return (
         <div className="h-screen">
             <SessionProvider session={session}>
-                <Web3ModalProvider initialState={initialState}>
+                <Web3ModalProvider cookies={cookies}>
                     <Navbar />
                     <main className="h-full pt-[70px]">{children}</main>
                 </Web3ModalProvider>
