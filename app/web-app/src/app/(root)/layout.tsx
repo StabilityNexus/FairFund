@@ -1,7 +1,5 @@
-import { config } from '@/wagmi/config';
 import Web3ModalProvider from '@/wagmi/provider/web3-modal';
 import { SessionProvider } from '@/components/session-provider';
-import { cookieToInitialState } from 'wagmi';
 import { headers } from 'next/headers';
 import { Toaster } from '@/components/ui/toaster';
 import Navbar from '@/components/navbar';

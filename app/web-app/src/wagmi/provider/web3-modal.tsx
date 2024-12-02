@@ -31,6 +31,7 @@ const modal = createAppKit({
     features: {
         analytics: false,
     },
+    siweConfig: siweConfig,
 });
 
 export default function Web3ModalProvider({
@@ -44,6 +45,7 @@ export default function Web3ModalProvider({
         wagmiAdapter.wagmiConfig as Config,
         cookies
     );
+
     return (
         <WagmiProvider
             config={wagmiAdapter.wagmiConfig as Config}

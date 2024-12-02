@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useAppKit } from '@reown/appkit/react';
 
 interface NoSpacesPlaceholderProps {
     targetRoute: string;
@@ -13,7 +13,7 @@ interface NoSpacesPlaceholderProps {
 export default function NoSpacesPlaceholder({
     targetRoute,
 }: NoSpacesPlaceholderProps) {
-    const { open } = useWeb3Modal();
+    const { open } = useAppKit();
     const { isConnected } = useAccount();
     const router = useRouter();
     const handleCreateSpaceClick = () => {

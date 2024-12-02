@@ -47,8 +47,8 @@
         "tailwind-merge": "^2.3.0",
         "tailwindcss-animate": "^1.0.7",
         "use-debounce": "^10.0.1",
-        "viem": "2.21.52",
-        "wagmi": "2.13.2",
+        "viem": "2.21.53",
+        "wagmi": "2.13.3",
         "zod": "^3.23.8"
     },
     "devDependencies": {

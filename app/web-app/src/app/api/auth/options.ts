@@ -57,7 +57,8 @@ export const authOptions: NextAuthOptions = {
                     }
                     const { message, signature } = credentials;
                     const address = getAddressFromMessage(message);
-                    const chainId = getChainIdFromMessage(message);
+                    const chainId =
+                        getChainIdFromMessage(message).split(':')[1];
                     const isValid = await verifySignature({
                         address,
                         message,

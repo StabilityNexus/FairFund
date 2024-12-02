@@ -6,21 +6,38 @@ import type {
     SIWECreateMessageArgs,
     SIWESession,
 } from '@reown/appkit-siwe';
-import { foundry, polygonAmoy } from 'viem/chains';
 import { type Session } from 'next-auth';
+import { getAddress } from 'viem';
+import { foundry, polygonAmoy, AppKitNetwork } from '@reown/appkit/networks';
+
+const normalizeAddress = (address: string): string => {
+    try {
+        const splitAddress = address.split(':');
+        const extractedAddress = splitAddress[splitAddress.length - 1];
+        const checksumAddress = getAddress(extractedAddress);
+        splitAddress[splitAddress.length - 1] = checksumAddress;
+        const normalizedAddress = splitAddress.join(':');
+
+        return normalizedAddress;
+    } catch (error) {
+        return address;
+    }
+};
+
+const chains =
+    process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? [foundry] : [polygonAmoy];
 
 export const siweConfig = createSIWEConfig({
     getMessageParams: async () => ({
         domain: typeof window !== 'undefined' ? window.location.host : '',
         uri: typeof window !== 'undefined' ? window.location.origin : '',
-        chains:
-            process.env.NEXT_PUBLIC_NETWORK === 'foundry'
-                ? [foundry.id]
-                : [polygonAmoy.id],
+        chains: chains.map((chain: AppKitNetwork) =>
+            parseInt(chain.id.toString())
+        ),
         statement: process.env.NEXT_PUBLIC_SIGN_IN_STATEMENT,
     }),
     createMessage: ({ address, ...args }: SIWECreateMessageArgs) =>
-        formatMessage(args, address),
+        formatMessage(args, normalizeAddress(address)),
     getNonce: async () => {
         const nonce = await getCsrfToken();
         if (!nonce) {
@@ -52,6 +69,9 @@ export const siweConfig = createSIWEConfig({
         }
     },
     signOut: async () => {
+        const session: Session | null = await getSession();
+        console.log(session, 'From Signout');
+        // return true;
         try {
             await signOut({
                 callbackUrl: '/dashboard',
@@ -62,5 +82,4 @@ export const siweConfig = createSIWEConfig({
             return false;
         }
     },
-    signOutOnNetworkChange: false,
 });
