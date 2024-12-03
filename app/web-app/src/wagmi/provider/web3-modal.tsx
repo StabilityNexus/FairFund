@@ -30,6 +30,8 @@ const modal = createAppKit({
     metadata,
     features: {
         analytics: false,
+        socials: false,
+        onramp: false,
     },
     siweConfig: siweConfig,
 });

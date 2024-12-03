@@ -5,7 +5,6 @@ import {
 import Credentials from 'next-auth/providers/credentials';
 import prisma from '@/lib/db';
 import {
-    type SIWESession,
     verifySignature,
     getChainIdFromMessage,
     getAddressFromMessage,
@@ -24,7 +23,6 @@ if (!projectId) {
 export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt',
-        maxAge: 30 * 60,
     },
     secret: nextAuthSecret,
     providers: [
