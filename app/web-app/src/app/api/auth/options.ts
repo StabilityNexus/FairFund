@@ -5,11 +5,10 @@ import {
 import Credentials from 'next-auth/providers/credentials';
 import prisma from '@/lib/db';
 import {
-    type SIWESession,
     verifySignature,
     getChainIdFromMessage,
     getAddressFromMessage,
-} from '@web3modal/siwe';
+} from '@reown/appkit-siwe';
 
 const nextAuthSecret = process.env.NEXTAUTH_SECRET;
 if (!nextAuthSecret) {
@@ -24,7 +23,6 @@ if (!projectId) {
 export const authOptions: NextAuthOptions = {
     session: {
         strategy: 'jwt',
-        maxAge: 30 * 60,
     },
     secret: nextAuthSecret,
     providers: [
