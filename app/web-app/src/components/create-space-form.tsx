@@ -29,7 +29,7 @@ import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import { useSession } from 'next-auth/react';
 
 const createSpaceFormSchema = z.object({
-    name: z.string().min(1, 'Name is requeired.'),
+    name: z.string().min(1, 'Name is required.'),
     description: z.string().min(1, 'Description is required.'),
 });
 
@@ -74,7 +74,7 @@ export default function CreateSpaceForm({
                 toast({
                     variant: 'destructive',
                     title: 'Error',
-                    description: 'An error occured while creating the space.',
+                    description: 'An error occurred while creating the space.',
                 });
             } finally {
                 setIsLoading(false);
@@ -94,7 +94,7 @@ export default function CreateSpaceForm({
             <CardHeader>
                 <CardTitle>Space Details</CardTitle>
                 <CardDescription>
-                    Enter name for your space and a clear and consice
+                    Enter name for your space and a clear and concise
                     description.
                 </CardDescription>
             </CardHeader>
