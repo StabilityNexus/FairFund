@@ -11,7 +11,8 @@
 7. [Deployment](#deployment)
 8. [Future Improvements](#future-improvements)
 9. [Contributing](#contributing)
-10. [Community](#community)
+10. [Troubleshooting](#troubleshooting)
+11. [Community](#community)
 
 ## Introduction
 
@@ -241,6 +242,101 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 9. Commit and push your changes
 10. Open a pull request to the `v2` branch
 11. Provide a detailed description of your changes in the PR, including videos and images if applicable
+
+## Troubleshooting
+
+Before proceeding further ensure that you have: 
+1. **Foundry**: Installed Foundry globally. If not, follow [Foundry installation instructions](https://getfoundry.sh/).
+2. **Node.js Version**: Installed the correct Node.js version as given in `.nvmrc` or the README.
+3. **Environment Variables**: Properly configure your `.env` file in both the `web-app` and `blockchain` directories.
+
+
+### 1. **Dependency errors**
+
+- **Issue**: Errors may arise such as missing or incompatible modules, network issues, or permission-related errors. This can happen due to:
+  - Outdated versions of Node.js, Foundry, or npm/yarn.
+  - Network configurations blocking certain package registries.
+  - Incorrectly set up package managers or corrupted caches.
+- **Solution**:
+  1. Ensure you are using the correct Node.js version specified in `.nvmrc` or the README.
+  2. Check your internet connection, as some dependencies may require downloading external files.
+  3. Clear npm cache and retry:
+     ```bash
+     npm cache clean --force
+     npm install
+     ```
+  4. For Foundry-related dependencies, ensure Foundry is installed and updated:
+     ```bash
+     foundryup
+     ```
+
+### 2. **Local Blockchain Not Starting**
+
+- **Issue**: When attempting to start the Anvil blockchain using `anvil`, you might see errors like:
+  - "Command not found" (if Foundry is not installed).
+  - "Address already in use" (indicating a port conflict).
+  - Unexpected crashes or runtime errors (due to incompatible environments or versions).
+- **Solution**:
+  1. Verify that Foundry is installed and correctly set up:
+     ```bash
+     foundryup
+     ```
+  2. Restart the Anvil chain:
+     ```bash
+     anvil
+     ```
+  3. Ensure no other processes are using the port Anvil is attempting to bind to. If necessary, specify a different port:
+     ```bash
+     anvil --port 8546
+     ```
+
+### 3. **Frontend related issues**
+
+- **Issue**: When running `npm run dev`, the frontend fails to load, or you see errors like:
+  - "Cannot find module" (missing dependencies).
+  - Environment-related errors (e.g., missing or incorrectly configured `.env` variables).
+  - Compilation errors in the codebase (syntax or configuration issues).
+- **Solution**:
+  1. Ensure environment variables are correctly configured in the `.env` file.
+  2. Verify all dependencies are installed:
+     ```bash
+     npm install
+     ```
+  3. Check the logs for missing dependencies or incorrect configurations. Fix any issues and retry.
+
+### 4. **Database Connection Issues**
+
+- **Issue**: The application is unable to connect to the PostgreSQL database, showing errors such as:
+  - "Connection refused" (database server not running or incorrect host/port configuration).
+  - "Authentication failed" (incorrect credentials).
+  - "Database does not exist" (database hasn't been created yet).
+- **Solution**:
+  1. Ensure Docker Desktop is running if using Docker for PostgreSQL.
+  2. If using a local PostgreSQL instance, verify the credentials in the `.env` file.
+  3. Test the database connection manually:
+     ```bash
+     psql -h localhost -U postgres -d your_database
+     ```
+  4. If the database hasn’t been initialized, follow the setup instructions to create and migrate the database schema.
+
+### 5. **Smart Contract Deployment Errors**
+
+- **Issue**: Deployment scripts fail, throw runtime errors, or produce incorrect output. Possible causes include:
+  - Missing or incorrectly configured environment variables (e.g., RPC URLs, private keys).
+  - Insufficient ETH in your wallet for transaction fees on the target network.
+  - RPC endpoint downtime or network congestion causing timeouts.
+  - Incorrect compilation of contracts leading to invalid bytecode.
+- **Solution**:
+  1. Verify the `.env` file contains valid RPC endpoints and private keys.
+  2. Ensure your wallet has enough ETH for deployment.
+  3. Retry deployment with verbose logging for detailed error output:
+     ```bash
+     forge script DeployScript --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+     ```
+  4. Check that Anvil or another blockchain environment is running if deploying locally.
+
+
+
 
 ## Community
 
