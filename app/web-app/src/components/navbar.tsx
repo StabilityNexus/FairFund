@@ -20,7 +20,7 @@ export default function Navbar() {
     const { data: session } = useSession();
 
     return (
-        <nav className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/80">
+        <nav className="fixed w-full z-50 flex justify-between items-center py-4 px-4 border-b border-primary/10 bg-secondary/90 backdrop-blur-sm">
             <Link href={'/'} className="flex items-center group">
                 <VoteIcon className="h-8 w-8 transition-transform group-hover:scale-110" />
                 <h1 className="ml-2 text-2xl font-bold text-primary group-hover:text-primary/80 transition-colors">
