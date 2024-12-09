@@ -115,18 +115,20 @@ export default function CreateSpaceForm({
                                             <FormControl>
                                                 <Input
                                                     disabled={formIsLoading}
-                                                    placeholder="Name here..."
+                                                    placeholder="Name of the space..."
+                                                    autoComplete="name" // Added autoComplete attribute
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
+                                            {/* <FormDescription>
                                                 Name of the space
-                                            </FormDescription>
+                                            </FormDescription> */}
                                             <FormMessage />
                                         </FormItem>
                                     );
                                 }}
                             />
+                            <br />
                             <FormField
                                 name="description"
                                 control={form.control}
@@ -139,19 +141,21 @@ export default function CreateSpaceForm({
                                                     className="bg-background resize-none"
                                                     rows={6}
                                                     disabled={formIsLoading}
-                                                    placeholder="Description here..."
+                                                    placeholder="Description of the space..."
+                                                    autoComplete="off" // Added autocomplete attribute
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
+                                            {/* <FormDescription>
                                                 Description of the space
-                                            </FormDescription>
+                                            </FormDescription> */}
                                             <FormMessage />
                                         </FormItem>
                                     );
                                 }}
                             />
                         </div>
+
                         <Button
                             type="submit"
                             disabled={formIsLoading || isLoading}
