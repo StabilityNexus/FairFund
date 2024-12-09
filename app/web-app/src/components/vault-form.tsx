@@ -46,6 +46,7 @@ import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Space, type FundingVault } from '@prisma/client';
 import { useEffect } from 'react';
+import MoreInfo from '@/components/more-info';
 
 const createVaultFormSchema = z.object({
     vaultName: z.string().min(1, 'Vault Name is required.'),
@@ -364,13 +365,17 @@ export default function VaultForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
+                                       <FormLabel className="flex items-center gap-2">
                                             Minimum Requestable Amount
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Minimum amount (in ETH)"
+                                                placeholder="Minimum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -389,13 +394,17 @@ export default function VaultForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
-                                            Maximum Requestable Amount
+                                        <FormLabel className="flex items-center gap-2">
+                                        Maximum Requestable Amount
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Maximum amount (in ETH)"
+                                                placeholder="Maximum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>

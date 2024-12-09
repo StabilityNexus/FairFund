@@ -35,6 +35,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { Button } from '@/components/ui/button';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
+import MoreInfo from '@/components/more-info';
 
 interface ProposalFormProps {
     steps: {
@@ -306,19 +307,23 @@ export default function ProposalForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
+                                      <FormLabel>
                                             Minimum Request Amount
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Minimum amount (in ETH)"
+                                               placeholder="Minimum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
                                             The minimum amount that would be
-                                            suffice for recepient.
+                                            suffice for recipient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -331,19 +336,23 @@ export default function ProposalForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel>
+                                      <FormLabel>
                                             Maximum Request Amount
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
                                         </FormLabel>
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Maximum amount (in ETH)"
+                                               placeholder="Maximum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
                                             The maximum amount needed for the
-                                            recepient.
+                                            recipient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -360,7 +369,7 @@ export default function ProposalForm({
                             return (
                                 <FormItem className="col-span-2 md:col-span-1">
                                     <FormLabel>
-                                        Recepient Wallet Address
+                                    Recipient Wallet Address
                                     </FormLabel>
                                     <FormControl>
                                         <Input
