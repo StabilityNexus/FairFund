@@ -293,7 +293,7 @@ export default function ProposalForm({
                                         </FormControl>
                                         <FormDescription>
                                             The minimum amount that would be
-                                            suffice for recepient.
+                                            suffice for recipient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -318,7 +318,7 @@ export default function ProposalForm({
                                         </FormControl>
                                         <FormDescription>
                                             The maximum amount needed for the
-                                            recepient.
+                                            recipient.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -335,7 +335,7 @@ export default function ProposalForm({
                             return (
                                 <FormItem className="col-span-2 md:col-span-1">
                                     <FormLabel>
-                                        Recepient Wallet Address
+                                        Recipient Wallet Address
                                     </FormLabel>
                                     <FormControl>
                                         <Input
