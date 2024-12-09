@@ -43,7 +43,7 @@ const ActivityItem = ({
     return (
         <div
             className={cn(
-                'flex  space-x-4 mb-4 p-3 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-lg transition duration-150 ease-in-out',
+                'flex  space-x-4 mb-4 p-3 hover:bg-gray-100 rounded-lg transition duration-150 ease-in-out',
                 type === 'overview'
                     ? 'justify-start'
                     : 'items-center justify-between'

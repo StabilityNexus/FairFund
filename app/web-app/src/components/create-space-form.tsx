@@ -29,7 +29,7 @@ import Loader2 from 'lucide-react/dist/esm/icons/loader-2';
 import { useSession } from 'next-auth/react';
 
 const createSpaceFormSchema = z.object({
-    name: z.string().min(1, 'Name is required.'),
+    name: z.string().min(1, 'Name is requeired.'),
     description: z.string().min(1, 'Description is required.'),
 });
 
@@ -74,7 +74,7 @@ export default function CreateSpaceForm({
                 toast({
                     variant: 'destructive',
                     title: 'Error',
-                    description: 'An error occurred while creating the space.',
+                    description: 'An error occured while creating the space.',
                 });
             } finally {
                 setIsLoading(false);
@@ -94,7 +94,7 @@ export default function CreateSpaceForm({
             <CardHeader>
                 <CardTitle>Space Details</CardTitle>
                 <CardDescription>
-                    Enter name for your space and a clear and concise
+                    Enter name for your space and a clear and consice
                     description.
                 </CardDescription>
             </CardHeader>
@@ -115,18 +115,20 @@ export default function CreateSpaceForm({
                                             <FormControl>
                                                 <Input
                                                     disabled={formIsLoading}
-                                                    placeholder="Name here..."
+                                                    placeholder="Name of the space..."
+                                                    autoComplete="name" // Added autoComplete attribute
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
+                                            {/* <FormDescription>
                                                 Name of the space
-                                            </FormDescription>
+                                            </FormDescription> */}
                                             <FormMessage />
                                         </FormItem>
                                     );
                                 }}
                             />
+                            <br />
                             <FormField
                                 name="description"
                                 control={form.control}
@@ -139,19 +141,21 @@ export default function CreateSpaceForm({
                                                     className="bg-background resize-none"
                                                     rows={6}
                                                     disabled={formIsLoading}
-                                                    placeholder="Description here..."
+                                                    placeholder="Description of the space..."
+                                                    autoComplete="off" // Added autocomplete attribute
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormDescription>
+                                            {/* <FormDescription>
                                                 Description of the space
-                                            </FormDescription>
+                                            </FormDescription> */}
                                             <FormMessage />
                                         </FormItem>
                                     );
                                 }}
                             />
                         </div>
+
                         <Button
                             type="submit"
                             disabled={formIsLoading || isLoading}

@@ -10,6 +10,7 @@ export async function POST(req: Request) {
         }
 
         const {
+            title,
             description,
             minRequestAmount,
             maxRequestAmount,
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
 
         const proposal = await prisma.proposal.create({
             data: {
+                title,
                 description,
                 proposerAddress: session.user.address,
                 minRequestAmount: min,

@@ -7,7 +7,7 @@ import SelectSpace from '@/components/select-space';
 import { SpaceWithCount } from '@/lib/space-data';
 
 const createSpaceFormSchema = z.object({
-    name: z.string().min(1, 'Name is required.'),
+    name: z.string().min(1, 'Name is requeired.'),
     description: z.string().min(1, 'Description is required.'),
 });
 

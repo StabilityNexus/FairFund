@@ -105,11 +105,11 @@ export default async function VaultDetailsPage({
             <Card>
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold">
-                        Vault Details
+                        Vault Details #{id}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <CardWrapper fundingVault={vault} />
+                    {await CardWrapper({ fundingVault: vault })}
                 </CardContent>
             </Card>
 
@@ -120,7 +120,7 @@ export default async function VaultDetailsPage({
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <TableWrapper fundingVaultId={Number(id)} />
+                    {await TableWrapper({ fundingVaultId: Number(id) })}
                 </CardContent>
             </Card>
             <Card>

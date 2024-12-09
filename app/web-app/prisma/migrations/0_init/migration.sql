@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE "FundingVault" (
     "id" SERIAL NOT NULL,
+    "vaultName" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "creatorAddress" TEXT NOT NULL,
     "fundingTokenAddress" TEXT NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE "FundingVault" (
 -- CreateTable
 CREATE TABLE "Proposal" (
     "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "proposerAddress" TEXT NOT NULL,
     "minRequestAmount" INTEGER NOT NULL,

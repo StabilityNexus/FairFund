@@ -11,6 +11,7 @@ export async function POST(req: Request) {
         }
 
         const {
+            vaultName,
             vaultAddress,
             description,
             fundingTokenAddress,
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
         const votingTokenSymbol = await getTokenName(votingTokenAddress);
         const vault = await prisma.fundingVault.create({
             data: {
+                vaultName,
                 description,
                 creatorAddress: session.user.address,
                 vaultAddress,

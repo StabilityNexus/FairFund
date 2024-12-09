@@ -43,11 +43,12 @@ export default async function VaultDetailsCardWrapper({
     return (
         <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              
                 <StatCard
-                    title="Vault ID"
+                    title="Vault Name"
                     icon={<Wallet className="text-blue-500" />}
-                    value={`#${vault.id}`}
-                    description="Unique identifier for this funding vault"
+                    value={vault.vaultName}
+                    description="Name of this funding vault"
                 />
                 <StatCard
                     title="Available Funds"
