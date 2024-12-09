@@ -46,7 +46,7 @@ import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Space, type FundingVault } from '@prisma/client';
 import { useEffect } from 'react';
-import MoreInfo from './more-info';
+import MoreInfo from '@/components/more-info';
 
 const createVaultFormSchema = z.object({
     description: z.string().min(1, 'Description is required.'),

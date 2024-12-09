@@ -35,7 +35,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import ChevronLeft from 'lucide-react/dist/esm/icons/chevron-left';
 import { Button } from '@/components/ui/button';
 import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
-import MoreInfo from './more-info';
+import MoreInfo from '@/components/more-info';
 
 interface ProposalFormProps {
     steps: {
