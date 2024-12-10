@@ -51,6 +51,9 @@ interface ProposalFormProps {
 }
 
 const proposalFormSchema = z.object({
+    title: z.string().min(1, {
+        message: 'Please enter a title.',
+    }),
     description: z.string().min(1, {
         message: 'Please enter a description.',
     }),
@@ -131,6 +134,7 @@ export default function ProposalForm({
             });
             await axios.post('/api/proposal/new', {
                 description: data.description,
+                title: data.title,
                 proposerAddress: address,
                 minRequestAmount: data.minRequestAmount,
                 maxRequestAmount: data.maxRequestAmount,
@@ -223,6 +227,27 @@ export default function ProposalForm({
                 {currentProposalStep === 0 && (
                     <div className="space-y-2 flex flex-col">
                         <FormField
+                            name="title"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Title</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={isLoading}
+                                                placeholder="Title of the proposal..."
+                                                {...field}
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+                        <br />
+                        <FormField
                             name="description"
                             control={form.control}
                             render={({ field }) => {
@@ -282,7 +307,7 @@ export default function ProposalForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel className="flex items-center gap-2">
+                                      <FormLabel>
                                             Minimum Request Amount
                                             <MoreInfo
                                                 message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
@@ -292,7 +317,7 @@ export default function ProposalForm({
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Minimum amount (absolute value, considering token decimals)"
+                                               placeholder="Minimum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -311,7 +336,7 @@ export default function ProposalForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel className="flex items-center gap-2">
+                                      <FormLabel>
                                             Maximum Request Amount
                                             <MoreInfo
                                                 message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
@@ -321,7 +346,7 @@ export default function ProposalForm({
                                         <FormControl>
                                             <Input
                                                 disabled={isLoading}
-                                                placeholder="Maximum amount (absolute value, considering token decimals)"
+                                               placeholder="Maximum amount (absolute value, considering token decimals)"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -344,7 +369,7 @@ export default function ProposalForm({
                             return (
                                 <FormItem className="col-span-2 md:col-span-1">
                                     <FormLabel>
-                                        Recipient Wallet Address
+                                    Recipient Wallet Address
                                     </FormLabel>
                                     <FormControl>
                                         <Input

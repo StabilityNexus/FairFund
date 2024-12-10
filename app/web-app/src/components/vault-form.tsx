@@ -49,6 +49,7 @@ import { useEffect } from 'react';
 import MoreInfo from '@/components/more-info';
 
 const createVaultFormSchema = z.object({
+    vaultName: z.string().min(1, 'Vault Name is required.'),
     description: z.string().min(1, 'Description is required.'),
     fundingTokenAddress: z
         .string()
@@ -153,6 +154,7 @@ export default function VaultForm({
                     hash: hash,
                 });
                 const response = await axios.post('/api/vault/new', {
+                    vaultName: data.vaultName,
                     description: data.description,
                     creatorAddress: address,
                     vaultAddress: result,
@@ -247,7 +249,31 @@ export default function VaultForm({
                     </p>
                 </div>
                 {currentVaultFormStep === 0 && (
-                    <div className="space-y-2 ">
+                    <div className="space-y-2">
+                        {/* Name Field */}
+                        <FormField
+                            name="vaultName"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                className="bg-background resize-none"
+                                                placeholder="Name of the funding vault..."
+                                                rows={1}
+                                                disabled={isLoading}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
+
+                        {/* Description Field */}
                         <FormField
                             name="description"
                             control={form.control}
@@ -258,14 +284,14 @@ export default function VaultForm({
                                         <FormControl>
                                             <Textarea
                                                 className="bg-background resize-none"
+                                                placeholder="Description of the funding vault..."
                                                 rows={6}
                                                 disabled={isLoading}
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            A short description of the funding
-                                            vault (this won&apos;t be stored on
+                                            (this won&apos;t be stored on
                                             chain).
                                         </FormDescription>
                                         <FormMessage />
@@ -339,7 +365,7 @@ export default function VaultForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
-                                        <FormLabel className="flex items-center gap-2">
+                                       <FormLabel className="flex items-center gap-2">
                                             Minimum Requestable Amount
                                             <MoreInfo
                                                 message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
@@ -369,7 +395,7 @@ export default function VaultForm({
                                 return (
                                     <FormItem className="col-span-2 md:col-span-1">
                                         <FormLabel className="flex items-center gap-2">
-                                            Maximum Requestable Amount
+                                        Maximum Requestable Amount
                                             <MoreInfo
                                                 message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
                                                 iconSize={15}
