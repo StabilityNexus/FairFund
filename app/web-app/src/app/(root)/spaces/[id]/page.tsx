@@ -105,7 +105,9 @@ export default async function SpaceDetailsPage({
                         >
                             <CardContent className="p-6">
                                 <h3 className="text-lg font-semibold mb-2">
-                                    Vault {vault.id}
+                                    {vault.name
+                                        ? vault.name
+                                        : `Vault ${vault.id}`}
                                 </h3>
                                 <p className="text-sm text-gray-600 mb-6">
                                     {truncateText(vault.description, 100)}

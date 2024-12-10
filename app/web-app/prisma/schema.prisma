@@ -39,6 +39,7 @@ model Space {
 
 model FundingVault {
   id                       Int      @id @default(autoincrement())
+  name                     String?
   description              String
   creatorAddress           String
   fundingTokenAddress      String
