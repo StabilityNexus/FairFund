@@ -21,6 +21,7 @@ import { type FundingVault } from '@prisma/client';
 import { getVaultBalance } from '@/lib/vault-data';
 import { truncateText } from '@/lib/truncate-text';
 import { Button } from '@/components/ui/button';
+import { WalletMinimal } from 'lucide-react';
 
 interface VaultDetailsCardWrapperProps {
     fundingVault: FundingVault;
@@ -49,6 +50,14 @@ export default async function VaultDetailsCardWrapper({
                     value={`#${vault.id}`}
                     description="Unique identifier for this funding vault"
                 />
+                {vault.name && (
+                    <StatCard
+                        title="Vault Name"
+                        icon={<WalletMinimal className="text-yellow-500" />}
+                        value={`${vault.name}`}
+                        description="Name for this funding vault"
+                    />
+                )}
                 <StatCard
                     title="Available Funds"
                     icon={<LockKeyhole className="text-green-500" />}

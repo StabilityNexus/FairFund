@@ -224,10 +224,13 @@ export default async function ProfilePage() {
                                             icon={
                                                 <Vault className="h-5 w-5 text-purple-500" />
                                             }
-                                            title={truncateText(
-                                                vault.description,
-                                                50
-                                            )}
+                                            title={
+                                                vault.name ||
+                                                truncateText(
+                                                    vault.description,
+                                                    50
+                                                )
+                                            }
                                             description={`Created on ${new Date(vault.createdAt).toLocaleDateString()}`}
                                             type="vault"
                                             id={vault.id}

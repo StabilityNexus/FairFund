@@ -49,6 +49,7 @@ import { useEffect } from 'react';
 import MoreInfo from '@/components/more-info';
 
 const createVaultFormSchema = z.object({
+    name: z.string(),
     description: z.string().min(1, 'Description is required.'),
     fundingTokenAddress: z
         .string()
@@ -100,6 +101,7 @@ export default function VaultForm({
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
         resolver: zodResolver(createVaultFormSchema),
         defaultValues: {
+            name: '',
             description: '',
             fundingTokenAddress: '',
             votingTokenAddress: '',
@@ -153,6 +155,7 @@ export default function VaultForm({
                     hash: hash,
                 });
                 const response = await axios.post('/api/vault/new', {
+                    name: data.name,
                     description: data.description,
                     creatorAddress: address,
                     vaultAddress: result,
@@ -192,20 +195,29 @@ export default function VaultForm({
 
     function renderReviewStep() {
         const data = form.getValues();
+        const fieldOrder = [
+            'name',
+            'description',
+            'fundingTokenAddress',
+            'votingTokenAddress',
+            'minRequestableAmount',
+            'maxRequestableAmount',
+            'tallyDate',
+        ] as const;
         return (
             <Card className="w-full mx-auto flex flex-col h-[500px]">
                 <ScrollArea className="flex-grow">
                     <CardContent className="p-6 space-y-4">
-                        {Object.entries(data).map(([key, value]) => (
+                        {fieldOrder.map((field) => (
                             <div
-                                key={key}
+                                key={field}
                                 className="flex flex-col sm:flex-row sm:justify-between py-2 last:border-b-0"
                             >
                                 <span className="font-medium capitalize mb-1 sm:mb-0">
-                                    {key.replace(/([A-Z])/g, ' $1').trim()}:
+                                    {field.replace(/([A-Z])/g, ' $1').trim()}:
                                 </span>
                                 <span className="text-sm text-right sm:text-left sm:w-1/2 break-words">
-                                    {value.toString()}
+                                    {data[field].toString()}
                                 </span>
                             </div>
                         ))}
@@ -247,7 +259,29 @@ export default function VaultForm({
                     </p>
                 </div>
                 {currentVaultFormStep === 0 && (
-                    <div className="space-y-2 ">
+                    <div className="space-y-4 ">
+                        <FormField
+                            name="name"
+                            control={form.control}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormLabel>Vault Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                disabled={formIsLoading}
+                                                placeholder="Name here..."
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            Name of the Vault
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                );
+                            }}
+                        />
                         <FormField
                             name="description"
                             control={form.control}
