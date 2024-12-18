@@ -73,7 +73,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 
    Note: This will automatically update relevant contract addresses and ABIs for smart contract in web-app folder.
 
-6. **Deploy to the Testnet**:
+6. **Deploy to the Testnet**: (Optional)
    - Ensure you have a `.env` file set up. You can use `.env.example` as a template.
    - Load the environment variables:
    ```bash
@@ -84,7 +84,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
    make deploy-sepolia
    ```
 
-### Frontend
+### Frontend 
 
 1. **Navigate to the Web App Directory**:
 
@@ -208,8 +208,8 @@ Smart contract documentation can be found [here](/app/blockchain/README.md).
 
 ### Test Deployed Instances
 
-- **Smart Contract**: [Sepolia Testnet](https://sepolia.etherscan.io/address/0x345a143558a286c861ce5b7367bafaa5f62b14d6)
-- **Frontend**: [https://fair-fund.vercel.app/](https://fair-fund.vercel.app/)
+- **Smart Contract**: [Polygon Amoy Testnet](https://www.oklink.com/amoy/address/0xde65b790a754720078b5a503783d025f28747246/contract)
+- **Frontend**: [FairFund](https://fairfund.stability.nexus)
 
 ## Future Improvements
 
