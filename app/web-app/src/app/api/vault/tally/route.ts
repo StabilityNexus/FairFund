@@ -52,13 +52,15 @@ async function tally(vault: FundingVault): Promise<void> {
     });
 }
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
     if (
         process.env.NODE_ENV !== 'development' &&
         req.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`
     ) {
         return new NextResponse('Unauthorized', { status: 401 });
     }
+
+    console.log('Working.');
 
     try {
         // retrive all the vaults whos is tallied is false,
