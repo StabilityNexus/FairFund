@@ -30,6 +30,7 @@ import {MockFundingVault} from "./MockFundingVault.sol";
 import {MockVotingPowerToken} from "./MockVotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
  * @title FairFund
@@ -88,7 +89,9 @@ contract MockFairFund is Ownable {
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);
         string memory votingPowerTokenName = string.concat("Voting Power Token ", fundingVaultIdString);
         string memory votingPowerTokenSymbol = string.concat("VOTE_", fundingVaultIdString);
-        MockVotingPowerToken votingPowerToken = new MockVotingPowerToken(votingPowerTokenName, votingPowerTokenSymbol);
+        uint256 decimals = ERC20(_votingToken).decimals();
+        MockVotingPowerToken votingPowerToken =
+            new MockVotingPowerToken(votingPowerTokenName, votingPowerTokenSymbol, decimals);
         MockFundingVault fundingVault = new MockFundingVault(
             _fundingToken,
             _votingToken,

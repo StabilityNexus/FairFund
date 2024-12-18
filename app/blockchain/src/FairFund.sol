@@ -30,6 +30,7 @@ import {FundingVault} from "./FundingVault.sol";
 import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /**
  * @title FairFund
@@ -94,7 +95,8 @@ contract FairFund is Ownable {
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);
         string memory votingPowerTokenName = string.concat("Voting Power Token ", fundingVaultIdString);
         string memory votingPowerTokenSymbol = string.concat("VOTE_", fundingVaultIdString);
-        VotingPowerToken votingPowerToken = new VotingPowerToken(votingPowerTokenName, votingPowerTokenSymbol);
+        uint256 decimals = ERC20(_votingToken).decimals();
+        VotingPowerToken votingPowerToken = new VotingPowerToken(votingPowerTokenName, votingPowerTokenSymbol, decimals);
         FundingVault fundingVault = new FundingVault(
             _fundingToken,
             _votingToken,

@@ -21,7 +21,8 @@ contract InvarientsTest is StdInvariant, Test {
     function setUp() external {
         fundingToken = new MockERC20("FundingToken", "FTK");
         votingToken = new MockERC20("VotingToken", "VTK");
-        votingPowerToken = new VotingPowerToken("VotingPowerToken", "VOTE");
+        uint256 decimals = ERC20(address(votingToken)).decimals();
+        votingPowerToken = new VotingPowerToken("VotingPowerToken", "VOTE", decimals);
         fundingVault = new FundingVault(
             address(fundingToken),
             address(votingToken),

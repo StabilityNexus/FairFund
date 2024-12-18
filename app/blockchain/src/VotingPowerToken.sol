@@ -29,7 +29,14 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VotingPowerToken is ERC20, Ownable {
-    constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) Ownable(msg.sender) {}
+    uint256 private _decimals;
+
+    constructor(string memory _name, string memory _symbol, uint256 decimals_)
+        ERC20(_name, _symbol)
+        Ownable(msg.sender)
+    {
+        _decimals = decimals_;
+    }
 
     function mint(address _to, uint256 _amount) external onlyOwner {
         _mint(_to, _amount);

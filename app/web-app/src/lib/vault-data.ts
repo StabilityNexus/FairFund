@@ -94,14 +94,19 @@ export async function getTotalVotingTokens(vault: FundingVault) {
             functionName: 'getTotalVotingPowerTokensUsed',
             args: [],
         });
+        const decimals = await readContract(wagmiConfig, {
+            address: vault.votingTokenAddress as `0x${string}`,
+            abi: erc20ABI,
+            functionName: 'decimals',
+        });
         return {
             totalVotingTokensAvailable: formatUnits(
                 totalVotingTokensAvailable as bigint,
-                18
+                decimals as number
             ),
             totalVotingTokensUsed: formatUnits(
                 totalVotingTokensUsed as bigint,
-                18
+                decimals as number
             ),
         };
     } catch (error) {
