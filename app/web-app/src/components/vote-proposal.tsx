@@ -25,6 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useWeb3FormSubmit } from '@/hooks/use-web3-form-submit';
 import { Web3SubmitButton } from './web3-submit-button';
+import MoreInfo from './more-info';
 
 interface VoteProposalButtonProps {
     className?: string;
@@ -90,10 +91,16 @@ export default function VoteProposal({
                             render={({ field }) => {
                                 return (
                                     <FormItem>
-                                        <FormLabel>Amount of Tokens</FormLabel>
+                                        <FormLabel className="flex gap-2">
+                                            Amount of Tokens
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="in ETH units."
+                                                placeholder="Absolute value, considering token decimals"
                                                 {...field}
                                             />
                                         </FormControl>

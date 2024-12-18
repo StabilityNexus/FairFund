@@ -34,6 +34,7 @@ import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import MoreInfo from './more-info';
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
@@ -114,10 +115,16 @@ export default function DepositTokensForm({
                             render={({ field }) => {
                                 return (
                                     <FormItem>
-                                        <FormLabel>Amount of Tokens</FormLabel>
+                                        <FormLabel className="flex gap-2">
+                                            Amount of Tokens
+                                            <MoreInfo
+                                                message="Enter the absolute value. For example, 1 token with 10^8 decimals = 10^8"
+                                                iconSize={15}
+                                            />
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="in ETH units."
+                                                placeholder="Absolute value, considering token decimals"
                                                 {...field}
                                             />
                                         </FormControl>
