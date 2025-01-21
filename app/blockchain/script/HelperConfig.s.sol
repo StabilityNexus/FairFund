@@ -14,16 +14,40 @@ contract HelperConfig is Script {
     constructor() {
         if (block.chainid == 80002) {
             activeNetworkConfig = getPolygonTestnetConfig();
+        } else if (block.chainid == 11155111) {
+            activeNetworkConfig = getSepoliaConfig();
+        } else if (block.chainid == 5) {
+            activeNetworkConfig = getGoerliConfig();
+        } else if (block.chainid == 80001) {
+            activeNetworkConfig = getMumbaiConfig();
+        } else if (block.chainid == 97) {
+            activeNetworkConfig = getBscTestnetConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
         }
     }
 
-    function getPolygonTestnetConfig() public view returns (NetworkConfig memory sepoliaNetworkConfig) {
-        sepoliaNetworkConfig = NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    function getPolygonTestnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
     }
 
-    function getOrCreateAnvilEthConfig() public view returns (NetworkConfig memory anvilNetworkConfig) {
-        anvilNetworkConfig = NetworkConfig({deployerKey: DEFAULT_ANVIL_PRIVATE_KEY});
+    function getSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    }
+
+    function getGoerliConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    }
+
+    function getMumbaiConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    }
+
+    function getBscTestnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    }
+
+    function getOrCreateAnvilEthConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({deployerKey: DEFAULT_ANVIL_PRIVATE_KEY});
     }
 }

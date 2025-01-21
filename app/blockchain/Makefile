@@ -21,13 +21,28 @@ deploy-polygon-testnet:
 
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
 
+# Testnet Deployments
+deploy-sepolia:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) $(VERBOSITY)
 
+deploy-goerli:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${GOERLI_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) $(VERBOSITY)
+
+deploy-mumbai:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${MUMBAI_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --polygonscan-api-key ${POLYGONSCAN_API_KEY} $(LEGACY) $(VERBOSITY)
+
+deploy-bsc-testnet:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${BSC_TESTNET_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${BSC_API_KEY} $(LEGACY) $(VERBOSITY)
 
 help:
 	@echo "Available targets:"
 	@echo "  deploy-mock-fair-fund (dmf)  : Deploy FairFund contract"
 	@echo "  deploy-mock-erc20 (dme)      : Deploy MockERC20 contract"
 	@echo "  mock-all                     : Deploy both contracts to anvil testnet"
+	@echo "  deploy-sepolia              : Deploy to Sepolia testnet"
+	@echo "  deploy-goerli               : Deploy to Goerli testnet"
+	@echo "  deploy-mumbai               : Deploy to Polygon Mumbai testnet"
+	@echo "  deploy-bsc-testnet          : Deploy to BSC testnet"
 	@echo "  help                         : Show this help message"
 
-.PHONY: deploy-mock-fair-fund deploy-mock-erc20 deploy-fair-fund dmf dme df all help
+.PHONY: deploy-mock-fair-fund deploy-mock-erc20 deploy-fair-fund dmf dme df mock-all help deploy-sepolia deploy-goerli deploy-mumbai deploy-bsc-testnet
