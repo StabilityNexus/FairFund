@@ -44,11 +44,14 @@ contract FairFund is Ownable {
     error FairFund__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount();
     error FairFund__MaxRequestableAmountCannotBeZero();
     error FairFund__TransferFailed(address token, address recepient, uint256 amount);
+    error FairFund__VaultLimitExceeded(address user, uint256 maxAllowed);
 
     // State Variables //
     uint256 private s_fundingVaultIdCounter;
     mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
     uint256 private s_platformFee;
+    uint256 public constant MAX_VAULTS_PER_ADDRESS = 5;
+    mapping(address => uint256) private s_vaultsCreated;
 
     // Events //
     event FundingVaultDeployed(address indexed fundingVault);
@@ -77,6 +80,9 @@ contract FairFund is Ownable {
         uint256 _maxRequestableAmount,
         uint256 _tallyDate
     ) external returns (address) {
+        if (s_vaultsCreated[msg.sender] >= MAX_VAULTS_PER_ADDRESS) {
+        revert FairFund__VaultLimitExceeded(msg.sender, MAX_VAULTS_PER_ADDRESS);
+        }
         if (_fundingToken == address(0) || _votingToken == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
@@ -89,7 +95,8 @@ contract FairFund is Ownable {
         if (_maxRequestableAmount == 0) {
             revert FairFund__MaxRequestableAmountCannotBeZero();
         }
-
+        
+        s_vaultsCreated[msg.sender]++;
         s_fundingVaultIdCounter++;
         uint256 fundingVaultId = s_fundingVaultIdCounter;
         string memory fundingVaultIdString = Strings.toString(fundingVaultId);
