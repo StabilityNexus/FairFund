@@ -31,13 +31,14 @@ import {VotingPowerToken} from "./VotingPowerToken.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title FairFund
  * @author Aditya Bhattad
  * @notice This is the main FairFund contract that will be used for deployment and keeping track of all the funding vaults.
  */
-contract FairFund is Ownable {
+contract FairFund is Ownable, ReentrancyGuard {
     // Errors //
     error FairFund__CannotBeAZeroAddress();
     error FairFund__TallyDateCannotBeInThePast();
@@ -125,7 +126,7 @@ contract FairFund is Ownable {
      * @param recepient The address to receive the withdrawn fees
      * @param token The address of the token to withdraw
      */
-    function withdrawPlatformFee(address recepient, address token) external onlyOwner {
+    function withdrawPlatformFee(address recepient, address token) external onlyOwner nonReentrant {
         if (recepient == address(0) || token == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
