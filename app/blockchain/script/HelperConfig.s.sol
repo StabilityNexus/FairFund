@@ -18,10 +18,8 @@ contract HelperConfig is Script {
             activeNetworkConfig = getSepoliaConfig();
         } else if (block.chainid == 5) {
             activeNetworkConfig = getGoerliConfig();
-        } else if (block.chainid == 80001) {
-            activeNetworkConfig = getMumbaiConfig();
-        } else if (block.chainid == 97) {
-            activeNetworkConfig = getBscTestnetConfig();
+        } else if (block.chainid == 200201) {
+            activeNetworkConfig = getMilkomedaTestnetConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
         }
@@ -39,11 +37,7 @@ contract HelperConfig is Script {
         return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
     }
 
-    function getMumbaiConfig() public view returns (NetworkConfig memory) {
-        return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
-    }
-
-    function getBscTestnetConfig() public view returns (NetworkConfig memory) {
+    function getMilkomedaTestnetConfig() public view returns (NetworkConfig memory) {
         return NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
     }
 

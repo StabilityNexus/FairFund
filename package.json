@@ -5,5 +5,10 @@
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "dependencies": {
+    "@wagmi/chains": "^1.8.0",
+    "@wagmi/core": "^2.16.3",
+    "viem": "^2.22.10"
   }
 }

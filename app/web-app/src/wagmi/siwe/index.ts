@@ -1,7 +1,28 @@
 'use client';
 import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
+import { foundry, polygonAmoy, sepolia, goerli,AppKitNetwork } from '@reown/appkit/networks';
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { foundry, polygonAmoy, sepolia, goerli, polygonMumbai, bscTestnet } from 'viem/chains';
+
+const milkomedaTestnet: AppKitNetwork = {
+    id: 200101,
+    name: 'Milkomeda C1 Testnet',
+    rpcUrls: {
+        default: {
+            http: [process.env.NEXT_PUBLIC_MILKOMEDA_TESTNET_RPC_URL || 'https://rpc-devnet-cardano-evm.c1.milkomeda.com'], // ✅ Changed to HTTP
+        },
+    },
+    nativeCurrency: {
+        name: 'Wrapped Test ADA',
+        symbol: 'mTADA',
+        decimals: 18,
+    },
+    blockExplorers: {
+        default: {
+            name: 'Milkomeda Explorer',
+            url: 'https://explorer-devnet-cardano-evm.c1.milkomeda.com',
+        },
+    },
+};
 
 export const siweConfig = createSIWEConfig({
     getMessageParams: async () => ({
@@ -10,7 +31,7 @@ export const siweConfig = createSIWEConfig({
         chains:
             process.env.NEXT_PUBLIC_NETWORK === 'foundry'
                 ? [foundry.id]
-                : [polygonAmoy.id, sepolia.id, goerli.id, polygonMumbai.id, bscTestnet.id],
+                : [polygonAmoy.id, sepolia.id, goerli.id, milkomedaTestnet.id],
         statement: 'Sign In With Ethereum to prove you control this wallet.',
     }),
     createMessage: ({ address, ...args }) => formatMessage(args, address),
