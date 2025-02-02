@@ -25,9 +25,6 @@ mock-all: deploy-mock-fair-fund deploy-mock-erc20
 deploy-sepolia:
 	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${SEPOLIA_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) $(VERBOSITY)
 
-deploy-goerli:
-	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${GOERLI_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) $(VERBOSITY)
-
 deploy-milkomeda-testnet:
 	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${MILKOMEDA_TESTNET_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${MILKOMEDA_API_KEY} $(LEGACY) $(VERBOSITY)
 
