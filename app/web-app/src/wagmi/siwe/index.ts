@@ -1,16 +1,18 @@
 'use client';
 import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
+import { foundry, polygonAmoy, sepolia } from '@reown/appkit/networks';
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { foundry, polygonAmoy } from 'viem/chains';
+import { milkomedaTestnet } from '../networks';
+
 
 export const siweConfig = createSIWEConfig({
-    getMessageParams: async () => ({
+    getMessageParams : async () => ({
         uri: window.location.origin,
         domain: window.location.host,
         chains:
             process.env.NEXT_PUBLIC_NETWORK === 'foundry'
                 ? [foundry.id]
-                : [polygonAmoy.id],
+                : [polygonAmoy.id, sepolia.id, milkomedaTestnet.id].map(chain => Number(chain)),
         statement: 'Sign In With Ethereum to prove you control this wallet.',
     }),
     createMessage: ({ address, ...args }) => formatMessage(args, address),
