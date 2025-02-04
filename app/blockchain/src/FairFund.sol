@@ -47,6 +47,7 @@ contract FairFund is Ownable, ReentrancyGuard {
     error FairFund__TransferFailed(address token, address recepient, uint256 amount);
 
     // State Variables //
+    address private treasury;
     uint256 private s_fundingVaultIdCounter;
     mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
     uint256 private s_platformFee;
@@ -59,6 +60,7 @@ contract FairFund is Ownable, ReentrancyGuard {
      * @param _platformFee The fee that will be charged by the platform for using the FairFund platform
      */
     constructor(uint256 _platformFee) Ownable(msg.sender) {
+        treasury = msg.sender;
         s_platformFee = _platformFee;
     }
 
@@ -123,21 +125,24 @@ contract FairFund is Ownable, ReentrancyGuard {
 
     /**
      * @notice Withdraws the accumulated platform fees to a specified recipient (only callable by the owner)
-     * @param recepient The address to receive the withdrawn fees
      * @param token The address of the token to withdraw
      */
-    function withdrawPlatformFee(address recepient, address token) external onlyOwner nonReentrant {
-        if (recepient == address(0) || token == address(0)) {
+    function withdrawPlatformFee(address token) external nonReentrant {
+        if (token == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
         uint256 platformBalance = IERC20(token).balanceOf(address(this));
         if (platformBalance != 0) {
-            bool success = IERC20(token).transfer(recepient, platformBalance);
+            bool success = IERC20(token).transfer(treasury, platformBalance);
             if (!success) {
-                revert FairFund__TransferFailed(token, recepient, platformBalance);
+                revert FairFund__TransferFailed(token, treasury, platformBalance);
             }
-            emit TransferTokens(token, recepient, platformBalance);
+            emit TransferTokens(token, treasury, platformBalance);
         }
+    }
+
+    function setTreasury(address _treasury) external onlyOwner {
+        treasury = _treasury;
     }
 
     // Getters //

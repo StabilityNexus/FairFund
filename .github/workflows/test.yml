@@ -1,6 +1,9 @@
 name: test
 
 on:
+  pull_request:
+    paths:
+      - 'app/blockchain/**'
   push:
     paths:
       - 'app/blockchain/**'
