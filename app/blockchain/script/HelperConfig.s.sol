@@ -13,14 +13,14 @@ contract HelperConfig is Script {
 
     constructor() {
         if (block.chainid == 80002) {
-            activeNetworkConfig = getPolygonTestnetConfig();
+            activeNetworkConfig = getProdNetworkConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
         }
     }
 
-    function getPolygonTestnetConfig() public view returns (NetworkConfig memory sepoliaNetworkConfig) {
-        sepoliaNetworkConfig = NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
+    function getProdNetworkConfig() public view returns (NetworkConfig memory prodNetworkConfig) {
+        prodNetworkConfig = NetworkConfig({deployerKey: vm.envUint("PRIVATE_KEY")});
     }
 
     function getOrCreateAnvilEthConfig() public view returns (NetworkConfig memory anvilNetworkConfig) {

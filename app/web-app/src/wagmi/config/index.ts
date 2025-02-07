@@ -1,6 +1,6 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { cookieStorage, createStorage, http } from '@wagmi/core';
-import { foundry, polygonAmoy } from '@reown/appkit/networks';
+import { foundry, polygonAmoy, polygon } from '@reown/appkit/networks';
 
 export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
@@ -18,6 +18,7 @@ export const wagmiAdapter = new WagmiAdapter({
     networks,
     transports: {
         [polygonAmoy.id]: http('https://rpc-amoy.polygon.technology/'),
+        [polygon.id]: http('https://polygon.llamarpc.com'),
         [foundry.id]: http('http://localhost:8545'),
     },
 });

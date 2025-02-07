@@ -19,6 +19,10 @@ dme: deploy-mock-erc20
 deploy-polygon-testnet:
 	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_AMOY_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
 
+deploy-polygon-mainnet:
+	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+
+
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
 
 

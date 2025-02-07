@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { siweConfig } from '@/wagmi/siwe';
-import { foundry, polygonAmoy } from '@reown/appkit/networks';
+import { foundry, polygonAmoy, polygon } from '@reown/appkit/networks';
 
 const queryClient = new QueryClient();
 
@@ -24,9 +24,9 @@ const modal = createAppKit({
     networks:
         process.env.NEXT_PUBLIC_NETWORK === 'foundry'
             ? [foundry]
-            : [polygonAmoy],
+            : [polygonAmoy, polygon],
     defaultNetwork:
-        process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? foundry : polygonAmoy,
+        process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? foundry : polygon,
     metadata,
     features: {
         analytics: false,

@@ -47,7 +47,7 @@ contract FairFund is Ownable, ReentrancyGuard {
     error FairFund__TransferFailed(address token, address recepient, uint256 amount);
 
     // State Variables //
-    address private treasury;
+    address private s_treasury;
     uint256 private s_fundingVaultIdCounter;
     mapping(uint256 fundingVaultId => address fundingVault) private s_fundingVaults;
     uint256 private s_platformFee;
@@ -60,7 +60,7 @@ contract FairFund is Ownable, ReentrancyGuard {
      * @param _platformFee The fee that will be charged by the platform for using the FairFund platform
      */
     constructor(uint256 _platformFee) Ownable(msg.sender) {
-        treasury = msg.sender;
+        s_treasury = msg.sender;
         s_platformFee = _platformFee;
     }
 
@@ -119,7 +119,7 @@ contract FairFund is Ownable, ReentrancyGuard {
      * @notice Modifies the platform fee (only callable by the owner)
      * @param _platformFee The new platform fee percentage to be set (i.e. 1 for 1% of amount every proposal will get.)
      */
-    function modityPlatformFee(uint256 _platformFee) external onlyOwner {
+    function updatePlatformFee(uint256 _platformFee) external onlyOwner {
         s_platformFee = _platformFee;
     }
 
@@ -133,16 +133,16 @@ contract FairFund is Ownable, ReentrancyGuard {
         }
         uint256 platformBalance = IERC20(token).balanceOf(address(this));
         if (platformBalance != 0) {
-            bool success = IERC20(token).transfer(treasury, platformBalance);
+            bool success = IERC20(token).transfer(s_treasury, platformBalance);
             if (!success) {
-                revert FairFund__TransferFailed(token, treasury, platformBalance);
+                revert FairFund__TransferFailed(token, s_treasury, platformBalance);
             }
-            emit TransferTokens(token, treasury, platformBalance);
+            emit TransferTokens(token, s_treasury, platformBalance);
         }
     }
 
     function setTreasury(address _treasury) external onlyOwner {
-        treasury = _treasury;
+        s_treasury = _treasury;
     }
 
     // Getters //
@@ -156,5 +156,9 @@ contract FairFund is Ownable, ReentrancyGuard {
 
     function getPlatformFee() external view returns (uint256) {
         return s_platformFee;
+    }
+
+    function getTreasury() external view returns (address) {
+        return s_treasury;
     }
 }
