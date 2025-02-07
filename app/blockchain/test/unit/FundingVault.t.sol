@@ -48,7 +48,8 @@ contract FundingVaultTest is Test {
         vm.stopPrank();
     }
 
-    function testFailDeposit() public {
+    function test_RevertWhen_Deposit() public {
+        vm.expectRevert();
         fundingVault.deposit(0 ether);
     }
 
@@ -62,15 +63,17 @@ contract FundingVaultTest is Test {
         vm.stopPrank();
     }
 
-    function testFailRegisterWithAmountLessThanZero() public {
+    function test_RevertWhen_RegisterWithAmountLessThanZero() public {
+        vm.expectRevert();
         fundingVault.register(0 ether);
     }
 
-    function testFailRegisterWithAmountGreaterThanBalance() public {
+    function test_RevertWhen_RegisterWithAmountGreaterThanBalance() public {
         vm.startPrank(randomUser);
         votingToken.mint(randomUser, 10 ether);
         votingToken.approve(address(fundingVault), 10 ether);
         vm.stopPrank();
+        vm.expectRevert();
         fundingVault.register(20 ether);
     }
 
