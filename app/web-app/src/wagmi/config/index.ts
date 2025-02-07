@@ -7,7 +7,9 @@ export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 if (!projectId) throw new Error('Project ID is not defined');
 
 export const networks =
-    process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? [foundry] : [polygonAmoy];
+    process.env.NEXT_PUBLIC_NETWORK === 'foundry'
+        ? [foundry]
+        : [polygonAmoy, polygon];
 
 export const wagmiAdapter = new WagmiAdapter({
     storage: createStorage({

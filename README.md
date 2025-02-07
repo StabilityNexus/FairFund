@@ -208,7 +208,7 @@ Smart contract documentation can be found [here](/app/blockchain/README.md).
 
 ### Test Deployed Instances
 
-- **Smart Contract**: [Polygon Amoy Testnet](https://www.oklink.com/amoy/address/0xde65b790a754720078b5a503783d025f28747246/contract)
+- **Smart Contract**: [Polygon Mainnet](https://polygonscan.com/address/0xb6dc3af544303f41478821c0dfb9af57c278cb34)
 - **Frontend**: [FairFund](https://fairfund.stability.nexus)
 
 ## Future Improvements

@@ -15,5 +15,6 @@ fail_on_revert=false
 
 [etherscan]
 polygon-amoy = { key = "${ETHERSCAN_API_KEY}", url = "https://www.oklink.com/api/explorer/v1/contract/verify/async/api/polygonAmoy" }
+polygon = { key = "${POLYGONSCAN_API_KEY}", url = "https://api.polygonscan.com/api" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

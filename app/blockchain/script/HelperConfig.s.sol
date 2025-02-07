@@ -12,7 +12,7 @@ contract HelperConfig is Script {
     }
 
     constructor() {
-        if (block.chainid == 80002) {
+        if (block.chainid != 31337) {
             activeNetworkConfig = getProdNetworkConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilEthConfig();
