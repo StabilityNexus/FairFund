@@ -11,7 +11,8 @@
 7. [Deployment](#deployment)
 8. [Future Improvements](#future-improvements)
 9. [Contributing](#contributing)
-10. [Community](#community)
+10. [Troublesooting](#troubleshooting)
+11. [Community](#community)
 
 ## Introduction
 
@@ -84,7 +85,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
    make deploy-sepolia
    ```
 
-### Frontend 
+### Frontend
 
 1. **Navigate to the Web App Directory**:
 
@@ -107,6 +108,7 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
    - If using a local instance of PostgreSQL, update the `POSTGRES_PRISMA_URL` and `POSTGRES_URL_NON_POOLING` with the correct connection url for the local postgreSQL.
 
    NextAuth:
+
    - Generate a secure `NEXTAUTH_SECRET` by running the following command in the terminal
 
    ```bash
@@ -115,22 +117,18 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 
    - For local development `NEXTAUTH_URL` will be `http://localhost:3000`
 
-5. **To start local instance of postgreSQL database (with docker)**:
-
+4. **To start local instance of postgreSQL database (with docker)**:
 
    1. Start docker desktop
    2. Run `docker compose up`
 
-
-6. **Run the Development Server**:
-
+5. **Run the Development Server**:
 
    ```bash
    npm run dev
    ```
 
-
-7. **Access the Web App**:
+6. **Access the Web App**:
 
    - Open your browser and navigate to `http://localhost:3000`.
 
@@ -241,6 +239,131 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 9. Commit and push your changes
 10. Open a pull request to the `v2` branch
 11. Provide a detailed description of your changes in the PR, including videos and images if applicable
+
+## Troubleshooting
+
+This guide will serve as a solution to the common problems which may arise while setting up the project so follow along-
+
+### Common Setup Issues
+
+NOTE: Always make sure your .env file created in the root folder and has correct credentials for smooth running of the project as followed by the .env.example file
+
+#### 1. Docker Compose Fails to Start PostgreSQL
+
+Case 1: Connection errors in web-app logs
+
+Solutions: Verify Docker Desktop is running
+
+- **Check if port 5432 is occupied:**
+
+  \_ **macOS/Linux:** Open your terminal and run the command: `lsof -i :5432`. This command lists any processes using port 5432.
+
+  - **Windows:** Open Command Prompt or PowerShell as an administrator and run: `netstat -ano | findstr :5432`. This will show the processes using the port along with their PIDs. You can then use Task Manager to identify and close the process.
+
+  - **Verify Docker Compose Installation:** The error "command not found: docker-compose" indicates that Docker Compose isn't installed or accessible.
+
+  - **If using Docker Desktop:** Docker Compose is usually included. Ensure it's enabled in Docker Desktop's settings. \* **If using a separate installation:** Follow the official Docker Compose installation guide for your operating system: [https://docs.docker.com/compose/install/]
+
+```
+lsof -i :5432
+```
+
+Remove existing containers:
+
+```
+docker-compose down -v
+```
+
+##### Note:
+
+If facing hard times using docker then it would be wise to get postgres connection string and prisma connection url from neon.tech for free.
+
+##### 1.1 Dependency Installation Failures
+
+- Problem: forge install errors
+  - Solution: Ensure Foundry is updated to latest version
+
+```
+foundryup
+```
+
+- Verify network connectivity for GitHub dependencies
+
+#### 2. Smart Contract Tests Fail
+
+Case 2: forge test errors
+Solutions: Update dependencies
+
+```
+forge update
+
+# Restart Anvil chain
+
+pkill anvil && anvil
+```
+
+#### 3. Frontend Environment Issues
+
+Case 3: NextAuth/NEXTAUTH_SECRET errors
+Solutions: Regenerate secret:
+
+```
+openssl rand -base64 32
+```
+
+Note: Ensure .env matches .env.example structure
+
+#### 4. Wallet Connection Problems
+
+Case 4: SIWE authentication failures
+Solutions:
+Clear browser cache
+Verify wallet network matches application chain (Amoy Testnet)
+
+### Codebase Assumptions
+
+#### 1. Dependency Versions
+
+The project assumes:
+-> Node.js ≥18.x (LTS version recommended)
+-> Foundry ≥0.2.0
+-> Docker ≥24.0+
+
+#### 2. Blockchain Knowledge
+
+Developers should understand:
+-> Foundry Framework
+-> Basic Solidity patterns
+-> ERC-20 token standards
+-> Wallet authentication flows (SIWE)
+
+- Contracts are deployed on Polygon Amoy testnet by default
+- Test transactions require MATIC on Amoy network
+
+#### 3. Local Environment
+
+-> PostgreSQL is managed via Docker
+-> All blockchain interactions use test ETH sepolia
+-> Frontend auto-reloads contract ABIs after make mock-all
+
+#### 4. Testing
+
+-> Smart contracts use Foundry's cheatcodes
+-> Frontend tests assume Metamask test accounts
+-> End-to-end tests require local Anvil chain
+
+#### 5. Common Configuration Pitfalls
+
+- Anvil local chain must run on default port 8545
+- Frontend expects contract ABIs in /web-app/abi/ directory
+- All environment variables are case-sensitive
+
+#### 6. Codebase Assumptions
+
+- Foundry v0.2.0+ required for Solidity ^0.8.20 support
+- PostgreSQL 15+ required for Prisma ORM compatibility
+
+For additional support reach out to us via discord channel
 
 ## Community
 
