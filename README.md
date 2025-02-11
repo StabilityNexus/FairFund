@@ -276,7 +276,7 @@ docker-compose down -v
 
 ##### Note:
 
-If facing hard times using docker then it would be wise to get postgres connection string and prisma connection url from neon.tech for free.
+If facing hard times using docker then it would be wise to get postgres connection string and prisma connection url from neon.tech for free. You have to signup there and create a project name and get the connection string from there, pretty straight forward!
 
 ##### 1.1 Dependency Installation Failures
 
