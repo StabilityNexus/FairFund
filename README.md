@@ -238,9 +238,39 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
    - Example: `feat/add-space-moderation-functionality`
 7. Switch to the new branch
 8. Make your changes
-9. Commit and push your changes
-10. Open a pull request to the `v2` branch
-11. Provide a detailed description of your changes in the PR, including videos and images if applicable
+9. Commit your changes
+10. Decide on the scope of the change:  
+   - **Small changes** (minor fixes, documentation updates, small UI tweaks) → **Make a pull request directly to `main`**  
+   - **Big changes** (new features, major refactors) → **Make a pull request to `develop`** branch
+11. Provide a detailed description of your changes in the PR, including videos and images for visible UI changes.
+
+
+### Important Guidelines
+
+#### Code Quality and Testing
+- Take your time to create high-quality PRs - do not commit code hastily
+- Ensure all changes are thoroughly tested before submission
+- Avoid introducing code smells
+- Do not submit untested code as it complicates the review process
+- Only include code in the commit that is intentional. Avoid using `git add .` to prevent unintended changes from being committed.
+
+#### Pull Request Rules
+- Small frontend changes (< 20 lines) or documentation updates can be submitted without prior assignment
+- Unassigned PRs will be closed without review
+- Check existing issues and PRs to avoid duplicating efforts
+- Tag the maintainer if your PR is unattended for:
+  - 1 week for small contributions
+  - 2 weeks for larger contributions
+
+#### Timeline and Progress
+- Issues should be completed within:
+  - 5 days for small tasks
+  - 15 days for complex tasks
+- Provide regular progress updates in issue/PR comments if work extends beyond expected timeline
+- Issues may be reassigned if not completed within the specified timeframe
+
+### Need Help?
+If you have questions or need clarification, please ask on [Discord](https://discord.gg/7jS9qJNjJv).
 
 ## Community
 
