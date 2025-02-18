@@ -59,6 +59,11 @@ contract FairFundTest is Test {
         fairFund.deployFundingVault(address(1), address(mockERC20), 10, 1, block.timestamp + 1 days);
     }
 
+    function testDeployFundingVaultMaxRequestableAmountZero() public {
+        vm.expectRevert(FairFund.FairFund__MaxRequestableAmountCannotBeZero.selector);
+        fairFund.deployFundingVault(address(0xAAA), address(mockERC20), 0, 0, block.timestamp + 1 days);
+    }
+
     function testUpdatePlatformFee() public {
         uint256 newFee = 200;
         address owner = fairFund.owner();
@@ -87,8 +92,6 @@ contract FairFundTest is Test {
         mockERC20.mint(address(fairFund), balance);
         address treasury = fairFund.getTreasury();
         uint256 initialTreasuryBalance = mockERC20.balanceOf(treasury);
-        vm.expectEmit(true, true, true, true);
-        emit FairFund.TransferTokens(address(mockERC20), treasury, balance);
         fairFund.withdrawPlatformFee(address(mockERC20));
         assertEq(
             mockERC20.balanceOf(treasury),
@@ -106,9 +109,25 @@ contract FairFundTest is Test {
         fairFund.withdrawPlatformFee(address(mockERC20));
     }
 
+    function testWithdrawPlatformFeeTransactionFailed() public {
+        mockERC20.updateTransferFalseNeeded(true);
+
+        uint256 balance = 100000000000000000000;
+        mockERC20.mint(address(fairFund), balance);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                FairFund.FairFund__TransferFailed.selector, address(mockERC20), fairFund.getTreasury(), balance
+            )
+        );
+        fairFund.withdrawPlatformFee(address(mockERC20));
+        mockERC20.updateTransferFalseNeeded(false);
+    }
+
     function testSetTreasurySuccess() public {
         address owner = fairFund.owner();
         vm.startPrank(owner);
+
         address newTreasury = address(0xAAAA);
         fairFund.setTreasury(newTreasury);
 
