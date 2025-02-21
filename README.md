@@ -280,6 +280,48 @@ docker-compose down -v
 
 If facing hard times using docker then it would be wise to get postgres connection string and prisma connection url from neon.tech for free. By sigining up and creating a project name of your choice and getting your connection strings.
 
+#### Prisma Database issues
+
+If you are encountering issues like drift detected, then follow along
+
+Errors like "Drift detected: Your database schema is not in sync with your migration history" can get encountered during the execution of npx prisma migrate dev. This typically occurs when manual changes are made to the database or when prisma db push is used to directly alter the database schema without updating migration files.
+
+Solution:
+
+1. Run this command cautiously to sync schema changes without migrations.
+
+```
+prisma db push
+```
+
+2. Review and update the 'dev script' in 'package.json' to ensure it aligns with the workflow. Avoid pushing changes directly to production scripts.
+
+3. For persistent errors, reset migrations using:
+
+   ```
+   npx prisma migrate reset
+   ```
+
+   This will clear existing migrations and reapply them based on the current schema.
+
+### Environment Credential Errors
+
+If issues were noted in retrieving or configuring environment variables, particularly for PostgreSQL and NextAuth, then follow along.
+
+Solutions:
+
+Ensure all required environment variables are correctly set in the .env file:
+
+1. PostgreSQL connection strings (POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING) must match your setup, whether local or cloud-based (e.g., Neon.tech).
+
+2. Generate a secure NEXTAUTH_SECRET using:
+
+```
+openssl rand -base64 32
+```
+
+3. For local development, set NEXTAUTH_URL to http://localhost:3000.
+
 ##### 1.1 Dependency Installation Failures
 
 - Problem: forge install errors
