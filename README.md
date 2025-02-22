@@ -208,7 +208,7 @@ Smart contract documentation can be found [here](/app/blockchain/README.md).
 
 ### Test Deployed Instances
 
-- **Smart Contract**: [Polygon Amoy Testnet](https://www.oklink.com/amoy/address/0xde65b790a754720078b5a503783d025f28747246/contract)
+- **Smart Contract**: [Polygon Mainnet](https://polygonscan.com/address/0xb6dc3af544303f41478821c0dfb9af57c278cb34)
 - **Frontend**: [FairFund](https://fairfund.stability.nexus)
 
 ## Future Improvements
@@ -239,15 +239,17 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 7. Switch to the new branch
 8. Make your changes
 9. Commit your changes
-10. Decide on the scope of the change:  
-   - **Small changes** (minor fixes, documentation updates, small UI tweaks) → **Make a pull request directly to `main`**  
-   - **Big changes** (new features, major refactors) → **Make a pull request to `develop`** branch
-11. Provide a detailed description of your changes in the PR, including videos and images for visible UI changes.
+10. Decide on the scope of the change:
 
+- **Small changes** (minor fixes, documentation updates, small UI tweaks) → **Make a pull request directly to `main`**
+- **Big changes** (new features, major refactors) → **Make a pull request to `develop`** branch
+
+11. Provide a detailed description of your changes in the PR, including videos and images for visible UI changes.
 
 ### Important Guidelines
 
 #### Code Quality and Testing
+
 - Take your time to create high-quality PRs - do not commit code hastily
 - Ensure all changes are thoroughly tested before submission
 - Avoid introducing code smells
@@ -255,6 +257,7 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 - Only include code in the commit that is intentional. Avoid using `git add .` to prevent unintended changes from being committed.
 
 #### Pull Request Rules
+
 - Small frontend changes (< 20 lines) or documentation updates can be submitted without prior assignment
 - Unassigned PRs will be closed without review
 - Check existing issues and PRs to avoid duplicating efforts
@@ -263,6 +266,7 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
   - 2 weeks for larger contributions
 
 #### Timeline and Progress
+
 - Issues should be completed within:
   - 5 days for small tasks
   - 15 days for complex tasks
@@ -270,6 +274,7 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 - Issues may be reassigned if not completed within the specified timeframe
 
 ### Need Help?
+
 If you have questions or need clarification, please ask on [Discord](https://discord.gg/7jS9qJNjJv).
 
 ## Troubleshooting
