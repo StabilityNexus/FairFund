@@ -19,6 +19,7 @@ if (process.env.NODE_ENV === 'development') {
 export const chainToFairFund: Record<string, string> = {
     "63": fairFundDeploymentProd.ethereumMordor,
     "80002": fairFundDeploymentProd.polygonTestnet,
+    "137":fairFundDeploymentProd.polygonMainnet,
     "31337": fairFundDeploymentDev.mockFairFund, // Local development network
 };
 
