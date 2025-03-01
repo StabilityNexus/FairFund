@@ -64,7 +64,7 @@ contract FundingVault is ReentrancyGuard {
     error FundingVault__NoFundsToWithdraw();
     error FundingVault__NoRemainingFundsToWithdraw();
     error FundingVault__WithdrawableAmountTooSmall();
-
+    error FundingVault__TallyDatePassed();
     // Type Declarations //
     struct Proposal {
         string metadata;
@@ -113,6 +113,13 @@ contract FundingVault is ReentrancyGuard {
         }
         _;
     }
+    modifier beforeTallyDate(){
+        if ( block.timestamp>i_tallyDate){
+            revert FundingVault__TallyDatePassed();
+        }
+        _;
+    }
+
 
     // Functions //
 
@@ -150,7 +157,7 @@ contract FundingVault is ReentrancyGuard {
      * @dev Allows users to deposit fundingToken into the vault
      * @param _amount The amount of fundingToken to deposit
      */
-    function deposit(uint256 _amount) public nonReentrant {
+    function deposit(uint256 _amount) public  nonReentrant beforeTallyDate {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
@@ -164,7 +171,7 @@ contract FundingVault is ReentrancyGuard {
      * @dev locks votingToken from the user and mints votingPowerToken
      * @param _amount The amount of votingTokens to lock in order to receive votingPowerTokens
      */
-    function register(uint256 _amount) public nonReentrant {
+    function register(uint256 _amount) public nonReentrant beforeTallyDate {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }
@@ -188,6 +195,7 @@ contract FundingVault is ReentrancyGuard {
     function submitProposal(string memory _metadata, uint256 _minimumAmount, uint256 _maximumAmount, address _recipient)
         public
         nonReentrant
+        beforeTallyDate
         returns (uint256)
     {
         if (bytes(_metadata).length == 0) {
@@ -214,7 +222,7 @@ contract FundingVault is ReentrancyGuard {
      * @param _proposalId The id of the proposal to vote on
      * @param _amount The amount of votingToken to vote with
      */
-    function voteOnProposal(uint256 _proposalId, uint256 _amount) public nonReentrant {
+    function voteOnProposal(uint256 _proposalId, uint256 _amount) public nonReentrant beforeTallyDate {
         if (_proposalId <= 0 || _proposalId > s_proposalIdCounter) {
             revert FundingVault__ProposalDoesNotExist();
         }

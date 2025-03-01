@@ -48,6 +48,17 @@ contract FundingVaultTest is Test {
         vm.stopPrank();
     }
 
+    function testRevertIfDepositAfterTallyDate() public {
+        uint256 originalTime = block.timestamp;
+        vm.warp(block.timestamp + 2 days);
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 10 ether);
+        fundingToken.approve(address(fundingVault), 10 ether);
+        vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
+        fundingVault.deposit(10 ether);
+        vm.warp(originalTime);
+    }
+
     function test_RevertWhen_Deposit() public {
         vm.expectRevert();
         fundingVault.deposit(0 ether);
@@ -77,6 +88,17 @@ contract FundingVaultTest is Test {
         fundingVault.register(20 ether);
     }
 
+    function testRevertWhenRegisterAfterTalleydate() public {
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        uint256 originalTime = block.timestamp;
+        vm.warp(originalTime + 2 days);
+        vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
+        fundingVault.register(10 ether);
+        vm.warp(originalTime);
+    }
+
     function testSubmitProposal() public {
         fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
         (string memory metadata, uint256 minAmount, uint256 maxAmount, address recipient) = fundingVault.getProposal(1);
@@ -102,6 +124,15 @@ contract FundingVaultTest is Test {
     function testSubmitProposalWithZeroAddress() public {
         vm.expectRevert(FundingVault.FundingVault__CannotBeAZeroAddress.selector);
         fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(0));
+    }
+
+    function testRevertWhenProposalSubmittedAfterTallyDate() public {
+        uint256 originalTime = block.timestamp;
+        vm.warp(originalTime + 2 days);
+        vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+
+        vm.warp(originalTime);
     }
 
     function testVoteOnProposal() public {
@@ -141,6 +172,24 @@ contract FundingVaultTest is Test {
         vm.expectRevert(FundingVault.FundingVault__AmountExceededsLimit.selector);
         fundingVault.voteOnProposal(1, 20 ether);
         vm.stopPrank();
+    }
+
+    function testRevertWhenVotedAfterTallyDatePassed() public {
+        uint256 originalTime = block.timestamp;
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        vm.stopPrank();
+        // attempt voting after the tally date is passed
+        vm.startPrank(randomUser);
+        vm.warp(originalTime + 2 days);
+        votingPowerToken.approve(address(fundingVault), 10 ether);
+        vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
+        fundingVault.voteOnProposal(1, 10 ether);
+        vm.stopPrank();
+        vm.warp(originalTime);
     }
 
     function testCalculateFundingToBeReceived() public {
