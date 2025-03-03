@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { type FundingVault } from '@prisma/client';
 import { getVaultBalance } from '@/lib/vault-data';
 import VaultDetailsCard from './vault-details-card';
+import {chain} from '@/lib/chains'
 
 interface VaultDetailsCardWrapperProps {
   fundingVault: FundingVault;
@@ -20,12 +21,7 @@ export default async function VaultDetailsCardWrapper({
     proposalsPromise,
   ]);
 
-  const chain = new Map<number, string>([
-    [63, "Etherium Mordor"],
-    [80002, "Polygon Amoye"],
-    [137, "Polygon"],
-    [31337, "Anvil"],
-  ]);
+
   const chainName = chain.get(parseInt(vault.chainId)) || "Unknown Chain";
 
   return (
