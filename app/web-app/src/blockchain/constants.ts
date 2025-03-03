@@ -16,11 +16,16 @@ if (process.env.NODE_ENV === 'development') {
     erc20DeploymentDev = require('@/blockchain/deployments/anvil/erc20_deployment.json');
 }
 
+export const chainToFairFund: Record<string, string> = {
+    "63": fairFundDeploymentProd.ethereumMordor,
+    "80002": fairFundDeploymentProd.polygonTestnet,
+    "137":fairFundDeploymentProd.polygonMainnet,
+    "31337": fairFundDeploymentDev.mockFairFund, // Local development network
+};
+
 export const fairFund: SmartContract = {
-    address:
-        process.env.NODE_ENV === 'development'
-            ? fairFundDeploymentDev.mockFairFund
-            : fairFundDeploymentProd.fairFund,
+    address: "80002",
+  
     abi:
         process.env.NODE_ENV === 'development'
             ? mockFairFundABI.abi

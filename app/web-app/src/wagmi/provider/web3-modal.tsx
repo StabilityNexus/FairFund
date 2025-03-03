@@ -6,6 +6,7 @@ import { createAppKit } from '@reown/appkit/react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { siweConfig } from '@/wagmi/siwe';
 import { foundry, polygonAmoy, polygon } from '@reown/appkit/networks';
+import { mordor } from '../networks';
 
 const queryClient = new QueryClient();
 
@@ -24,9 +25,9 @@ const modal = createAppKit({
     networks:
         process.env.NEXT_PUBLIC_NETWORK === 'foundry'
             ? [foundry]
-            : [polygonAmoy, polygon],
+            : [polygonAmoy, polygon,mordor],
     defaultNetwork:
-        process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? foundry : polygon,
+        process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? foundry : polygonAmoy,
     metadata,
     features: {
         analytics: false,
