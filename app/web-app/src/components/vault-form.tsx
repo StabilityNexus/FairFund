@@ -70,6 +70,7 @@ const createVaultFormSchema = z.object({
     tallyDate: z.date({
         required_error: 'Tally Date is required.',
     }),
+    // chainId: z.string(),
 });
 
 interface VaultFormInterface {
@@ -167,6 +168,8 @@ export default function VaultForm({
                     minimumRequestableAmount: data.minRequestableAmount,
                     maximumRequestableAmount: data.maxRequestableAmount,
                     spaceId: selectedSpace.id,
+                    chainId:chainId,
+                    
                 });
                 setFundingVault(response.data);
                 nextComp();

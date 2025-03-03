@@ -20,6 +20,7 @@ export async function POST(req: Request) {
             minimumRequestableAmount,
             maximumRequestableAmount,
             spaceId,
+            chainId
         } = await req.json();
 
         // If current user is not the creator of the space, return unauthorized
@@ -52,6 +53,8 @@ export async function POST(req: Request) {
                 minimumRequestableAmount: parseFloat(minimumRequestableAmount),
                 maximumRequestableAmount: parseFloat(maximumRequestableAmount),
                 spaceId,
+                chainId:`${chainId}`
+                
             },
         });
         return NextResponse.json(vault);

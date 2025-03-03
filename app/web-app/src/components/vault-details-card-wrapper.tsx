@@ -1,6 +1,7 @@
 import React from 'react';
 import prisma from '@/lib/db';
 import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import LaptopMinimalCheck from 'lucide-react/dist/esm/icons/circle-check';
 import File from 'lucide-react/dist/esm/icons/file';
 import FileText from 'lucide-react/dist/esm/icons/file-text';
 import LockKeyhole from 'lucide-react/dist/esm/icons/lock-keyhole';
@@ -16,7 +17,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { StatCard } from '@/components/stat-card';
-
 import { type FundingVault } from '@prisma/client';
 import { getVaultBalance } from '@/lib/vault-data';
 import { truncateText } from '@/lib/truncate-text';
@@ -40,6 +40,14 @@ export default async function VaultDetailsCardWrapper({
         vaultBalancePromise,
         proposalsPromise,
     ]);
+
+    const chain = new Map<number, string>([
+        [63, "Etherium Mordor"],
+        [80002, "Polygon Amoye"],
+        [137, "Polygon"],
+        [31337, "Anvil"],
+    ]);
+    const chainName = chain.get(parseInt(vault.chainId)) || "Unknown Chain";
 
     return (
         <div className="space-y-6">
@@ -75,6 +83,12 @@ export default async function VaultDetailsCardWrapper({
                     icon={<Calendar className="text-red-500" />}
                     value={vault.tallyDate.toLocaleDateString()}
                     description="Date when the voting results will be tallied"
+                />
+                <StatCard
+                    title="Deployed on"
+                    icon={<LaptopMinimalCheck className="text-green-500" />}
+                    value={chainName}
+                    description="Contract Deployed on Which Chain"
                 />
             </div>
 
