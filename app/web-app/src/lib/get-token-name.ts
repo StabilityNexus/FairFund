@@ -14,6 +14,6 @@ export async function getTokenName(chainId:number,address: string): Promise<stri
         return result as string;
     } catch (err) {
         console.log('[GET_TOKEN_NAME_ERROR]', err, address);
-        return 'Unknown';
+        return 'TOKEN';
     }
 }

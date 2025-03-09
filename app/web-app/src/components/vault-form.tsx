@@ -125,6 +125,7 @@ export default function VaultForm({
                     address: data.fundingTokenAddress as `0x${string}`,
                     abi: erc20ABI,
                     functionName: 'decimals',
+                    chainId:chainId
                 });
                 const minRequestableAmount = parseUnits(
                     data.minRequestableAmount,
