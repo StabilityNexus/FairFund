@@ -1,7 +1,8 @@
 'use client';
 import { createSIWEConfig, formatMessage } from '@reown/appkit-siwe';
 import { getCsrfToken, getSession, signIn, signOut } from 'next-auth/react';
-import { foundry, polygonAmoy, polygon } from 'viem/chains';
+import { foundry, polygonAmoy, polygon} from 'viem/chains';
+import { mordor } from '../networks';
 
 export const siweConfig = createSIWEConfig({
     getMessageParams: async () => ({
@@ -10,7 +11,7 @@ export const siweConfig = createSIWEConfig({
         chains:
             process.env.NEXT_PUBLIC_NETWORK === 'foundry'
                 ? [foundry.id]
-                : [polygonAmoy.id, polygon.id],
+                : [polygonAmoy.id, polygon.id, mordor.id],
         statement: 'Sign In With Ethereum to prove you control this wallet.',
     }),
     createMessage: ({ address, ...args }) => formatMessage(args, address),
