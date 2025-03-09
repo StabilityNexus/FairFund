@@ -38,6 +38,7 @@ import MoreInfo from './more-info';
 
 interface DepositTokensFormProps {
     fundingTokenAddress: string;
+    vaultChainId:number;
     vaultAddress: string;
     vaultId: number;
     isCreateVault?: boolean;
@@ -52,6 +53,7 @@ export default function DepositTokensForm({
     vaultAddress,
     vaultId,
     isCreateVault = false,
+    vaultChainId,
 }: DepositTokensFormProps) {
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof depositTokensForm>>();
@@ -91,7 +93,8 @@ export default function DepositTokensForm({
             });
             return { depositHash, message: 'Tokens deposited successfully.' };
         },
-        isCreateVault ? '/dashboard' : `/vault/${vaultId}`
+        isCreateVault ? '/dashboard' : `/vault/${vaultId}`,
+        vaultChainId
     );
 
     const handleSkip = () => {

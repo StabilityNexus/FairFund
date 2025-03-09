@@ -26,6 +26,7 @@ export default async function RegisterPage({
                 vaultId={vault!.id}
                 vaultAddress={vault!.vaultAddress}
                 votingTokenAddress={vault!.votingTokenAddress}
+                vaultChainId={parseInt(vault!.chainId)}
             />
         </>
     );

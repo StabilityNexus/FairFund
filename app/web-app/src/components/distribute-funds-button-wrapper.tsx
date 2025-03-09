@@ -31,6 +31,7 @@ export default function DistributeFundsButtonWrapper({
     return (
         <BlockchainActionButton
             smartContractAddress={vault.vaultAddress as `0x${string}`}
+            chainId={parseInt(vault.chainId)}
             functionName="distributeFunds"
             smartContractABI={smartContractABI}
             buttonText="Distribute Funds"

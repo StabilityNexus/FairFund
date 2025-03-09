@@ -28,10 +28,11 @@ deploy-ethereum-mordor:
 
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
 
-
-
 help:
 	@echo "Available targets:"
+	@echo "  deploy-polygon-testnet       : Deploy FairFund contract to Polygon testnet"
+	@echo "  deploy-polygon-mainnet       : Deploy FairFund contract to Polygon mainnet"
+	@echo "  deploy-ethereum-mordor       : Deploy FairFund contract to Ethereum Mordor"
 	@echo "  deploy-mock-fair-fund (dmf)  : Deploy FairFund contract"
 	@echo "  deploy-mock-erc20 (dme)      : Deploy MockERC20 contract"
 	@echo "  mock-all                     : Deploy both contracts to anvil testnet"

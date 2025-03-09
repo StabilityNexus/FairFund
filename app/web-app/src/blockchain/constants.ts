@@ -16,21 +16,41 @@ if (process.env.NODE_ENV === 'development') {
     erc20DeploymentDev = require('@/blockchain/deployments/anvil/erc20_deployment.json');
 }
 
-export const chainToFairFund: Record<string, string> = {
-    "63": fairFundDeploymentProd.ethereumMordor,
-    "80002": fairFundDeploymentProd.polygonTestnet,
-    "137":fairFundDeploymentProd.polygonMainnet,
-    "31337": fairFundDeploymentDev.mockFairFund, // Local development network
+interface FairFundConfig {
+    address: string;
+    abi: any;
+    name?: string;
+}
+
+export const chainToFairFund: Record<number, FairFundConfig> = {
+    63: {
+        address: fairFundDeploymentProd.ethereumMordor,
+        abi: fairFundABI.abi,
+        name: "Ethereum Mordor"
+    },
+    80002: {
+        address: fairFundDeploymentProd.polygonTestnet,
+        abi: fairFundABI.abi,
+        name: "Polygon Mumbai"
+    },
+    137: {
+        address: fairFundDeploymentProd.polygonMainnet,
+        abi: fairFundABI.abi,
+        name: "Polygon Mainnet"
+    },
+    31337: {
+        address: fairFundDeploymentDev?.mockFairFund || "",
+        abi: mockFairFundABI?.abi || fairFundABI.abi,
+        name: "Anvil Local"
+    }
 };
 
-export const fairFund: SmartContract = {
-    address: "80002",
-  
-    abi:
-        process.env.NODE_ENV === 'development'
-            ? mockFairFundABI.abi
-            : fairFundABI.abi,
-};
+export function getFairFundForChain(chainId: number): FairFundConfig | null {
+    if (chainId in chainToFairFund) {
+        return chainToFairFund[chainId];
+    }
+    return null;
+}
 
 export const erc20ABI = erc20.abi;
 

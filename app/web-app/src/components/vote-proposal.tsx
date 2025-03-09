@@ -32,6 +32,7 @@ interface VoteProposalButtonProps {
     proposal: Proposal;
     votingTokenAddress: string;
     vaultAddress: string;
+    vaultChainId:number
 }
 
 const voteProposalForm = z.object({
@@ -42,6 +43,7 @@ export default function VoteProposal({
     proposal,
     votingTokenAddress,
     vaultAddress,
+    vaultChainId,
 }: VoteProposalButtonProps) {
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof voteProposalForm>>();
@@ -74,7 +76,9 @@ export default function VoteProposal({
                 hash: hash as `0x${string}`,
             });
             return { hash, message: 'Successfully voted on the proposal.' };
-        }
+        },
+        undefined,
+        vaultChainId
     );
 
     return (

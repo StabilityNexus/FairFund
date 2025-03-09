@@ -15,7 +15,7 @@ import axios from 'axios';
 
 import { cn } from '@/lib/utils';
 import { config as wagmiConfig } from '@/wagmi/config';
-import { chainToFairFund, erc20ABI, fairFund } from '@/blockchain/constants';
+import { erc20ABI,getFairFundForChain } from '@/blockchain/constants';
 
 import {
     Form,
@@ -70,7 +70,6 @@ const createVaultFormSchema = z.object({
     tallyDate: z.date({
         required_error: 'Tally Date is required.',
     }),
-    // chainId: z.string(),
 });
 
 interface VaultFormInterface {
@@ -96,7 +95,7 @@ export default function VaultForm({
     setFundingVault,
     selectedSpace,
 }: VaultFormInterface) {
-    const { address } = useAccount();
+    const { address, chainId } = useAccount();
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
@@ -118,8 +117,6 @@ export default function VaultForm({
         }
     }, [selectedSpace, prevComp]);
 
-    const { chainId } = useAccount();
-
     const onSubmit = handleSubmit(
         async (data: z.infer<typeof createVaultFormSchema>) => {
             if (selectedSpace) {
@@ -137,11 +134,17 @@ export default function VaultForm({
                     data.maxRequestableAmount,
                     decimals as number
                 );
-
+                if(!chainId){
+                    throw new Error('Chain ID not found');
+                }
+                const fairFund = getFairFundForChain(chainId);
+                if (!fairFund) {
+                    throw new Error('FairFund Contract not found for this chain');
+                }
                 const { result, request } = await simulateContract(
                     wagmiConfig,
                     {
-                        address: (chainToFairFund[chainId || "63"] || chainToFairFund["80002"]) as `0x${string}`,
+                        address: fairFund.address as `0x${string}`,
                         abi: fairFund.abi,
                         functionName: 'deployFundingVault',
                         args: [
