@@ -65,6 +65,7 @@ contract FundingVault is ReentrancyGuard {
     error FundingVault__NoRemainingFundsToWithdraw();
     error FundingVault__WithdrawableAmountTooSmall();
     error FundingVault__TallyDatePassed();
+
     // Type Declarations //
     struct Proposal {
         string metadata;
@@ -113,13 +114,13 @@ contract FundingVault is ReentrancyGuard {
         }
         _;
     }
-    modifier beforeTallyDate(){
-        if ( block.timestamp>i_tallyDate){
+
+    modifier beforeTallyDate() {
+        if (block.timestamp > i_tallyDate) {
             revert FundingVault__TallyDatePassed();
         }
         _;
     }
-
 
     // Functions //
 
@@ -157,7 +158,7 @@ contract FundingVault is ReentrancyGuard {
      * @dev Allows users to deposit fundingToken into the vault
      * @param _amount The amount of fundingToken to deposit
      */
-    function deposit(uint256 _amount) public  nonReentrant beforeTallyDate {
+    function deposit(uint256 _amount) public nonReentrant beforeTallyDate {
         if (_amount <= 0) {
             revert FundingVault__AmountCannotBeZero();
         }

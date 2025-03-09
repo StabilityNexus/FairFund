@@ -20,7 +20,7 @@ contract DeployFairFund is Script {
         string memory path = string.concat("../web-app/src/blockchain/deployments/production/fairFund_deployment.json");
 
         string memory existingContent = vm.readFile(path);
-        
+
         // If file is empty, initialize with an empty object
         if (bytes(existingContent).length == 0) {
             existingContent = "{}";
@@ -30,7 +30,8 @@ contract DeployFairFund is Script {
 
         string memory updatedContent;
 
-        if (bytes(existingContent).length > 2) { // If it's not just "{}"
+        if (bytes(existingContent).length > 2) {
+            // If it's not just "{}"
             // Check if the chainName already exists in the existing content
             if (containsKey(existingContent, chainName)) {
                 updatedContent = replaceKey(existingContent, chainName, vm.toString(address(fairFund)));
@@ -70,7 +71,11 @@ contract DeployFairFund is Script {
     }
 
     // Helper function to replace a key's value in the JSON string
-    function replaceKey(string memory json, string memory key, string memory newValue) internal pure returns (string memory) {
+    function replaceKey(string memory json, string memory key, string memory newValue)
+        internal
+        pure
+        returns (string memory)
+    {
         bytes memory jsonBytes = bytes(json);
         bytes memory keyBytes = abi.encodePacked('"', key, '"'); // Wrap key in quotes
         bytes memory valueBytes = abi.encodePacked(newValue); // Wrap new value in quotes

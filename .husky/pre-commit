@@ -1,7 +1,16 @@
-cd app/blockchain && forge build
+#!/bin/sh
+set -e  # Exit on any error
 
-cd ../../app/web-app && npm run lint 
+ROOT_DIR=$(git rev-parse --show-toplevel)
 
-cd ../../
+# Ensure the script runs from the root directory
+cd "$ROOT_DIR"
 
+# Build blockchain code
+forge build --root "$ROOT_DIR/app/blockchain"
+
+# Run linting on web app
+npm --prefix "$ROOT_DIR/app/web-app" run lint
+
+# Run lint-staged for staged files from the root directory
 npx lint-staged
