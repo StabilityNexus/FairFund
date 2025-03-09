@@ -14,6 +14,7 @@ export async function getVault(id: number): Promise<FundingVault | null> {
         throw new Error('[GET_VAULT: Funding vault not found.]');
     }
 }
+
 export async function getVaultsForSpaceId(
     id: number,
     page: number,
@@ -46,16 +47,18 @@ export async function getVaultBalance(vault: FundingVault) {
             abi: fundingVaultABI,
             functionName: 'getTotalBalanceAvailbleForDistribution',
             args: [],
+            chainId: parseInt(vault.chainId),
         });
         const decimals = await readContract(wagmiConfig, {
             address: vault.fundingTokenAddress as `0x${string}`,
             abi: erc20ABI,
             functionName: 'decimals',
             args: [],
+            chainId: parseInt(vault.chainId),
         });
         return formatUnits(vaultBalance as bigint, decimals as number);
     } catch (error) {
-        console.error('Error getting vault balance:', error);
+        console.error('[GET_VAULT_BALANCE_ERROR]:', error);
         return '0';
     }
 }
@@ -67,15 +70,17 @@ export async function getTotalDistributedAmount(vault: FundingVault) {
             abi: fundingVaultABI,
             functionName: 'getTotalFundsDistributed',
             args: [],
+            chainId: parseInt(vault.chainId),
         });
         const decimals = await readContract(wagmiConfig, {
             address: vault.fundingTokenAddress as `0x${string}`,
             abi: erc20ABI,
             functionName: 'decimals',
+            chainId: parseInt(vault.chainId),
         });
         return formatUnits(distributedAmount as bigint, decimals as number);
     } catch (error) {
-        console.error('Error getting total distributed amount:', error);
+        console.error('[GET_TOTAT_DISTRIBUTION_AMOUNT_ERROR]:', error);
         return '0';
     }
 }
@@ -87,17 +92,20 @@ export async function getTotalVotingTokens(vault: FundingVault) {
             abi: fundingVaultABI,
             functionName: 'getTotalVotingPowerTokensMinted',
             args: [],
+            chainId: parseInt(vault.chainId),
         });
         const totalVotingTokensUsed = await readContract(wagmiConfig, {
             address: vault.vaultAddress as `0x${string}`,
             abi: fundingVaultABI,
             functionName: 'getTotalVotingPowerTokensUsed',
             args: [],
+            chainId: parseInt(vault.chainId),
         });
         const decimals = await readContract(wagmiConfig, {
             address: vault.votingTokenAddress as `0x${string}`,
             abi: erc20ABI,
             functionName: 'decimals',
+            chainId: parseInt(vault.chainId),
         });
         return {
             totalVotingTokensAvailable: formatUnits(
@@ -110,7 +118,7 @@ export async function getTotalVotingTokens(vault: FundingVault) {
             ),
         };
     } catch (error) {
-        console.error('Error getting total voting tokens:', error);
+        console.error('[GET_TOKEN_VALUE_ERROR]:', error);
         return {
             totalVotingTokensAvailable: '0',
             totalVotingTokensUsed: '0',
