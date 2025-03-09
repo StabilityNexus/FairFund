@@ -17,18 +17,22 @@ dmf: deploy-mock-fair-fund
 dme: deploy-mock-erc20
 
 deploy-polygon-testnet:
-	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_AMOY_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+	CHAIN_NAME=polygonTestnet $(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_AMOY_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
 
 deploy-polygon-mainnet:
-	$(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+	CHAIN_NAME=polygonMainnet $(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url ${POLYGON_RPC_URL} --private-key ${PRIVATE_KEY} ${BROADCAST} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} $(LEGACY) -vvvv
+
+deploy-ethereum-mordor:
+	CHAIN_NAME=ethereumMordor $(FORGE_SCRIPT) script/DeployFairFund.s.sol:DeployFairFund --rpc-url $(ETHEREUM_MORDOR_RPC_URL) --private-key $(PRIVATE_KEY) ${BROADCAST} --verify --verifier blockscout --verifier-url ${BLOCKSCOUT_HOMEPAGE_URL}${BLOCKSCOUT_API_KEY} --legacy 
 
 
 mock-all: deploy-mock-fair-fund deploy-mock-erc20
 
-
-
 help:
 	@echo "Available targets:"
+	@echo "  deploy-polygon-testnet       : Deploy FairFund contract to Polygon testnet"
+	@echo "  deploy-polygon-mainnet       : Deploy FairFund contract to Polygon mainnet"
+	@echo "  deploy-ethereum-mordor       : Deploy FairFund contract to Ethereum Mordor"
 	@echo "  deploy-mock-fair-fund (dmf)  : Deploy FairFund contract"
 	@echo "  deploy-mock-erc20 (dme)      : Deploy MockERC20 contract"
 	@echo "  mock-all                     : Deploy both contracts to anvil testnet"

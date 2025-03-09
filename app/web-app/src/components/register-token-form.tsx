@@ -29,6 +29,7 @@ interface RegisterTokenFormProps {
     votingTokenAddress: string;
     vaultId: number;
     vaultAddress: string;
+    vaultChainId: number;
 }
 
 const registerTokensForm = z.object({
@@ -41,6 +42,7 @@ export function RegisterTokenForm({
     votingTokenAddress,
     vaultId,
     vaultAddress,
+    vaultChainId,
 }: RegisterTokenFormProps) {
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof registerTokensForm>>();
@@ -83,7 +85,8 @@ export function RegisterTokenForm({
             });
             return { hash, message: 'Successfully registered.' };
         },
-        `/vault/${vaultId}`
+        `/vault/${vaultId}`,
+        vaultChainId
     );
 
     return (

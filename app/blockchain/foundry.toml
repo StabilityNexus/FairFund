@@ -3,6 +3,7 @@ src = "src"
 out ='../web-app/src/blockchain/out'
 libs = ["lib"]
 fs_permissions = [{ access = "read-write", path = "../web-app"}]
+evm_version = "Paris" 
 
 remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts"
