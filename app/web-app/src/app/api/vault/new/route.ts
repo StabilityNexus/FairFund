@@ -36,8 +36,8 @@ export async function POST(req: Request) {
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        const fundingTokenSymbol = await getTokenName(fundingTokenAddress);
-        const votingTokenSymbol = await getTokenName(votingTokenAddress);
+        const fundingTokenSymbol = await getTokenName(parseInt(chainId),fundingTokenAddress);
+        const votingTokenSymbol = await getTokenName(parseInt(chainId),votingTokenAddress);
         const vault = await prisma.fundingVault.create({
             data: {
                 name,
