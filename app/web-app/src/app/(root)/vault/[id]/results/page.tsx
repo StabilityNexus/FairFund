@@ -139,6 +139,7 @@ export default async function VaultResultsPage({
                             smartContractAddress={
                                 vault.vaultAddress as `0x${string}`
                             }
+                            chainId={parseInt(vault.chainId)}
                             functionName="releaseVotingTokens"
                             smartContractABI={fundingVaultABI}
                             buttonText="Withdraw Voting Tokens"
@@ -150,6 +151,7 @@ export default async function VaultResultsPage({
                             smartContractAddress={
                                 vault.vaultAddress as `0x${string}`
                             }
+                            chainId={parseInt(vault.chainId)}
                             functionName="withdrawRemaining"
                             smartContractABI={fundingVaultABI}
                             buttonText="Withdraw Remaining Funding Tokens"

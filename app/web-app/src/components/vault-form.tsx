@@ -15,7 +15,7 @@ import axios from 'axios';
 
 import { cn } from '@/lib/utils';
 import { config as wagmiConfig } from '@/wagmi/config';
-import { erc20ABI, fairFund } from '@/blockchain/constants';
+import { erc20ABI,getFairFundForChain } from '@/blockchain/constants';
 
 import {
     Form,
@@ -95,7 +95,7 @@ export default function VaultForm({
     setFundingVault,
     selectedSpace,
 }: VaultFormInterface) {
-    const { address } = useAccount();
+    const { address, chainId } = useAccount();
     const { handleSubmit, isLoading } =
         useWeb3FormSubmit<z.infer<typeof createVaultFormSchema>>();
     const form = useForm<z.infer<typeof createVaultFormSchema>>({
@@ -134,7 +134,13 @@ export default function VaultForm({
                     data.maxRequestableAmount,
                     decimals as number
                 );
-
+                if(!chainId){
+                    throw new Error('Chain ID not found');
+                }
+                const fairFund = getFairFundForChain(chainId);
+                if (!fairFund) {
+                    throw new Error('FairFund Contract not found for this chain');
+                }
                 const { result, request } = await simulateContract(
                     wagmiConfig,
                     {
@@ -165,6 +171,8 @@ export default function VaultForm({
                     minimumRequestableAmount: data.minRequestableAmount,
                     maximumRequestableAmount: data.maxRequestableAmount,
                     spaceId: selectedSpace.id,
+                    chainId:chainId,
+                    
                 });
                 setFundingVault(response.data);
                 nextComp();

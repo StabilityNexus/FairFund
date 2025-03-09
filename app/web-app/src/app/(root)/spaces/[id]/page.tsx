@@ -12,6 +12,7 @@ import Pagination from '@/components/pagination';
 import { getVaultsForSpaceId } from '@/lib/vault-data';
 import JoinSpaceButton from '@/components/join-space-button';
 import { getServerSession } from '@/app/api/auth/options';
+import {chain} from '@/lib/chains'
 
 const VAULTS_PER_PAGE = 6;
 
@@ -59,6 +60,8 @@ export default async function SpaceDetailsPage({
         ? user.joinedSpaces.some((s) => s.id === spaceId)
         : false;
 
+
+        
     return (
         <div className="container mx-auto px-4 py-8">
             <header className="mb-8">
@@ -104,14 +107,27 @@ export default async function SpaceDetailsPage({
                             className="hover:shadow-lg transition-shadow duration-300"
                         >
                             <CardContent className="p-6">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    {vault.name
-                                        ? vault.name
-                                        : `Vault ${vault.id}`}
-                                </h3>
-                                <p className="text-sm text-gray-600 mb-6">
-                                    {truncateText(vault.description, 100)}
-                                </p>
+                                <div className="flex justify-between">
+                                    <div className="">
+                                        <h3 className="text-lg font-semibold mb-2">
+                                            {vault.name
+                                                ? vault.name
+                                                : `Vault ${vault.id}`}
+                                        </h3>
+                                        <p className="text-sm text-gray-600 mb-6">
+                                            {truncateText(vault.description, 100)}
+                                        </p>
+                                    </div>
+                                    <div className="">
+                                        <h3 className="text-sm text-gray-600  mb-2">
+                                            Deployed on
+                                        </h3>
+                                        <p className="text-mb mb-6">
+                                            {chain.get(parseInt(vault.chainId)) }
+                                        </p>
+                                    </div>
+                                </div>
+                               
                                 <div className="flex justify-between">
                                     <p className="text-sm font-medium">
                                         Max Requestable:{' '}

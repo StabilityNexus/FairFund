@@ -26,6 +26,7 @@ interface BlockchainActionButtonProps {
     iconName: keyof typeof iconMap;
     isDisabled?: boolean;
     successMessage: string;
+    chainId?: number;
     callback?: () => Promise<void>;
 }
 
@@ -39,6 +40,7 @@ export function BlockchainActionButton({
     isDisabled = false,
     successMessage,
     smartContractABI,
+    chainId,
     callback,
 }: BlockchainActionButtonProps) {
     const Icon = iconMap[iconName];
@@ -60,7 +62,10 @@ export function BlockchainActionButton({
             hash,
             message: successMessage,
         };
-    });
+    },
+        undefined,
+        chainId
+    );
 
     return (
         <Web3SubmitButton

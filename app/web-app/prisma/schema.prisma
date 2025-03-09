@@ -48,6 +48,7 @@ model FundingVault {
   fundingTokenSymbol       String
   votingTokenAddress       String
   votingTokenSymbol        String
+  chainId                  String
   vaultAddress             String
   isTallied                Boolean  @default(false)
   tallyDate                DateTime

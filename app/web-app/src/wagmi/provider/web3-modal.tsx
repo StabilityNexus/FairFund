@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createAppKit } from '@reown/appkit/react';
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi';
 import { siweConfig } from '@/wagmi/siwe';
-import { foundry, polygonAmoy, polygon } from '@reown/appkit/networks';
+import { foundry, polygonAmoy, polygon, Chain } from '@reown/appkit/networks';
+import { mordor } from '../networks';
 
 const queryClient = new QueryClient();
 
@@ -24,7 +25,7 @@ const modal = createAppKit({
     networks:
         process.env.NEXT_PUBLIC_NETWORK === 'foundry'
             ? [foundry]
-            : [polygonAmoy, polygon],
+            : [polygonAmoy, polygon, mordor],
     defaultNetwork:
         process.env.NEXT_PUBLIC_NETWORK === 'foundry' ? foundry : polygon,
     metadata,
@@ -35,6 +36,24 @@ const modal = createAppKit({
     },
     siweConfig: siweConfig,
 });
+
+export function switchChain(chainId: number) {
+    const availableChains = [
+        polygonAmoy,
+        polygon,
+        foundry,
+        mordor,
+    ];
+    let targetChain: Chain | undefined = availableChains.find(
+        (chain) => chain.id === chainId
+    );
+    if (!targetChain) {
+        throw new Error(
+            `Chain with id ${chainId} not found in available chains`
+        );
+    }
+    modal.switchNetwork(targetChain);
+}
 
 export default function Web3ModalProvider({
     children,

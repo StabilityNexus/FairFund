@@ -26,6 +26,7 @@ export default async function DepositPage({
                 vaultId={vault!.id}
                 vaultAddress={vault!.vaultAddress}
                 fundingTokenAddress={vault!.fundingTokenAddress}
+                vaultChainId={parseInt(vault!.chainId)}
             />
         </>
     );

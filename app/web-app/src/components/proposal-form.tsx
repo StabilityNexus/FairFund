@@ -15,7 +15,6 @@ import {
     FormMessage,
     FormLabel,
 } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import {
@@ -142,7 +141,8 @@ export default function ProposalForm({
             });
             return { hash, message: 'Proposal created successfully.' };
         },
-        `/vault/${fundingVault.id}`
+        `/vault/${fundingVault.id}`,
+        parseInt(fundingVault.chainId)
     );
 
     async function nextStep() {

@@ -33,6 +33,7 @@ export default async function ProposalDetailsPage({
             fundingTokenSymbol: true,
             votingTokenAddress: true,
             vaultAddress: true,
+            chainId:true,
         },
     });
     if (!vault) {
@@ -73,6 +74,7 @@ export default async function ProposalDetailsPage({
                             proposal={proposal}
                             votingTokenAddress={vault.votingTokenAddress}
                             vaultAddress={vault.vaultAddress}
+                            vaultChainId={parseInt(vault.chainId)}
                         />
                     </div>
                 </CardContent>
