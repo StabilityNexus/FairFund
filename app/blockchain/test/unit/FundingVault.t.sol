@@ -690,4 +690,266 @@ contract FundingVaultTest is Test {
         // Check if the total funds distributed is updated correctly
         assertEq(fundingVault.getTotalFundsDistributed(), 7 ether);
     }
+
+    function testMinRequestableAmountGreaterThanMaxRequestable() public {
+        vm.expectRevert(FundingVault.FundingVault__MinRequestableAmountCannotBeGreaterThanMaxRequestableAmount.selector);
+        fundingVault.submitProposal("<Proposal Link>", 6 ether, 5 ether, address(randomUser));
+    }
+
+    function testCalculateFundingWithNoVotingPowerTokens() public {
+        // Submit a proposal
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+
+        // Fast forward time
+        vm.warp(block.timestamp + 2 days);
+
+        // Try to calculate funding when no voting power tokens have been minted
+        vm.expectRevert(FundingVault.FundingVault__NoVotingPowerTokenMinted.selector);
+        fundingVault.calculateFundingToBeReceived(1);
+    }
+
+    function testDistributeFundsFailedTransfer() public {
+        // Setup scenario
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 10 ether);
+        fundingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.deposit(10 ether);
+
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 10 ether);
+        fundingVault.voteOnProposal(1, 10 ether);
+        vm.stopPrank();
+
+        // Fast forward time
+        vm.warp(block.timestamp + 2 days);
+
+        // Mock the transfer function to always return false
+        vm.mockCall(address(fundingToken), abi.encodeWithSelector(IERC20.transfer.selector), abi.encode(false));
+
+        // Attempt to distribute funds, should revert due to transfer failure
+        vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
+        fundingVault.distributeFunds();
+
+        // Clear the mock to not affect other tests
+        vm.clearMockedCalls();
+    }
+
+    function testDistributeFundsAlreadyDistributed() public {
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 10 ether);
+        fundingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.deposit(10 ether);
+
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 10 ether);
+        fundingVault.voteOnProposal(1, 10 ether);
+        vm.stopPrank();
+
+        // Fast forward time
+        vm.warp(block.timestamp + 2 days);
+
+        // Distribute funds first time
+        fundingVault.distributeFunds();
+
+        // Try to distribute funds again
+        vm.expectRevert(FundingVault.FundingVault__AlreadyDistributedFunds.selector);
+        fundingVault.distributeFunds();
+    }
+
+    // function testWithdrawRemainingWithTinyAmount() public {
+    //     // Setup with a very small total deposit
+    //     uint256 depositAmount = 1000;  // Small initial amount
+
+    //     vm.startPrank(randomUser);
+    //     fundingToken.mint(randomUser, depositAmount);
+    //     fundingToken.approve(address(fundingVault), depositAmount);
+    //     fundingVault.deposit(depositAmount);
+
+    //     // Submit proposal for most of the funds (leaving tiny remainder)
+    //     fundingVault.submitProposal("<Proposal Link>", 995, 995, address(randomUser));
+
+    //     // Setup voting to ensure proposal gets funded
+    //     votingToken.mint(randomUser, 10 ether);
+    //     votingToken.approve(address(fundingVault), 10 ether);
+    //     fundingVault.register(10 ether);
+    //     votingPowerToken.approve(address(fundingVault), 10 ether);
+    //     fundingVault.voteOnProposal(1, 10 ether);
+    //     vm.stopPrank();
+
+    //     // Fast forward and distribute
+    //     vm.warp(block.timestamp + 2 days);
+    //     fundingVault.distributeFunds();
+
+    //     // Now try to withdraw the tiny remaining amount
+    //     // After platform fee (5%) and main distribution, the remaining amount will be very small
+    //     vm.prank(randomUser);
+    //     vm.expectRevert(FundingVault.FundingVault__WithdrawableAmountTooSmall.selector);
+    //     fundingVault.withdrawRemaining();
+    // }
+    function testGetProposalIdsByProposer() public {
+        // Submit multiple proposals
+        vm.startPrank(randomUser);
+        fundingVault.submitProposal("<Proposal Link 1>", 1 ether, 5 ether, address(randomUser));
+        fundingVault.submitProposal("<Proposal Link 2>", 2 ether, 6 ether, address(randomUser));
+        fundingVault.submitProposal("<Proposal Link 3>", 3 ether, 7 ether, address(randomUser));
+        vm.stopPrank();
+
+        // Get proposal IDs for the proposer
+        uint256[] memory proposalIds = fundingVault.getProposalIdsByProposer(randomUser);
+
+        // Verify the returned array
+        assertEq(proposalIds.length, 3);
+        assertEq(proposalIds[0], 1);
+        assertEq(proposalIds[1], 2);
+        assertEq(proposalIds[2], 3);
+
+        // Check for a user with no proposals
+        uint256[] memory emptyProposalIds = fundingVault.getProposalIdsByProposer(randomUser1);
+        assertEq(emptyProposalIds.length, 0);
+    }
+
+    function testGetTotalProposals() public {
+        assertEq(fundingVault.getTotalProposals(), 0);
+
+        // Submit proposals
+        vm.startPrank(randomUser);
+        fundingVault.submitProposal("<Proposal Link 1>", 1 ether, 5 ether, address(randomUser));
+        fundingVault.submitProposal("<Proposal Link 2>", 2 ether, 6 ether, address(randomUser));
+        vm.stopPrank();
+
+        assertEq(fundingVault.getTotalProposals(), 2);
+    }
+
+    function testGetMinAndMaxRequestableAmount() public {
+        assertEq(fundingVault.getMinRequestableAmount(), 1);
+        assertEq(fundingVault.getMaxRequestableAmount(), 10 ether);
+    }
+
+    function testGetTotalVotingPowerTokensUsed() public {
+        // Initially should be 0
+        assertEq(fundingVault.getTotalVotingPowerTokensUsed(), 0);
+
+        // Setup voter and proposal
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+
+        // Vote with some tokens
+        votingPowerToken.approve(address(fundingVault), 5 ether);
+        fundingVault.voteOnProposal(1, 5 ether);
+        vm.stopPrank();
+
+        // Check used voting power tokens
+        assertEq(fundingVault.getTotalVotingPowerTokensUsed(), 5 ether);
+    }
+
+    function testGetDeployer() public {
+        assertEq(fundingVault.getDeployer(), address(fairFund));
+    }
+
+    function testDepositZeroAmount() public {
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 1 ether);
+        fundingToken.approve(address(fundingVault), 1 ether);
+        vm.expectRevert(FundingVault.FundingVault__AmountCannotBeZero.selector);
+        fundingVault.deposit(0);
+        vm.stopPrank();
+    }
+
+    function testRegisterWithInsufficientBalance() public {
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 1 ether);
+        votingToken.approve(address(fundingVault), 2 ether);
+        vm.expectRevert(FundingVault.FundingVault__NotEnoughBalance.selector);
+        fundingVault.register(2 ether);
+        vm.stopPrank();
+    }
+
+    function testVoteWithoutVotingPower() public {
+        // Submit a proposal first
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+
+        // Try to vote without having any voting power
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__AmountExceededsLimit.selector);
+        fundingVault.voteOnProposal(1, 1 ether);
+        vm.stopPrank();
+    }
+
+    function testProposalDoesNotExist() public {
+        vm.expectRevert(FundingVault.FundingVault__ProposalDoesNotExist.selector);
+        fundingVault.voteOnProposal(999, 1 ether);
+    }
+
+    function testDistributeFundsWithPlatformFeeTransferFailure() public {
+        uint256 depositAmount = 10 ether;
+
+        // Setup proposal and voting
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, depositAmount);
+        fundingToken.approve(address(fundingVault), depositAmount);
+        fundingVault.deposit(depositAmount);
+
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 8 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 10 ether);
+        fundingVault.voteOnProposal(1, 10 ether);
+        vm.stopPrank();
+
+        // Fast forward time
+        vm.warp(block.timestamp + 2 days);
+
+        // Mock the transfer function to return false only for the platform fee transfer
+        vm.mockCall(
+            address(fundingToken),
+            abi.encodeWithSelector(IERC20.transfer.selector, address(fundingVault.getDeployer())),
+            abi.encode(false)
+        );
+
+        // Attempt to distribute funds
+        vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
+        fundingVault.distributeFunds();
+
+        // Clear mocked calls
+        vm.clearMockedCalls();
+    }
+
+    function testGetTotalVotingPowerTokensMinted() public {
+        // Initially should be 0
+        assertEq(fundingVault.getTotalVotingPowerTokensMinted(), 0);
+
+        // Register a voter
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        vm.stopPrank();
+
+        // Check minted amount
+        assertEq(fundingVault.getTotalVotingPowerTokensMinted(), 10 ether);
+
+        // Register another voter
+        vm.startPrank(randomUser1);
+        votingToken.mint(randomUser1, 5 ether);
+        votingToken.approve(address(fundingVault), 5 ether);
+        fundingVault.register(5 ether);
+        vm.stopPrank();
+
+        // Check total minted amount
+        assertEq(fundingVault.getTotalVotingPowerTokensMinted(), 15 ether);
+    }
 }
