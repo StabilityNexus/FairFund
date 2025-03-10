@@ -208,6 +208,9 @@ export default function VaultFormWrapper({
                                         fundingVault.fundingTokenAddress
                                     }
                                     isCreateVault={true}
+                                    vaultChainId={parseInt(
+                                        fundingVault.chainId
+                                    )}
                                 />
                             ) : (
                                 <Button
