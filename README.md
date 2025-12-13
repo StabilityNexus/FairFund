@@ -5,13 +5,15 @@
 1. [Introduction](#introduction)
 2. [Technology Stack](#technology-stack)
 3. [Architecture](#architecture)
-4. [Run Locally](#run-locally)
-5. [Usage Guide](#usage-guide)
-6. [Smart Contract Documentation](#smart-contract-documentation)
-7. [Deployment](#deployment)
-8. [Future Improvements](#future-improvements)
-9. [Contributing](#contributing)
-10. [Community](#community)
+4. [Quick Start](#quick-start)
+5. [Run Locally](#run-locally)
+6. [Troubleshooting](#troubleshooting)
+7. [Usage Guide](#usage-guide)
+8. [Smart Contract Documentation](#smart-contract-documentation)
+9. [Deployment](#deployment)
+10. [Future Improvements](#future-improvements)
+11. [Contributing](#contributing)
+12. [Community](#community)
 
 ## Introduction
 
@@ -28,6 +30,24 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 ## Architecture
 
 ![fairfund 1](https://github.com/user-attachments/assets/ce0e7792-2e29-4a8a-8102-880d3974fab0)
+
+## Quick Start
+
+**New to FairFund?** Get up and running in minutes with our [Quick Start Guide](QUICKSTART.md)!
+
+```bash
+# Clone, install, and run
+git clone https://github.com/StabilityNexus/FairFund.git
+cd FairFund
+
+# See QUICKSTART.md for detailed setup instructions
+```
+
+**Key Resources:**
+- 🚀 [Quick Start Guide](QUICKSTART.md) - Fastest setup path
+- 📖 [Full Setup Guide](#run-locally) - Detailed instructions below
+- 🛠️ [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+- 🤝 [Contributing](CONTRIBUTING.md) - How to contribute
 
 ## Run Locally
 
@@ -134,6 +154,23 @@ FairFund is a blockchain based platform for community-driven funding. Users can 
 
    - Open your browser and navigate to `http://localhost:3000`.
 
+## Troubleshooting
+
+Encountering issues during setup? Check our comprehensive [Troubleshooting Guide](TROUBLESHOOTING.md) which covers:
+
+- **Common Setup Issues**: Solutions for Foundry, Node.js, Docker, and more
+- **Platform-Specific Problems**: Windows, macOS, and Linux troubleshooting
+- **Environment Configuration**: Help with `.env` files and environment variables
+- **Database Issues**: PostgreSQL and Prisma-related problems
+- **Smart Contract Deployment**: Fixing Anvil and deployment errors
+- **Video Tutorials**: Step-by-step video guides (coming soon!)
+
+**Quick Links:**
+- [Prerequisites Issues](TROUBLESHOOTING.md#prerequisites-issues)
+- [Smart Contract Setup](TROUBLESHOOTING.md#smart-contract-setup-issues)
+- [Frontend/Web App Issues](TROUBLESHOOTING.md#frontenddeweb-app-issues)
+- [Still Need Help?](TROUBLESHOOTING.md#still-need-help)
+
 ## Usage Guide
 
 Our platform supports three types of users: Vault Creators, Proposal Creators, and Voters/Community Members. Here's how each user type can navigate and use the application:
@@ -233,49 +270,47 @@ We welcome additional suggestions! Join our Discord: [Discord Link](https://disc
 
 ## Contributing
 
-1. Create an issue on GitHub
-2. Discuss your ideas on our project's Discord channel `(#fairfund)` in [Stability Nexus Server](https://discord.gg/7jS9qJNjJv) (if required).
-3. Wait for the issue to be assigned to you
-4. Fork the repository
-5. Set up the project locally using this [Run Locally Guide](#run-locally)
-6. Create a new branch following this format: `type/brief-description`
-   - Types: `fix`, `feat`, `chore`, `perf`, or `refactor`
-   - Example: `feat/add-space-moderation-functionality`
-7. Switch to the new branch
-8. Make your changes
-9. Commit your changes
-10. Decide on the scope of the change:  
-   - **Small changes** (minor fixes, documentation updates, small UI tweaks) → **Make a pull request directly to `main`**  
-   - **Big changes** (new features, major refactors) → **Make a pull request to `develop`** branch
-11. Provide a detailed description of your changes in the PR, including videos and images for visible UI changes.
+We welcome contributions from developers of all experience levels! Whether you're fixing a bug, adding a feature, or improving documentation, your help is appreciated.
 
+### Quick Start
 
-### Important Guidelines
+1. **Read the Guidelines**: Check our [Contributing Guide](CONTRIBUTING.md) for detailed instructions
+2. **Pick an Issue**: Browse [open issues](https://github.com/StabilityNexus/FairFund/issues) or create a new one
+3. **Get Assigned**: Comment on the issue to get it assigned to you
+4. **Fork & Code**: Fork the repo, make your changes, and submit a PR
+5. **Get Reviewed**: Address feedback and get your PR merged!
 
-#### Code Quality and Testing
-- Take your time to create high-quality PRs - do not commit code hastily
-- Ensure all changes are thoroughly tested before submission
-- Avoid introducing code smells
-- Do not submit untested code as it complicates the review process
-- Only include code in the commit that is intentional. Avoid using `git add .` to prevent unintended changes from being committed.
+### Important Documents
 
-#### Pull Request Rules
-- Small frontend changes (< 20 lines) or documentation updates can be submitted without prior assignment
-- Unassigned PRs will be closed without review
-- Check existing issues and PRs to avoid duplicating efforts
-- Tag the maintainer if your PR is unattended for:
-  - 1 week for small contributions
-  - 2 weeks for larger contributions
+- 📖 [Contributing Guide](CONTRIBUTING.md) - Complete contribution workflow
+- 📜 [Code of Conduct](CODE_OF_CONDUCT.md) - Community standards
+- 🔒 [Security Policy](SECURITY.md) - Reporting vulnerabilities
+- 📋 [Changelog](CHANGELOG.md) - Project history
 
-#### Timeline and Progress
-- Issues should be completed within:
-  - 5 days for small tasks
-  - 15 days for complex tasks
-- Provide regular progress updates in issue/PR comments if work extends beyond expected timeline
-- Issues may be reassigned if not completed within the specified timeframe
+### Guidelines Summary
 
-### Need Help?
-If you have questions or need clarification, please ask on [Discord](https://discord.gg/7jS9qJNjJv).
+**Code Quality:**
+- Write clean, tested code
+- Follow existing code style
+- Add tests for new features
+- Update documentation
+
+**Pull Requests:**
+- Small changes (<20 lines): Can submit without assignment
+- Larger changes: Get issue assigned first
+- Unassigned PRs will be closed
+- Target `main` for small fixes, `develop` for features
+
+**Timeline:**
+- Small tasks: Complete within 5 days
+- Complex tasks: Complete within 15 days
+- Provide updates if extending beyond timeline
+- PRs reviewed within 1-2 weeks
+
+**Need Help?**
+- 💬 Join [Discord](https://discord.gg/7jS9qJNjJv) `#fairfund` channel
+- 📖 Read [Troubleshooting Guide](TROUBLESHOOTING.md)
+- 🐛 Check [existing issues](https://github.com/StabilityNexus/FairFund/issues)
 
 ## Community
 
