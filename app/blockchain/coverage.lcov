@@ -1,0 +1,127 @@
+Compiling 57 files with Solc 0.8.30
+Solc 0.8.30 finished in 4.57s
+Compiler run successful!
+Analysing contracts...
+Running tests...
+
+Ran 9 tests for test/unit/FairFundTreasury.t.sol:FairFundTreasuryTest
+[PASS] testERC20Release() (gas: 116206)
+[PASS] testEthRelease() (gas: 104184)
+[PASS] testInitialSharesDistribution() (gas: 24033)
+[PASS] testMultipleFundingDeposits() (gas: 100697)
+[PASS] testPartialWithdrawals() (gas: 117202)
+[PASS] testPaymentReleasedEvent() (gas: 101181)
+[PASS] testRevertsIfNoPayees() (gas: 38945)
+[PASS] testRevertsIfNoSharesOrPaymentDue() (gas: 106821)
+[PASS] testRevertsIfPayeesSharesLengthMismatch() (gas: 40839)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 8.45ms (20.99ms CPU time)
+
+Ran 51 tests for test/unit/FundingVault.t.sol:FundingVaultTest
+[PASS] testCalculateFundingToBeReceived() (gas: 532539)
+[PASS] testCalculateFundingToBeReceivedReturnsMaxRequestedAmountWhenGreaterThanTotalVotes() (gas: 532592)
+[PASS] testCalculateFundingToBeReceivedReturnsZeroWhenProposalIsRejected() (gas: 532493)
+[PASS] testCalculateFundingToBeReceivedWithInvalidProposal() (gas: 12056)
+[PASS] testCalculateFundingToBeReceivedWithoutTallyDatePassed() (gas: 9179)
+[PASS] testDeposit() (gas: 133936)
+[PASS] testDistributeFunds() (gas: 646407)
+[PASS] testGetFundingToken() (gas: 11327)
+[PASS] testGetMaxRequestableAmount() (gas: 11075)
+[PASS] testGetMinRequestableAmount() (gas: 11097)
+[PASS] testGetProposalIdsByProposer() (gas: 186649)
+[PASS] testGetTallyDate() (gas: 9162)
+[PASS] testGetTotalAvailableFunds() (gas: 133081)
+[PASS] testGetTotalBalanceAvailableForDistribution() (gas: 186003)
+[PASS] testGetTotalFundsDistributed() (gas: 596659)
+[PASS] testGetTotalProposals() (gas: 180983)
+[PASS] testGetTotalVotingPowerTokensMinted() (gas: 165174)
+[PASS] testGetTotalVotingPowerTokensUsed() (gas: 416654)
+[PASS] testGetVotingPowerOf() (gas: 164970)
+[PASS] testGetVotingPowerToken() (gas: 11241)
+[PASS] testGetVotingToken() (gas: 11304)
+[PASS] testRegister() (gas: 166832)
+[PASS] testReleaseVotingTokens() (gas: 190497)
+[PASS] testReleaseVotingTokensWhenNoVotingPower() (gas: 167083)
+[PASS] testReleaseVotingTokensWithoutTallyData() (gas: 13641)
+[PASS] testRevertIfDepositAfterTallyDate() (gas: 97512)
+[PASS] testRevertWhenCalculateFundingWithNoVotingPowerTokens() (gas: 187433)
+[PASS] testRevertWhenDistributeFundsTransferFails() (gas: 233)
+[PASS] testRevertWhenDistributeFundsTwice() (gas: 646914)
+[PASS] testRevertWhenProposalSubmittedAfterTallyDate() (gas: 20192)
+[PASS] testRevertWhenRegisterAfterTalleydate() (gas: 97490)
+[PASS] testRevertWhenVotedAfterTallyDatePassed() (gas: 362072)
+[PASS] testRevertWhenWithdrawRemainingTransferFails() (gas: 277)
+[PASS] testRevertWhenWithdrawRemainingWithZeroAmount() (gas: 754550)
+[PASS] testSubmitProposal() (gas: 185762)
+[PASS] testSubmitProposalWithInvalidAmounts() (gas: 34232)
+[PASS] testSubmitProposalWithZeroAddress() (gas: 20305)
+[PASS] testSubmitProposalWithZeroMetadata() (gas: 18102)
+[PASS] testVoteOnNonExistentProposal() (gas: 16807)
+[PASS] testVoteOnProposal() (gas: 415509)
+[PASS] testVoteWithExcessiveAmount() (gas: 362730)
+[PASS] testWithdrawRemaining() (gas: 621486)
+[PASS] testWithdrawRemainingBeforeDistribution() (gas: 142043)
+[PASS] testWithdrawRemainingCorrectRatio() (gas: 694575)
+[PASS] testWithdrawRemainingMultipleUsers() (gas: 965320)
+[PASS] testWithdrawRemainingTwice() (gas: 193293)
+[PASS] testWithdrawRemainingWithNoDeposit() (gas: 168132)
+[PASS] testWithdrawRemainingWithNoRemainingFunds() (gas: 605689)
+[PASS] test_RevertWhen_Deposit() (gas: 14086)
+[PASS] test_RevertWhen_RegisterWithAmountGreaterThanBalance() (gas: 100135)
+[PASS] test_RevertWhen_RegisterWithAmountLessThanZero() (gas: 14062)
+Suite result: ok. 51 passed; 0 failed; 0 skipped; finished in 77.13ms (339.95ms CPU time)
+
+Ran 22 tests for test/unit/FairFund.t.sol:FairFundTest
+[PASS] testConstructorSetsPlatformFeesCorrectly() (gas: 4976703)
+[PASS] testConstructorSetsTreasuryCorrectly() (gas: 4978032)
+[PASS] testDeployFairFund() (gas: 9112)
+[PASS] testDeployFundingVaultMaxRequestableAmountZero() (gas: 13115)
+[PASS] testDeployFundingVaultMinGreaterThanMax() (gas: 13004)
+[PASS] testDeployFundingVaultSuccess() (gas: 3566535)
+[PASS] testDeployFundingVaultTallyDateInPast() (gas: 13599)
+[PASS] testDeployFundingVaultZeroAddress() (gas: 12996)
+[PASS] testDeployPlatformFeesOnlyOwner() (gas: 13114)
+[PASS] testFundingVaultOwnership() (gas: 3568423)
+[PASS] testGetFundingVault() (gas: 3569061)
+[PASS] testGetTotalNumberOfFundingVaults() (gas: 3566513)
+[PASS] testSetTreasuryOnlyOwner() (gas: 13107)
+[PASS] testSetTreasurySuccess() (gas: 20479)
+[PASS] testSuccessfullDeploymentEmitEvent() (gas: 3566716)
+[PASS] testUpdatePlatformFee() (gas: 20117)
+[PASS] testVotingPowerTokenOwnership() (gas: 3569390)
+[PASS] testVotingTokenNameAndSymbol() (gas: 3575515)
+[PASS] testWithdrawPlatformFeeEmitsEvent() (gas: 52640)
+[PASS] testWithdrawPlatformFeeSuccessful() (gas: 54173)
+[PASS] testWithdrawPlatformFeeTransactionFailed() (gas: 63229)
+[PASS] testWithdrawPlatformFeeZeroAddress() (gas: 14026)
+Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 77.17ms (171.63ms CPU time)
+
+Ran 2 tests for test/fuzz/FundingVault.t.sol:FundingVaultTest
+[PASS] testFuzzDeposit(uint96) (runs: 256, μ: 131945, ~: 131952)
+[PASS] testFuzzRegister(uint96) (runs: 256, μ: 166163, ~: 166163)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 185.39ms (304.08ms CPU time)
+
+Ran 1 test for test/fuzz/FairFund.t.sol:FairFundTest
+[PASS] testFuzzDeployFundingVault(address,uint256,uint256,uint256,address) (runs: 256, μ: 3571504, ~: 3571893)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 390.70ms (372.85ms CPU time)
+
+Ran 1 test for test/fuzz/Invarients.t.sol:InvarientsTest
+[PASS] invariant_totalVotingPowerTokensUsedMustBeLessThanTotalSupplyOfVotingTokens() (runs: 100, calls: 12800, reverts: 12665)
+
+╭----------+---------------------+-------+---------+----------╮
+| Contract | Selector            | Calls | Reverts | Discards |
++=============================================================+
+| Handler  | distributeFunds     | 2607  | 2607    | 0        |
+|----------+---------------------+-------+---------+----------|
+| Handler  | registerVoter       | 2536  | 2479    | 0        |
+|----------+---------------------+-------+---------+----------|
+| Handler  | releaseVotingTokens | 2558  | 2502    | 0        |
+|----------+---------------------+-------+---------+----------|
+| Handler  | submitProposal      | 2572  | 2550    | 0        |
+|----------+---------------------+-------+---------+----------|
+| Handler  | voteOnProposal      | 2527  | 2527    | 0        |
+╰----------+---------------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.74s (1.71s CPU time)
+
+Ran 6 test suites in 1.74s (2.48s CPU time): 86 tests passed, 0 failed, 0 skipped (86 total tests)
+Wrote LCOV report.

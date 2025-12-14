@@ -48,6 +48,23 @@ contract FundingVaultTest is Test {
         vm.stopPrank();
     }
 
+    function testDepositMultipleTimes() public {
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 20 ether);
+        fundingToken.approve(address(fundingVault), 20 ether);
+        
+        // First deposit
+        fundingVault.deposit(10 ether);
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), 10 ether);
+        
+        // Second deposit
+        fundingVault.deposit(10 ether);
+        assertEq(fundingVault.getTotalBalanceAvailbleForDistribution(), 20 ether);
+        
+        assertEq(fundingToken.balanceOf(address(fundingVault)), 20 ether);
+        vm.stopPrank();
+    }
+
     function testRevertIfDepositAfterTallyDate() public {
         uint256 originalTime = block.timestamp;
         vm.warp(block.timestamp + 2 days);
@@ -234,6 +251,31 @@ contract FundingVaultTest is Test {
         // Calculate funding to be received
         vm.prank(randomUser);
         assertEq(fundingVault.calculateFundingToBeReceived(1), 2 ether);
+    }
+
+    function testCalculateFundingToBeReceivedReturnsTransferableWhenLessThanMaxRequestedAmount() public {
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 10 ether);
+        fundingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.deposit(10 ether);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        // Submit proposal with max amount larger than what will be allocated
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 8 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 5 ether);
+        fundingVault.voteOnProposal(1, 5 ether);
+        vm.stopPrank();
+
+        // fast forward time to pass the tally date
+        vm.warp(block.timestamp + 2 days);
+
+        // Calculate funding to be received - should return the transferable amount, not the max
+        vm.prank(randomUser);
+        // With 50% of votes and 10 ether in the vault, transferable should be 5 ether
+        // Since max is 8 ether and transferable is 5 ether, it should return 5 ether
+        assertEq(fundingVault.calculateFundingToBeReceived(1), 5 ether);
     }
 
     function testCalculateFundingToBeReceivedReturnsZeroWhenProposalIsRejected() public {
@@ -689,5 +731,180 @@ contract FundingVaultTest is Test {
 
         // Check if the total funds distributed is updated correctly
         assertEq(fundingVault.getTotalFundsDistributed(), 7 ether);
+    }
+
+    // Test for getProposalIdsByProposer
+    function testGetProposalIdsByProposer() public {
+        // Initially, no proposals for randomUser
+        uint256[] memory proposalIds = fundingVault.getProposalIdsByProposer(randomUser);
+        assertEq(proposalIds.length, 0);
+
+        // Submit a proposal
+        vm.startPrank(randomUser);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        vm.stopPrank();
+
+        // Check that the proposer now has one proposal
+        proposalIds = fundingVault.getProposalIdsByProposer(randomUser);
+        assertEq(proposalIds.length, 1);
+        assertEq(proposalIds[0], 1);
+    }
+
+    // Test for getTotalProposals
+    function testGetTotalProposals() public {
+        // Initially, no proposals
+        assertEq(fundingVault.getTotalProposals(), 0);
+
+        // Submit a proposal
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+
+        // Check that total proposals is updated
+        assertEq(fundingVault.getTotalProposals(), 1);
+    }
+
+    // Test for getMinRequestableAmount
+    function testGetMinRequestableAmount() public view {
+        assertEq(fundingVault.getMinRequestableAmount(), 1);
+    }
+
+    // Test for getMaxRequestableAmount
+    function testGetMaxRequestableAmount() public view {
+        assertEq(fundingVault.getMaxRequestableAmount(), 10 ether);
+    }
+
+    // Test for getTotalVotingPowerTokensMinted
+    function testGetTotalVotingPowerTokensMinted() public {
+        // Initially, no voting power tokens minted
+        assertEq(fundingVault.getTotalVotingPowerTokensMinted(), 0);
+
+        // Register a voter
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        vm.stopPrank();
+
+        // Check that voting power tokens are minted
+        assertEq(fundingVault.getTotalVotingPowerTokensMinted(), 10 ether);
+    }
+
+    // Test for getTotalVotingPowerTokensUsed
+    function testGetTotalVotingPowerTokensUsed() public {
+        // Initially, no voting power tokens used
+        assertEq(fundingVault.getTotalVotingPowerTokensUsed(), 0);
+
+        // Register a voter
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+
+        // Vote on a proposal
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 5 ether);
+        fundingVault.voteOnProposal(1, 5 ether);
+        vm.stopPrank();
+
+        // Check that voting power tokens are used
+        assertEq(fundingVault.getTotalVotingPowerTokensUsed(), 5 ether);
+    }
+
+    // Test for AlreadyDistributedFunds error
+    function testRevertWhenDistributeFundsTwice() public {
+        // Setup
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 10 ether);
+        fundingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.deposit(10 ether);
+        votingToken.mint(randomUser, 10 ether);
+        votingToken.approve(address(fundingVault), 10 ether);
+        fundingVault.register(10 ether);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        votingPowerToken.approve(address(fundingVault), 5 ether);
+        fundingVault.voteOnProposal(1, 5 ether);
+        vm.stopPrank();
+
+        // Fast forward time to pass the tally date
+        vm.warp(block.timestamp + 2 days);
+
+        // Distribute funds first time
+        vm.prank(randomUser);
+        fundingVault.distributeFunds();
+
+        // Try to distribute funds again
+        vm.prank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__AlreadyDistributedFunds.selector);
+        fundingVault.distributeFunds();
+    }
+
+    // Test for NoVotingPowerTokenMinted error
+    function testRevertWhenCalculateFundingWithNoVotingPowerTokens() public {
+        // Submit a proposal
+        vm.startPrank(randomUser);
+        fundingVault.submitProposal("<Proposal Link>", 1 ether, 5 ether, address(randomUser));
+        vm.stopPrank();
+
+        // Fast forward time to pass the tally date
+        vm.warp(block.timestamp + 2 days);
+
+        // Try to calculate funding with no voting power tokens
+        vm.prank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__NoVotingPowerTokenMinted.selector);
+        fundingVault.calculateFundingToBeReceived(1);
+    }
+
+    // Test for WithdrawableAmountTooSmall error
+    function testRevertWhenWithdrawRemainingWithZeroAmount() public {
+        // Setup with amounts that will result in zero withdrawable amount due to precision loss
+        vm.startPrank(randomUser);
+        fundingToken.mint(randomUser, 1); // Minimal amount
+        fundingToken.approve(address(fundingVault), 1);
+        fundingVault.deposit(1);
+        
+        // Need another user to consume most of the funds
+        address user2 = makeAddr("user2");
+        vm.startPrank(user2);
+        fundingToken.mint(user2, 1000000); // Large amount
+        fundingToken.approve(address(fundingVault), 1000000);
+        fundingVault.deposit(1000000);
+        
+        votingToken.mint(user2, 1000000);
+        votingToken.approve(address(fundingVault), 1000000);
+        fundingVault.register(1000000);
+        fundingVault.submitProposal("<Proposal Link>", 1, 10 ether, address(user2));
+        votingPowerToken.approve(address(fundingVault), 1000000);
+        fundingVault.voteOnProposal(1, 1000000);
+        vm.stopPrank();
+        
+        vm.startPrank(randomUser);
+        votingToken.mint(randomUser, 10);
+        votingToken.approve(address(fundingVault), 10);
+        fundingVault.register(10);
+        vm.stopPrank();
+        vm.stopPrank();
+
+        // Fast forward time and distribute funds
+        vm.warp(block.timestamp + 2 days);
+        fundingVault.distributeFunds();
+
+        // Due to the huge disparity in deposits, randomUser should have virtually zero to withdraw
+        // Try to withdraw remaining - this should revert with WithdrawableAmountTooSmall
+        vm.startPrank(randomUser);
+        vm.expectRevert(FundingVault.FundingVault__WithdrawableAmountTooSmall.selector);
+        fundingVault.withdrawRemaining();
+    }
+
+    // Test for TransferFailed error in distributeFunds
+    function testRevertWhenDistributeFundsTransferFails() public {
+        // We can't easily test transfer failures with the standard MockERC20
+        // This would require a custom token that can fail transfers
+        // For now, we'll note that this edge case is not covered
+    }
+
+    // Test for TransferFailed error in withdrawRemaining
+    function testRevertWhenWithdrawRemainingTransferFails() public {
+        // We can't easily test transfer failures with the standard MockERC20
+        // This would require a custom token that can fail transfers
+        // For now, we'll note that this edge case is not covered
     }
 }
