@@ -7,6 +7,87 @@ import {FundingVault} from "../../src/FundingVault.sol";
 import {FairFund} from "../../src/FairFund.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 import {MockERC20} from "../../src/mocks/MockERC20.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+
+interface ITransferHook {
+    function onTokenTransfer(address from, uint256 amount) external;
+}
+
+/// @dev Funding token that calls a hook on registered recipients and bubbles any revert,
+/// like an ERC777 tokensReceived hook.
+contract HookERC20 is ERC20 {
+    mapping(address => bool) public hasHook;
+
+    constructor() ERC20("Hook USD", "HUSD") {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+
+    function setHook(address account, bool on) external {
+        hasHook[account] = on;
+    }
+
+    function transfer(address to, uint256 value) public override returns (bool) {
+        bool ok = super.transfer(to, value);
+        if (hasHook[to]) {
+            (bool success, bytes memory ret) =
+                to.call(abi.encodeCall(ITransferHook.onTokenTransfer, (msg.sender, value)));
+            if (!success) {
+                assembly {
+                    revert(add(ret, 0x20), mload(ret))
+                }
+            }
+        }
+        return ok;
+    }
+}
+
+/// @dev Recipient whose hook reverts with the largest payload it can afford.
+contract ReturnBombRecipient is ITransferHook {
+    function onTokenTransfer(address, uint256) external view {
+        // Memory for w words costs about w^2/512 gas. Spend about 45% of the gas left on it.
+        uint256 words = Math.sqrt(512 * ((gasleft() * 45) / 100));
+        assembly {
+            revert(0, mul(words, 32))
+        }
+    }
+}
+
+/// @dev Token like USDT on Ethereum: transfer returns nothing. transferFrom returns true so deposits work.
+contract NoReturnTransferToken {
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+    mapping(address => bool) public isBlocked;
+    uint256 public totalSupply;
+
+    function mint(address to, uint256 amount) external {
+        balanceOf[to] += amount;
+        totalSupply += amount;
+    }
+
+    function setBlocked(address account, bool blocked) external {
+        isBlocked[account] = blocked;
+    }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        allowance[msg.sender][spender] = amount;
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+        allowance[from][msg.sender] -= amount;
+        balanceOf[from] -= amount;
+        balanceOf[to] += amount;
+        return true;
+    }
+
+    function transfer(address to, uint256 amount) external {
+        require(!isBlocked[to], "blocked");
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+    }
+}
 
 /// @dev Funding token with a blocklist and a global pause, like USDC.
 contract BlocklistPausableERC20 is ERC20 {
@@ -242,5 +323,66 @@ contract FundingVaultPayoutFailureTest is Test {
         vault.retryPayout(1);
         vm.expectRevert(FundingVault.FundingVault__NoPendingPayout.selector);
         vault.retryPlatformFee();
+    }
+
+    /// A recipient that reverts with a huge payload through a token hook must not make
+    /// distributeFunds run out of gas while copying the revert data.
+    function test_ReturnBombRecipient_DoesNotBlockDistribution() public {
+        HookERC20 hookToken = new HookERC20();
+        vault = _newVault(address(hookToken));
+        ReturnBombRecipient bomb = new ReturnBombRecipient();
+        hookToken.setHook(address(bomb), true);
+
+        hookToken.mint(alice, 100 ether);
+        vm.startPrank(alice);
+        hookToken.approve(address(vault), 100 ether);
+        vault.deposit(100 ether);
+        vm.stopPrank();
+
+        vault.submitProposal("bomb", 1 ether, 30 ether, address(bomb));
+        vault.submitProposal("p2", 1 ether, 20 ether, recipient2);
+        _registerAndVote(voter1, 10 ether, 1);
+        _registerAndVote(voter2, 10 ether, 2);
+        vm.warp(block.timestamp + 2 days);
+
+        vault.distributeFunds{gas: 20_000_000}();
+
+        assertEq(vault.getPendingPayout(1), 28.5 ether);
+        assertEq(hookToken.balanceOf(recipient2), 19 ether);
+        assertEq(hookToken.balanceOf(address(fairFund)), 2.5 ether);
+        vm.prank(alice);
+        vault.withdrawRemaining();
+        assertEq(hookToken.balanceOf(alice), 50 ether);
+    }
+
+    /// Tokens whose transfer succeeds but returns nothing are treated as success,
+    /// both in distributeFunds and in retryPayout.
+    function test_TokenReturnsNothing_PaysAndRetries() public {
+        NoReturnTransferToken nrToken = new NoReturnTransferToken();
+        vault = _newVault(address(nrToken));
+        nrToken.mint(alice, 100 ether);
+        vm.startPrank(alice);
+        nrToken.approve(address(vault), 100 ether);
+        vault.deposit(100 ether);
+        vm.stopPrank();
+
+        vault.submitProposal("p1", 1 ether, 30 ether, recipient1);
+        vault.submitProposal("p2", 1 ether, 20 ether, recipient2);
+        _registerAndVote(voter1, 10 ether, 1);
+        _registerAndVote(voter2, 10 ether, 2);
+        nrToken.setBlocked(recipient2, true);
+        vm.warp(block.timestamp + 2 days);
+
+        vault.distributeFunds();
+        assertEq(nrToken.balanceOf(recipient1), 28.5 ether);
+        assertEq(vault.getPendingPayout(1), 0);
+        assertEq(nrToken.balanceOf(address(fairFund)), 2.5 ether);
+        assertEq(vault.getPendingPlatformFee(), 0);
+        assertEq(vault.getPendingPayout(2), 19 ether);
+
+        nrToken.setBlocked(recipient2, false);
+        vault.retryPayout(2);
+        assertEq(nrToken.balanceOf(recipient2), 19 ether);
+        assertEq(vault.getPendingPayout(2), 0);
     }
 }

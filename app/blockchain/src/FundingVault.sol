@@ -425,19 +425,28 @@ contract FundingVault is ReentrancyGuard {
 
     /**
      * @dev Transfers fundingToken and returns false instead of reverting on failure.
-     * Same checks as OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2):
-     * the call must succeed, and return true or return nothing from an address that has code.
+     * Based on OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2), but stricter:
+     * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an address that has code.
+     * Only the first 32 bytes of return data are copied, so a huge revert payload cannot use up the gas.
      */
     function _tryTransfer(address _to, uint256 _amount) private returns (bool) {
-        (bool success, bytes memory data) =
-            address(i_fundingToken).call(abi.encodeCall(IERC20.transfer, (_to, _amount)));
+        address token = address(i_fundingToken);
+        bytes memory callData = abi.encodeCall(IERC20.transfer, (_to, _amount));
+        bool success;
+        uint256 returnSize;
+        uint256 returnValue;
+        assembly ("memory-safe") {
+            success := call(gas(), token, 0, add(callData, 0x20), mload(callData), 0x00, 0x20)
+            returnSize := returndatasize()
+            returnValue := mload(0x00)
+        }
         if (!success) {
             return false;
         }
-        if (data.length == 0) {
-            return address(i_fundingToken).code.length > 0;
+        if (returnSize == 0) {
+            return token.code.length > 0;
         }
-        return data.length >= 32 && abi.decode(data, (uint256)) == 1;
+        return returnSize >= 32 && returnValue == 1;
     }
 
     // Getters //
