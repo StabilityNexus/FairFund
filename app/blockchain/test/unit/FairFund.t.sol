@@ -163,6 +163,14 @@ contract FairFundTest is Test {
         assertEq(votingToken.owner(), address(fundingVault));
     }
 
+    function testVotingPowerTokenDecimalsMatchFundingToken() public {
+        fairFund.deployFundingVault(address(1), address(mockERC20), 1, 10, block.timestamp + 1 days);
+        FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
+        VotingPowerToken votingToken = VotingPowerToken(fundingVault.getVotingPowerToken());
+        assertEq(votingToken.decimals(), mockERC20.decimals());
+        assertEq(votingToken.decimals(), 6);
+    }
+
     function testFundingVaultOwnership() public {
         fairFund.deployFundingVault(address(1), address(mockERC20), 1, 10, block.timestamp + 1 days);
         FundingVault fundingVault = FundingVault(fairFund.getFundingVault(1));
