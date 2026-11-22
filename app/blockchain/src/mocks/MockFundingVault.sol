@@ -65,6 +65,7 @@ contract MockFundingVault is ReentrancyGuard {
     error FundingVault__NoFundsToWithdraw();
     error FundingVault__NoRemainingFundsToWithdraw();
     error FundingVault__WithdrawableAmountTooSmall();
+    error FundingVault__NoPendingPayout();
 
     // Type Declarations //
     struct Proposal {
@@ -97,6 +98,14 @@ contract MockFundingVault is ReentrancyGuard {
     mapping(uint256 proposalId => uint256 votes) private s_votes;
     mapping(address voter => uint256 amountOfVotingTokens) private s_voterToVotingTokens;
     mapping(address user => uint256 amountDeposited) private s_userToDistributionAmountDeposited;
+    /// @dev Payouts that failed during distributeFunds. Reserved for the proposal's recipient.
+    mapping(uint256 proposalId => uint256 amount) private s_pendingPayouts;
+    /// @dev Platform fee that failed to transfer during distributeFunds.
+    uint256 private s_pendingPlatformFee;
+    /// @dev Gas given to each token transfer inside distributeFunds. Plenty for normal ERC20 and
+    /// stablecoin transfers. A recipient hook cannot burn more than this, so the loop can finish.
+    /// A payout that needs more stays pending, and retryPayout forwards all gas.
+    uint256 private constant DISTRIBUTION_TRANSFER_GAS = 200_000;
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
@@ -107,6 +116,8 @@ contract MockFundingVault is ReentrancyGuard {
     event FundsDistributed(uint256 indexed proposalId, address indexed recipient, uint256 indexed amount);
     event RemainingFundsWithdrawn(address indexed user, uint256 amount);
     event PlatformFeeSubmitted(address indexed platform, uint256 amount);
+    event PayoutFailed(uint256 indexed proposalId, address indexed recipient, uint256 amount);
+    event PlatformFeeFailed(address indexed platform, uint256 amount);
 
     modifier tallyDatePassed() {
         // Will always be true
@@ -154,7 +165,10 @@ contract MockFundingVault is ReentrancyGuard {
             revert FundingVault__AmountCannotBeZero();
         }
         s_totalBalanceAvailableForDistribution += _amount;
-        i_fundingToken.transferFrom(msg.sender, address(this), _amount);
+        // Same checks as payouts: a token that returns false is not credited, one that returns nothing works.
+        if (!_tryTokenCall(abi.encodeCall(IERC20.transferFrom, (msg.sender, address(this), _amount)), gasleft())) {
+            revert FundingVault__TransferFailed();
+        }
         s_userToDistributionAmountDeposited[msg.sender] = _amount;
         emit FundingTokenDeposited(msg.sender, _amount);
     }
@@ -288,21 +302,60 @@ contract MockFundingVault is ReentrancyGuard {
                 uint256 fee = (amount * platformFeePercentage) / 100;
                 amount -= fee;
                 feeAmount += fee;
-                bool success = i_fundingToken.transfer(proposal.recipient, amount);
-                if (!success) {
-                    revert FundingVault__TransferFailed();
-                }
+                // The amount is allocated to this proposal whether or not the transfer succeeds,
+                // so depositors' remaining share is the same in both cases.
                 s_totalFundsDistributed += amount + fee;
-                emit FundsDistributed(i, proposal.recipient, amount);
+                if (_tryTransfer(proposal.recipient, amount, DISTRIBUTION_TRANSFER_GAS)) {
+                    emit FundsDistributed(i, proposal.recipient, amount);
+                } else {
+                    // e.g. the token blocked the recipient. Do not revert the whole distribution.
+                    s_pendingPayouts[i] = amount;
+                    emit PayoutFailed(i, proposal.recipient, amount);
+                }
             }
         }
         if (feeAmount > 0) {
-            bool success = i_fundingToken.transfer(address(i_deployer), feeAmount);
-            if (!success) {
-                revert FundingVault__TransferFailed();
+            if (_tryTransfer(address(i_deployer), feeAmount, DISTRIBUTION_TRANSFER_GAS)) {
+                emit PlatformFeeSubmitted(address(i_deployer), feeAmount);
+            } else {
+                s_pendingPlatformFee = feeAmount;
+                emit PlatformFeeFailed(address(i_deployer), feeAmount);
             }
-            emit PlatformFeeSubmitted(address(i_deployer), feeAmount);
         }
+    }
+
+    /**
+     * @dev Retries a payout that failed during distributeFunds.
+     * @notice Anyone can call it. Funds only ever go to the proposal's original recipient.
+     * @param _proposalId The proposal whose payout failed
+     */
+    function retryPayout(uint256 _proposalId) external nonReentrant {
+        uint256 amount = s_pendingPayouts[_proposalId];
+        if (amount == 0) {
+            revert FundingVault__NoPendingPayout();
+        }
+        s_pendingPayouts[_proposalId] = 0;
+        address recipient = s_proposals[_proposalId].recipient;
+        if (!_tryTransfer(recipient, amount, gasleft())) {
+            revert FundingVault__TransferFailed();
+        }
+        emit FundsDistributed(_proposalId, recipient, amount);
+    }
+
+    /**
+     * @dev Retries a platform fee transfer that failed during distributeFunds.
+     * @notice Anyone can call it. The fee only ever goes to the FairFund contract.
+     */
+    function retryPlatformFee() external nonReentrant {
+        uint256 amount = s_pendingPlatformFee;
+        if (amount == 0) {
+            revert FundingVault__NoPendingPayout();
+        }
+        s_pendingPlatformFee = 0;
+        if (!_tryTransfer(address(i_deployer), amount, gasleft())) {
+            revert FundingVault__TransferFailed();
+        }
+        emit PlatformFeeSubmitted(address(i_deployer), amount);
     }
 
     /**
@@ -359,15 +412,58 @@ contract MockFundingVault is ReentrancyGuard {
 
         s_userToDistributionAmountDeposited[msg.sender] = 0;
 
-        bool success = i_fundingToken.transfer(msg.sender, userWithdrawableAmount);
-        if (!success) {
+        // Same transfer rules as distributeFunds, so tokens that return nothing work here too.
+        if (!_tryTransfer(msg.sender, userWithdrawableAmount, gasleft())) {
             revert FundingVault__TransferFailed();
         }
 
         emit RemainingFundsWithdrawn(msg.sender, userWithdrawableAmount);
     }
 
+    /**
+     * @dev Transfers fundingToken and returns false instead of reverting on failure.
+     * @param _gasLimit The most gas the token call may use
+     */
+    function _tryTransfer(address _to, uint256 _amount, uint256 _gasLimit) private returns (bool) {
+        return _tryTokenCall(abi.encodeCall(IERC20.transfer, (_to, _amount)), _gasLimit);
+    }
+
+    /**
+     * @dev Calls fundingToken and returns false instead of reverting on failure.
+     * Based on OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2), but stricter:
+     * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an address that has code.
+     * Only the first 32 bytes of return data are copied, so a huge revert payload cannot use up the gas.
+     * @param _callData The encoded transfer or transferFrom call
+     * @param _gasLimit The most gas the token call may use
+     */
+    function _tryTokenCall(bytes memory _callData, uint256 _gasLimit) private returns (bool) {
+        address token = address(i_fundingToken);
+        bool success;
+        uint256 returnSize;
+        uint256 returnValue;
+        assembly ("memory-safe") {
+            success := call(_gasLimit, token, 0, add(_callData, 0x20), mload(_callData), 0x00, 0x20)
+            returnSize := returndatasize()
+            returnValue := mload(0x00)
+        }
+        if (!success) {
+            return false;
+        }
+        if (returnSize == 0) {
+            return token.code.length > 0;
+        }
+        return returnSize >= 32 && returnValue == 1;
+    }
+
     // Getters //
+    function getPendingPayout(uint256 _proposalId) public view returns (uint256) {
+        return s_pendingPayouts[_proposalId];
+    }
+
+    function getPendingPlatformFee() public view returns (uint256) {
+        return s_pendingPlatformFee;
+    }
+
     function getProposal(uint256 _proposalId) public view returns (string memory, uint256, uint256, address) {
         Proposal memory proposal = s_proposals[_proposalId];
         return (proposal.metadata, proposal.minimumAmount, proposal.maximumAmount, proposal.recipient);
