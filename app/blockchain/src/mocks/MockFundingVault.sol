@@ -237,8 +237,10 @@ contract MockFundingVault is ReentrancyGuard {
         }
 
         uint256 totalVotingPowerTokens = i_votingPowerToken.totalSupply();
+        // Nobody registered, so no proposal can win. Returning 0 instead of reverting lets
+        // distributeFunds finish, so depositors can still withdraw everything.
         if (totalVotingPowerTokens == 0) {
-            revert FundingVault__NoVotingPowerTokenMinted();
+            return 0;
         }
         // Floating point adjustment:
         // 1.totalVotes is multiplied by 1e18 to avoid rounding errors
