@@ -49,6 +49,11 @@ contract FundingVaultTallyBoundaryTest is Test {
     }
 
     function test_AtTallyDate_PreTallyActionsRevert() public {
+        // The attacker registers one second early, so it holds real voting power at the tally second.
+        vm.warp(tally - 1);
+        vm.prank(attacker);
+        vault.register(100e6);
+
         vm.warp(tally);
 
         vm.prank(depositor);
@@ -58,13 +63,14 @@ contract FundingVaultTallyBoundaryTest is Test {
         vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
         vault.submitProposal("late", 1, 100e6, attacker);
 
-        vm.prank(attacker);
+        votingToken.mint(voter, 100e6);
+        vm.prank(voter);
         vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
         vault.register(100e6);
 
-        vm.prank(voter);
+        vm.prank(attacker);
         vm.expectRevert(FundingVault.FundingVault__TallyDatePassed.selector);
-        vault.voteOnProposal(1, 0);
+        vault.voteOnProposal(1, 100e6);
     }
 
     function test_AtTallyDate_ReleaseAndDistributeWork() public {
