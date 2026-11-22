@@ -46,9 +46,11 @@ contract MockVotingPowerToken is ERC20, Ownable {
         _burn(_of, _amount);
     }
 
+    /// @dev The owner (the funding vault) moves tokens without an allowance when a user votes.
+    /// Anyone else needs an allowance, and the tokens move only once.
     function transferFrom(address from, address to, uint256 value) public override returns (bool) {
         if (msg.sender != owner()) {
-            super.transferFrom(from, to, value);
+            return super.transferFrom(from, to, value);
         }
         _transfer(from, to, value);
         return true;
