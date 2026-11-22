@@ -368,8 +368,9 @@ contract FundingVaultPayoutFailureTest is Test {
         assertEq(vault.getPendingPayout(1), 28.5 ether);
     }
 
-    /// Tokens whose transfer succeeds but returns nothing are treated as success,
-    /// both in distributeFunds and in retryPayout.
+    /// Tokens whose transfer succeeds but returns nothing are treated as success everywhere the
+    /// funding token leaves a contract: distributeFunds, retryPayout, withdrawRemaining and
+    /// FairFund.withdrawPlatformFee.
     function test_TokenReturnsNothing_PaysAndRetries() public {
         NoReturnTransferToken nrToken = new NoReturnTransferToken();
         vault = _newVault(address(nrToken));
@@ -397,6 +398,16 @@ contract FundingVaultPayoutFailureTest is Test {
         vault.retryPayout(2);
         assertEq(nrToken.balanceOf(recipient2), 19 ether);
         assertEq(vault.getPendingPayout(2), 0);
+
+        // The depositor gets the remainder and the treasury gets the fee.
+        vm.prank(alice);
+        vault.withdrawRemaining();
+        assertEq(nrToken.balanceOf(alice), 50 ether);
+        assertEq(nrToken.balanceOf(address(vault)), 0);
+
+        fairFund.withdrawPlatformFee(address(nrToken));
+        assertEq(nrToken.balanceOf(fairFund.getTreasury()), 2.5 ether);
+        assertEq(nrToken.balanceOf(address(fairFund)), 0);
     }
 
     /// Two recipients whose token hooks burn all forwarded gas must not make distributeFunds

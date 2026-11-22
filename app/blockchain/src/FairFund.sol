@@ -133,8 +133,7 @@ contract FairFund is Ownable, ReentrancyGuard {
         }
         uint256 platformBalance = IERC20(token).balanceOf(address(this));
         if (platformBalance != 0) {
-            bool success = IERC20(token).transfer(s_treasury, platformBalance);
-            if (!success) {
+            if (!_tryTransfer(token, s_treasury, platformBalance)) {
                 revert FairFund__TransferFailed(token, s_treasury, platformBalance);
             }
             emit TransferTokens(token, s_treasury, platformBalance);
@@ -143,6 +142,31 @@ contract FairFund is Ownable, ReentrancyGuard {
 
     function setTreasury(address _treasury) external onlyOwner {
         s_treasury = _treasury;
+    }
+
+    /**
+     * @dev Transfers a token and returns false instead of reverting on failure. Same rules as
+     * FundingVault._tryTransfer, so fee tokens whose transfer returns nothing can be withdrawn:
+     * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an
+     * address that has code. Only the first 32 bytes of return data are copied.
+     */
+    function _tryTransfer(address _token, address _to, uint256 _amount) private returns (bool) {
+        bytes memory callData = abi.encodeCall(IERC20.transfer, (_to, _amount));
+        bool success;
+        uint256 returnSize;
+        uint256 returnValue;
+        assembly ("memory-safe") {
+            success := call(gas(), _token, 0, add(callData, 0x20), mload(callData), 0x00, 0x20)
+            returnSize := returndatasize()
+            returnValue := mload(0x00)
+        }
+        if (!success) {
+            return false;
+        }
+        if (returnSize == 0) {
+            return _token.code.length > 0;
+        }
+        return returnSize >= 32 && returnValue == 1;
     }
 
     // Getters //

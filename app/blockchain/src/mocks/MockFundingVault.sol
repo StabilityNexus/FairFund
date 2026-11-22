@@ -409,8 +409,8 @@ contract MockFundingVault is ReentrancyGuard {
 
         s_userToDistributionAmountDeposited[msg.sender] = 0;
 
-        bool success = i_fundingToken.transfer(msg.sender, userWithdrawableAmount);
-        if (!success) {
+        // Same transfer rules as distributeFunds, so tokens that return nothing work here too.
+        if (!_tryTransfer(msg.sender, userWithdrawableAmount, gasleft())) {
             revert FundingVault__TransferFailed();
         }
 
