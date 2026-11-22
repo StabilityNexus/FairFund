@@ -54,6 +54,13 @@ contract ReturnBombRecipient is ITransferHook {
     }
 }
 
+/// @dev Recipient whose hook burns all the gas it is given.
+contract GasBurnerRecipient is ITransferHook {
+    function onTokenTransfer(address, uint256) external pure {
+        while (true) {}
+    }
+}
+
 /// @dev Token like USDT on Ethereum: transfer returns nothing. transferFrom returns true so deposits work.
 contract NoReturnTransferToken {
     mapping(address => uint256) public balanceOf;
@@ -326,7 +333,7 @@ contract FundingVaultPayoutFailureTest is Test {
     }
 
     /// A recipient that reverts with a huge payload through a token hook must not make
-    /// distributeFunds run out of gas while copying the revert data.
+    /// distributeFunds or retryPayout run out of gas while copying the revert data.
     function test_ReturnBombRecipient_DoesNotBlockDistribution() public {
         HookERC20 hookToken = new HookERC20();
         vault = _newVault(address(hookToken));
@@ -353,6 +360,12 @@ contract FundingVaultPayoutFailureTest is Test {
         vm.prank(alice);
         vault.withdrawRemaining();
         assertEq(hookToken.balanceOf(alice), 50 ether);
+
+        // retryPayout forwards all gas, so the bomb is as big as it can get here.
+        // The vault still fails cleanly instead of running out of gas.
+        vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
+        vault.retryPayout{gas: 20_000_000}(1);
+        assertEq(vault.getPendingPayout(1), 28.5 ether);
     }
 
     /// Tokens whose transfer succeeds but returns nothing are treated as success,
@@ -384,5 +397,45 @@ contract FundingVaultPayoutFailureTest is Test {
         vault.retryPayout(2);
         assertEq(nrToken.balanceOf(recipient2), 19 ether);
         assertEq(vault.getPendingPayout(2), 0);
+    }
+
+    /// Two recipients whose token hooks burn all forwarded gas must not make distributeFunds
+    /// revert at a normal block gas limit. Their payouts stay pending and everyone else is paid.
+    function test_TwoGasBurnerRecipients_DoNotBlockDistribution() public {
+        HookERC20 hookToken = new HookERC20();
+        vault = _newVault(address(hookToken));
+        GasBurnerRecipient burner1 = new GasBurnerRecipient();
+        GasBurnerRecipient burner2 = new GasBurnerRecipient();
+        hookToken.setHook(address(burner1), true);
+        hookToken.setHook(address(burner2), true);
+
+        hookToken.mint(alice, 100 ether);
+        vm.startPrank(alice);
+        hookToken.approve(address(vault), 100 ether);
+        vault.deposit(100 ether);
+        vm.stopPrank();
+
+        vault.submitProposal("burner1", 1 ether, 20 ether, address(burner1));
+        vault.submitProposal("burner2", 1 ether, 20 ether, address(burner2));
+        vault.submitProposal("honest", 1 ether, 10 ether, recipient2);
+        _registerAndVote(voter1, 10 ether, 1);
+        _registerAndVote(voter2, 10 ether, 2);
+        _registerAndVote(makeAddr("voter3"), 10 ether, 3);
+        vm.warp(block.timestamp + 2 days);
+
+        vault.distributeFunds{gas: 30_000_000}();
+
+        assertEq(vault.getPendingPayout(1), 19 ether);
+        assertEq(vault.getPendingPayout(2), 19 ether);
+        assertEq(hookToken.balanceOf(recipient2), 9.5 ether);
+        assertEq(hookToken.balanceOf(address(fairFund)), 2.5 ether);
+        vm.prank(alice);
+        vault.withdrawRemaining();
+        assertEq(hookToken.balanceOf(alice), 50 ether);
+
+        // A retry that still fails only affects that one payout.
+        vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
+        vault.retryPayout{gas: 5_000_000}(1);
+        assertEq(vault.getPendingPayout(1), 19 ether);
     }
 }

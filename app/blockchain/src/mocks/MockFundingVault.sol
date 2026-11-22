@@ -102,6 +102,10 @@ contract MockFundingVault is ReentrancyGuard {
     mapping(uint256 proposalId => uint256 amount) private s_pendingPayouts;
     /// @dev Platform fee that failed to transfer during distributeFunds.
     uint256 private s_pendingPlatformFee;
+    /// @dev Gas given to each token transfer inside distributeFunds. Plenty for normal ERC20 and
+    /// stablecoin transfers. A recipient hook cannot burn more than this, so the loop can finish.
+    /// A payout that needs more stays pending, and retryPayout forwards all gas.
+    uint256 private constant DISTRIBUTION_TRANSFER_GAS = 200_000;
 
     // Events //
     event FundingTokenDeposited(address indexed from, uint256 indexed amount);
@@ -298,7 +302,7 @@ contract MockFundingVault is ReentrancyGuard {
                 // The amount is allocated to this proposal whether or not the transfer succeeds,
                 // so depositors' remaining share is the same in both cases.
                 s_totalFundsDistributed += amount + fee;
-                if (_tryTransfer(proposal.recipient, amount)) {
+                if (_tryTransfer(proposal.recipient, amount, DISTRIBUTION_TRANSFER_GAS)) {
                     emit FundsDistributed(i, proposal.recipient, amount);
                 } else {
                     // e.g. the token blocked the recipient. Do not revert the whole distribution.
@@ -308,7 +312,7 @@ contract MockFundingVault is ReentrancyGuard {
             }
         }
         if (feeAmount > 0) {
-            if (_tryTransfer(address(i_deployer), feeAmount)) {
+            if (_tryTransfer(address(i_deployer), feeAmount, DISTRIBUTION_TRANSFER_GAS)) {
                 emit PlatformFeeSubmitted(address(i_deployer), feeAmount);
             } else {
                 s_pendingPlatformFee = feeAmount;
@@ -329,7 +333,7 @@ contract MockFundingVault is ReentrancyGuard {
         }
         s_pendingPayouts[_proposalId] = 0;
         address recipient = s_proposals[_proposalId].recipient;
-        if (!_tryTransfer(recipient, amount)) {
+        if (!_tryTransfer(recipient, amount, gasleft())) {
             revert FundingVault__TransferFailed();
         }
         emit FundsDistributed(_proposalId, recipient, amount);
@@ -345,7 +349,7 @@ contract MockFundingVault is ReentrancyGuard {
             revert FundingVault__NoPendingPayout();
         }
         s_pendingPlatformFee = 0;
-        if (!_tryTransfer(address(i_deployer), amount)) {
+        if (!_tryTransfer(address(i_deployer), amount, gasleft())) {
             revert FundingVault__TransferFailed();
         }
         emit PlatformFeeSubmitted(address(i_deployer), amount);
@@ -418,15 +422,16 @@ contract MockFundingVault is ReentrancyGuard {
      * Based on OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2), but stricter:
      * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an address that has code.
      * Only the first 32 bytes of return data are copied, so a huge revert payload cannot use up the gas.
+     * @param _gasLimit The most gas the token call may use
      */
-    function _tryTransfer(address _to, uint256 _amount) private returns (bool) {
+    function _tryTransfer(address _to, uint256 _amount, uint256 _gasLimit) private returns (bool) {
         address token = address(i_fundingToken);
         bytes memory callData = abi.encodeCall(IERC20.transfer, (_to, _amount));
         bool success;
         uint256 returnSize;
         uint256 returnValue;
         assembly ("memory-safe") {
-            success := call(gas(), token, 0, add(callData, 0x20), mload(callData), 0x00, 0x20)
+            success := call(_gasLimit, token, 0, add(callData, 0x20), mload(callData), 0x00, 0x20)
             returnSize := returndatasize()
             returnValue := mload(0x00)
         }
