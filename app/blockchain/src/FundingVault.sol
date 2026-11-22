@@ -115,8 +115,10 @@ contract FundingVault is ReentrancyGuard {
         _;
     }
 
+    /// @dev Must revert at block.timestamp == i_tallyDate too. Otherwise both modifiers pass in that
+    /// second and the same voting tokens can register, vote and be released again and again.
     modifier beforeTallyDate() {
-        if (block.timestamp > i_tallyDate) {
+        if (block.timestamp >= i_tallyDate) {
             revert FundingVault__TallyDatePassed();
         }
         _;

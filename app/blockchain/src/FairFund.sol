@@ -83,7 +83,8 @@ contract FairFund is Ownable, ReentrancyGuard {
         if (_fundingToken == address(0) || _votingToken == address(0)) {
             revert FairFund__CannotBeAZeroAddress();
         }
-        if (_tallyDate < block.timestamp) {
+        // A vault whose tally date is now would be closed for deposits and votes from the start.
+        if (_tallyDate <= block.timestamp) {
             revert FairFund__TallyDateCannotBeInThePast();
         }
         if (_minRequestableAmount > _maxRequestableAmount) {
