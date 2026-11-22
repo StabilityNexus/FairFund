@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, Vm} from "forge-std/Test.sol";
 import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 import {VotingPowerToken} from "../../src/VotingPowerToken.sol";
 
@@ -20,9 +20,13 @@ contract VotingPowerTokenTest is Test {
         vm.prank(holder);
         vpt.approve(spender, 10e18);
 
+        vm.recordLogs();
         vm.prank(spender);
         assertTrue(vpt.transferFrom(holder, receiver, 10e18));
 
+        Vm.Log[] memory logs = vm.getRecordedLogs();
+        assertEq(logs.length, 1); // one Transfer, no second move
+        assertEq(logs[0].topics[0], keccak256("Transfer(address,address,uint256)"));
         assertEq(vpt.balanceOf(receiver), 10e18);
         assertEq(vpt.balanceOf(holder), 90e18);
         assertEq(vpt.allowance(holder, spender), 0);
