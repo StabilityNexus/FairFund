@@ -174,7 +174,10 @@ contract FundingVault is ReentrancyGuard {
             revert FundingVault__AmountCannotBeZero();
         }
         s_totalBalanceAvailableForDistribution += _amount;
-        i_fundingToken.transferFrom(msg.sender, address(this), _amount);
+        // Same checks as payouts: a token that returns false is not credited, one that returns nothing works.
+        if (!_tryTokenCall(abi.encodeCall(IERC20.transferFrom, (msg.sender, address(this), _amount)), gasleft())) {
+            revert FundingVault__TransferFailed();
+        }
         s_userToDistributionAmountDeposited[msg.sender] = _amount;
         emit FundingTokenDeposited(msg.sender, _amount);
     }
@@ -429,19 +432,27 @@ contract FundingVault is ReentrancyGuard {
 
     /**
      * @dev Transfers fundingToken and returns false instead of reverting on failure.
-     * Based on OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2), but stricter:
-     * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an address that has code.
-     * Only the first 32 bytes of return data are copied, so a huge revert payload cannot use up the gas.
      * @param _gasLimit The most gas the token call may use
      */
     function _tryTransfer(address _to, uint256 _amount, uint256 _gasLimit) private returns (bool) {
+        return _tryTokenCall(abi.encodeCall(IERC20.transfer, (_to, _amount)), _gasLimit);
+    }
+
+    /**
+     * @dev Calls fundingToken and returns false instead of reverting on failure.
+     * Based on OpenZeppelin SafeERC20.trySafeTransfer (added in OZ 5.3, this repo uses 5.0.2), but stricter:
+     * the call must succeed, and return a full 32-byte word equal to 1 or return nothing from an address that has code.
+     * Only the first 32 bytes of return data are copied, so a huge revert payload cannot use up the gas.
+     * @param _callData The encoded transfer or transferFrom call
+     * @param _gasLimit The most gas the token call may use
+     */
+    function _tryTokenCall(bytes memory _callData, uint256 _gasLimit) private returns (bool) {
         address token = address(i_fundingToken);
-        bytes memory callData = abi.encodeCall(IERC20.transfer, (_to, _amount));
         bool success;
         uint256 returnSize;
         uint256 returnValue;
         assembly ("memory-safe") {
-            success := call(_gasLimit, token, 0, add(callData, 0x20), mload(callData), 0x00, 0x20)
+            success := call(_gasLimit, token, 0, add(_callData, 0x20), mload(_callData), 0x00, 0x20)
             returnSize := returndatasize()
             returnValue := mload(0x00)
         }

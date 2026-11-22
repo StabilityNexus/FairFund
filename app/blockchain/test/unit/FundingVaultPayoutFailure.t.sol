@@ -61,7 +61,7 @@ contract GasBurnerRecipient is ITransferHook {
     }
 }
 
-/// @dev Token like USDT on Ethereum: transfer returns nothing. transferFrom returns true so deposits work.
+/// @dev Token like USDT on Ethereum: transfer and transferFrom return nothing.
 contract NoReturnTransferToken {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
@@ -82,17 +82,29 @@ contract NoReturnTransferToken {
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) external {
         allowance[from][msg.sender] -= amount;
         balanceOf[from] -= amount;
         balanceOf[to] += amount;
-        return true;
     }
 
     function transfer(address to, uint256 amount) external {
         require(!isBlocked[to], "blocked");
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
+    }
+}
+
+/// @dev Token whose transferFrom returns false without moving anything.
+contract FalseTransferFromToken is ERC20 {
+    constructor() ERC20("False From", "FFROM") {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+
+    function transferFrom(address, address, uint256) public pure override returns (bool) {
+        return false;
     }
 }
 
@@ -368,8 +380,8 @@ contract FundingVaultPayoutFailureTest is Test {
         assertEq(vault.getPendingPayout(1), 28.5 ether);
     }
 
-    /// Tokens whose transfer succeeds but returns nothing are treated as success everywhere the
-    /// funding token leaves a contract: distributeFunds, retryPayout, withdrawRemaining and
+    /// Tokens whose transfer and transferFrom succeed but return nothing work everywhere the
+    /// funding token moves: deposit, distributeFunds, retryPayout, withdrawRemaining and
     /// FairFund.withdrawPlatformFee.
     function test_TokenReturnsNothing_PaysAndRetries() public {
         NoReturnTransferToken nrToken = new NoReturnTransferToken();
@@ -404,6 +416,9 @@ contract FundingVaultPayoutFailureTest is Test {
         vault.withdrawRemaining();
         assertEq(nrToken.balanceOf(alice), 50 ether);
         assertEq(nrToken.balanceOf(address(vault)), 0);
+        vm.prank(alice);
+        vm.expectRevert(FundingVault.FundingVault__NoFundsToWithdraw.selector);
+        vault.withdrawRemaining();
 
         fairFund.withdrawPlatformFee(address(nrToken));
         assertEq(nrToken.balanceOf(fairFund.getTreasury()), 2.5 ether);
@@ -448,5 +463,20 @@ contract FundingVaultPayoutFailureTest is Test {
         vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
         vault.retryPayout{gas: 5_000_000}(1);
         assertEq(vault.getPendingPayout(1), 19 ether);
+    }
+
+    /// A token whose transferFrom returns false must not be credited as a deposit.
+    function test_DepositWithFalseTransferFrom_IsNotCredited() public {
+        FalseTransferFromToken badToken = new FalseTransferFromToken();
+        vault = _newVault(address(badToken));
+        badToken.mint(alice, 10 ether);
+        vm.startPrank(alice);
+        badToken.approve(address(vault), 10 ether);
+        vm.expectRevert(FundingVault.FundingVault__TransferFailed.selector);
+        vault.deposit(10 ether);
+        vm.stopPrank();
+
+        assertEq(vault.getTotalBalanceAvailbleForDistribution(), 0);
+        assertEq(badToken.balanceOf(address(vault)), 0);
     }
 }

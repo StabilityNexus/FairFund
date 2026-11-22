@@ -124,7 +124,8 @@ contract FairFund is Ownable, ReentrancyGuard {
     }
 
     /**
-     * @notice Withdraws the accumulated platform fees to a specified recipient (only callable by the owner)
+     * @notice Sends this contract's whole balance of `token` to the treasury. Anyone can call it,
+     * but the tokens only ever go to the treasury set by the owner.
      * @param token The address of the token to withdraw
      */
     function withdrawPlatformFee(address token) external nonReentrant {
