@@ -101,4 +101,12 @@ contract FundingVaultTallyBoundaryTest is Test {
         vm.stopPrank();
         assertEq(vault.getTotalVotingPowerTokensMinted(), 1000e6);
     }
+
+    /// A vault with tallyDate == now would be closed from the start, so it cannot be created.
+    function test_DeployWithTallyDateNow_Reverts() public {
+        vm.expectRevert(FairFund.FairFund__TallyDateCannotBeInThePast.selector);
+        fairFund.deployFundingVault(address(fundingToken), address(votingToken), 1, 100e6, block.timestamp);
+
+        fairFund.deployFundingVault(address(fundingToken), address(votingToken), 1, 100e6, block.timestamp + 1);
+    }
 }
